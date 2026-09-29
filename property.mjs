@@ -1,5 +1,6 @@
 // Decree 2330 p. 31(з–к): object-by-object evaluation. Facts that cannot be
 // established from the form are returned as review items, not guessed.
+import {incomeWindow} from './engine.mjs';
 const excluded = item => item.wardOwned || item.seized || item.registrationBan ||
   (item.supported && ['apartment','house','land'].includes(item.type)) ||
   (item.auxiliaryExcluded && item.type==='nonresidential') || item.familyShare <= 1/3;
@@ -46,10 +47,31 @@ export function checkDepositInterest(accounts, {applicationMonth,perCapitaMinimu
   const appIndex=Number(applicationMonth.slice(0,4))*12+Number(applicationMonth.slice(5,7))-1;
   const activeInterest=accounts.reduce((sum,account)=>{
     if(!Number.isFinite(account.interestForRelevantTaxYear))return NaN;
+    if(account.nominalWardAccount)return sum;
     const closed=account.closedMonth;
     const closedIndex=closed?Number(closed.slice(0,4))*12+Number(closed.slice(5,7))-1:null;
     return sum+(closedIndex!==null&&closedIndex<=appIndex-6?0:account.interestForRelevantTaxYear);
   },0);
   if(!Number.isFinite(activeInterest))return {status:'unknown'};
   return {status:activeInterest>perCapitaMinimum?'no':'yes',interestForThreshold:activeInterest};
+}
+
+// P. 50: normally 1/12 of tax-year interest for each month in the 12-month
+// window that belongs to that year. If p. 31(k) denial applies, count the full
+// tax-year interest. Closed accounts can avoid that denial but still enter
+// income; qualifying ward nominal accounts are excluded under p. 53(щ).
+export function depositIncomeForApplication(accounts,{applicationMonth,perCapitaMinimum}) {
+  if(Array.isArray(accounts) && !accounts.length)return {status:'known',amount:0,thresholdStatus:'yes',method:'none',months:0};
+  if(!applicationMonth || !Number.isFinite(perCapitaMinimum) || perCapitaMinimum<=0)return {status:'unknown',reason:'Нужен ПМ на душу населения'};
+  const taxYear=Number(applicationMonth.slice(0,4))-1;
+  const relevant=accounts.filter(a=>!a.nominalWardAccount);
+  if(relevant.some(a=>a.taxYear!==taxYear || !Number.isFinite(a.interestForRelevantTaxYear) || a.interestForRelevantTaxYear<0))
+    return {status:'unknown',reason:`Нужны проценты всех счетов за ${taxYear} год`};
+  const threshold=checkDepositInterest(relevant,{applicationMonth,perCapitaMinimum});
+  if(threshold.status==='unknown')return threshold;
+  const annual=relevant.reduce((sum,a)=>sum+a.interestForRelevantTaxYear,0);
+  const months=incomeWindow(applicationMonth).filter(m=>Number(m.slice(0,4))===taxYear).length;
+  return {status:'known',amount:threshold.status==='no'?annual:annual*months/12,
+    taxYear,months,thresholdStatus:threshold.status,thresholdInterest:threshold.interestForThreshold,
+    method:threshold.status==='no'?'full-due-to-threshold':'prorated'};
 }
