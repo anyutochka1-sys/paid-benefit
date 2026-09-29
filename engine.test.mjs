@@ -28,6 +28,18 @@ test('pregnancy of twelve weeks on application date overrides minimum', () => {
   assert.equal(minimumIncomeTest({ pregnancyWeeksAtApplication:12 }, '2026-09', 27093).minimum, 0);
 });
 
+test('qualifying salary must be tested for each adult, child benefits cannot satisfy 8 MROT',()=>{
+  const window=incomeWindow('2026-09');
+  const salary={income:Object.fromEntries(window.map(m=>[m,[{type:'employment',amount:18000}]]))};
+  const childBenefits={income:Object.fromEntries(window.map(m=>[m,[{type:'childBenefit',amount:19243}]]))};
+  const applicant=minimumIncomeTest(salary,'2026-09',27093);
+  const spouse=minimumIncomeTest(childBenefits,'2026-09',27093);
+  assert.equal(applicant.earned,216000);
+  assert.equal(applicant.passed,false);
+  assert.equal(spouse.earned,0);
+  assert.equal(spouse.passed,false);
+});
+
 test('unknown next-year PM cannot be presented as approved', () => {
   assert.equal(assessMonth({ familySizeByMonth:{ '2027-01':3 }, pmByYear:{ 2026:{perCapita:20000} } }, '2027-01').status, 'unknown');
 });
