@@ -12,6 +12,7 @@ import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
 import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs';
+import {pregnancyTier} from './pregnancy.mjs';
 const $ = id => document.getElementById(id);
 function updatePmSelection() {
   const year=Number($('start').value.slice(0,4));
@@ -64,7 +65,7 @@ const sourceSection=document.createElement('section');
 sourceSection.className='source-picker';
 const sourceGroups=[
   ['Чаще всего',[['employment','Зарплата / ГПХ'],['pension','Пенсия / больничный'],['unemploymentBenefit','Пособие по безработице'],['otherBenefit','Другие пособия'],['childBenefit','Единое пособие на детей'],['alimony','Алименты'],['deposit','Проценты по вкладам'],['lottery','Выигрыш в лотерею']]],
-  ['Другие поступления',[['childIncome','Доходы детей'],['maternity','Пособие по беременности и родам'],['selfEmployed','Самозанятость'],['business','ИП'],['scholarship','Стипендия'],['military','Денежное довольствие'],['rent','Аренда'],['propertySale','Продажа имущества'],['securities','Ценные бумаги / дивиденды'],['copyright','Авторские выплаты'],['foreignEarned','Заработок за рубежом']]]
+  ['Другие поступления',[['childIncome','Доходы детей'],['maternity','Пособие по беременности и родам'],['selfEmployed','Самозанятость'],['business','ИП'],['scholarship','Стипендия'],['academicMedical','Выплата в медакадемическом отпуске'],['guardianReward','Вознаграждение приёмного родителя'],['successorPayment','Выплата правопреемнику'],['publicDuty','Компенсация за общественные обязанности'],['military','Денежное довольствие'],['rationCompensation','Компенсация вместо пайка'],['judgeAllowance','Содержание судьи в отставке'],['serviceSeverance','Выплата при увольнении со службы'],['rent','Аренда'],['propertySale','Продажа имущества'],['securities','Ценные бумаги / дивиденды'],['copyright','Авторские выплаты'],['foreignEarned','Заработок за рубежом']]]
 ];
 sourceSection.innerHTML='<h3>Какие поступления были в семье?</h3><p class="hint">Отметьте все виды. Дальше откроются только нужные поля. Если ничего не было, отметьте это отдельно.</p>'+sourceGroups.map(([title,items],index)=>`${index?'<details><summary>Другие виды дохода</summary>':''}<fieldset><legend>${title}</legend><div class="source-grid">${items.map(([key,label])=>`<label class="check"><input type="checkbox" value="${key}"> ${label}</label>`).join('')}</div></fieldset>${index?'</details>':''}`).join('')+'<label class="check"><input id="no-income" type="checkbox"> Никаких поступлений из перечисленных не было</label>';
 const incomePanel=$('income-people').closest('.panel');
@@ -100,15 +101,16 @@ function renderExtraRows() {
   additionalEntries.forEach((entry,index)=>{
     const row=document.createElement('div');row.className='form-row';
     if(!sourceEnabled.has(entry.type))return;
-    row.innerHTML=`<label>Кто получил<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><strong>${ADDITIONAL_TYPES[entry.type].label}</strong><label>Сумма, ₽<input class="amount" type="number" min="0"></label><label class="tax-field">Налоговый год<input class="tax-year" type="number" min="2024" max="2030"></label><label class="from-field">С какого месяца<input class="from" type="month"></label><label class="to-field">По какой месяц включительно<input class="to" type="month"></label><button class="remove" type="button">Убрать</button>`;
+    row.innerHTML=`<label>Кто получил<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><strong>${ADDITIONAL_TYPES[entry.type].label}</strong><label>${entry.type==='securities'?'Доход до расходов':'Сумма'}, ₽<input class="amount" type="number" min="0"></label><label class="expenses-field">Расходы по операциям, ₽<input class="expenses" type="number" min="0"></label><label class="tax-field">Налоговый год<input class="tax-year" type="number" min="2024" max="2030"></label><label class="from-field">С какого месяца<input class="from" type="month"></label><label class="to-field">По какой месяц включительно<input class="to" type="month"></label><button class="remove" type="button">Убрать</button>`;
     row.querySelector('.person').value=String(entry.personIndex);
     row.querySelector('.amount').value=entry.amount??'';
+    row.querySelector('.expenses').value=entry.expenses??'';
     row.querySelector('.tax-year').value=entry.taxYear??'';
     row.querySelector('.from').value=entry.from||'';
     row.querySelector('.to').value=entry.to||'';
-    const toggle=()=>{const annual=ADDITIONAL_TYPES[entry.type].period==='annual';row.querySelector('.tax-field').hidden=!annual;row.querySelector('.from-field').hidden=annual;row.querySelector('.to-field').hidden=annual};
-    for(const [selector,key] of [['.person','personIndex'],['.amount','amount'],['.tax-year','taxYear'],['.from','from'],['.to','to']])
-      row.querySelector(selector).oninput=e=>{entry[key]=['personIndex','amount','taxYear'].includes(key)?e.target.value===''?null:Number(e.target.value):e.target.value;toggle();render()};
+    const toggle=()=>{const annual=ADDITIONAL_TYPES[entry.type].period==='annual';row.querySelector('.tax-field').hidden=!annual;row.querySelector('.from-field').hidden=annual;row.querySelector('.to-field').hidden=annual;row.querySelector('.expenses-field').hidden=entry.type!=='securities'};
+    for(const [selector,key] of [['.person','personIndex'],['.amount','amount'],['.expenses','expenses'],['.tax-year','taxYear'],['.from','from'],['.to','to']])
+      row.querySelector(selector).oninput=e=>{entry[key]=['personIndex','amount','expenses','taxYear'].includes(key)?e.target.value===''?null:Number(e.target.value):e.target.value;toggle();render()};
     row.querySelector('.remove').onclick=()=>{additionalEntries.splice(index,1);renderExtraRows();render()};
     $('extra-entries').append(row);toggle();
   });
@@ -392,7 +394,7 @@ function render() {
     if(receiving && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните фактически поступившие алименты и период'}
     if(alimonyChildren.length && maritalStatus==='divorced' && !['court','court-order','bailiffs'].includes($('alimony-kind').value) && !['sole','other'].includes(secondParent)) {alimony.status='unknown';alimony.reason=secondParent==='mixed'?'У детей разные вторые родители: укажите отдельные алиментные обязательства; общий расчёт сейчас недоступен':'Уточните статус второго родителя у детей, указанных в алиментном обязательстве'}
     let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
-    const incomeText=scenarios.length?scenarios.map((group,scenarioIndex)=>{
+    const incomeText=selected.length?scenarios.map((group,scenarioIndex)=>{
       const awardChecks=group.map(child=>awardConflict(child,month,{jointRenewal}));
       if(awardChecks.some(check=>check.status==='block'))scenarioBlocks=true;
       if(awardChecks.some(check=>['unknown','review'].includes(check.status)))scenarioComplete=false;
@@ -415,8 +417,22 @@ function render() {
       const newbornText=newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'';
       const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
       return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+alimony.reason+')'}. Доходы детей: ${childEarnings.status==='known'?`${childEarnings.amount.toLocaleString('ru-RU')} ₽`:'уточнить ('+childEarnings.issues.join('; ')+')'}. Дополнительные источники: ${supplemental.status==='known'?`${supplemental.amount.toLocaleString('ru-RU')} ₽`:'уточнить вид, сумму и период'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. БиР за вошедшие месяцы: ${maternityIncome.status==='known'?`${maternityIncome.amount.toLocaleString('ru-RU')} ₽`:'уточнить период начисления'}. ${newbornText} ${regularText}`;
-    }).join(' '):'Отметьте хотя бы одного ребёнка для заявления.';
-    if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
+    }).join(' '):$('pregnancy-applying').checked?'Заявление на ребёнка не выбрано.':'Отметьте ребёнка или заявление по беременности.';
+    let pregnancyText='';
+    if($('pregnancy-applying').checked) {
+      if(selected.length) pregnancyText='Пособие беременной вместе с детским: совместная ступень пока не рассчитывается, требуется отдельная проверка обеих назначаемых выплат.';
+      else if(month!==start) pregnancyText='По беременности: для будущего месяца уточните срок на дату подачи и дату окончания беременности.';
+      else if($('pregnancy-registered').value!=='yes') pregnancyText=$('pregnancy-registered').value==='no'?'По беременности: нужна постановка на учёт в ранний срок.':'По беременности: уточните постановку на учёт до 12 недель.';
+      else if($('weeks').value==='') pregnancyText='По беременности: укажите срок на дату подачи.';
+      else if(Number($('weeks').value)<12) pregnancyText='По беременности: обратиться за назначением можно после наступления 12 недель.';
+      else {
+        const pregnancyBenefits=childBenefitIncome(benefitRows.payments,children,[],month,filingDate);
+        const pregnancyIncome=!sourceComplete||incomeResult.total===null||pregnancyBenefits.total===null||benefitRows.missing.length||pregnancyBenefits.missing.length||alimony.status!=='known'||depositIncome.status!=='known'||maternityIncome.status!=='known'||supplemental.status!=='known'||childEarnings.status!=='known'?null:incomeResult.total+pregnancyBenefits.total+alimony.amount+depositIncome.amount+maternityIncome.amount+supplemental.amount+childEarnings.amount;
+        const result=pregnancyTier({income12:pregnancyIncome,familySize:members.unanswered.length?null:members.included.length,pmPerson,pmWorking:pm.status==='known'?pm.working:null});
+        pregnancyText=result.status==='estimate'?`По беременности: предварительная ступень ${result.tier}% от ПМ трудоспособных (${result.monthly.toLocaleString('ru-RU')} ₽ в месяц); сроки выплаты и остальные критерии ещё требуют проверки.`:result.status==='income-too-high'?'По беременности: доход выше указанного ПМ на человека.':'По беременности: для ступени нужны подтверждённые доходы и ПМ.';
+      }
+    }
+    if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
     // An entered 12-week condition is applicable only to the selected month.
     const adults=countedAdults.map(({person,index:j})=>{
       const income=Object.fromEntries(incomeWindow(month).map(m=>[m,[...(Number.isFinite(baseMonths(person)[m])?[{type:person.incomeType,amount:baseMonths(person)[m]}]:[]),...(supplemental.byPerson.get(j)?.[m]?.qualifying?[{type:'employment',amount:supplemental.byPerson.get(j)[m].qualifying}]:[])]]));
@@ -436,8 +452,8 @@ function render() {
     const contextReview=addressReview||priorMeasureReview;
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'не указаны'}.`;
     const explicitBlockers=applicantCheck==='no'||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
-    const headline=shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':explicitBlockers?'Есть препятствие по введённым данным':scenarioComplete&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
-    output.push(`<div class="result"><strong>${filingDate}<small> · доходы ${incomeWindow(month)[0]} — ${incomeWindow(month).at(-1)}</small></strong><span class="${explicitBlockers?'bad':'unknown'}">${headline}. ${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}</span></div>`);
+    const headline=shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':explicitBlockers?'Есть препятствие по введённым данным':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
+    output.push(`<div class="result"><strong>${filingDate}<small> · доходы ${incomeWindow(month)[0]} — ${incomeWindow(month).at(-1)}</small></strong><span class="${explicitBlockers?'bad':'unknown'}">${headline}. ${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}</span></div>`);
   }
   $('results').innerHTML=output.join('');
 }
@@ -450,7 +466,7 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
  $('start').addEventListener('input',()=>{renderIncomeForm();updatePmSelection()});
  $('pm-region').addEventListener('input',updatePmSelection);
  $('pm-area').addEventListener('input',render);
-['applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','sole-guardian','day','weeks','large-family','grace-used','disability','support-car','rural'].forEach(id=>$(id).addEventListener('input',render));
+['applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','large-family','grace-used','disability','support-car','rural'].forEach(id=>$(id).addEventListener('input',render));
 renderIncomeForm();
 updatePmSelection();
 
