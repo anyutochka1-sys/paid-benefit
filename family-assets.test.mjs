@@ -1,0 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {ageAt,includedFamily,childCanApply,checkCars} from './family-assets.mjs';
+
+test('age changes on birthday, including child application cut-off at 17',()=>{
+  assert.equal(ageAt('2009-10-01','2026-09-30'),16);
+  assert.equal(childCanApply({birthDate:'2009-10-01',russianCitizen:true,livesInRussia:true},'2026-10-01').status,'no');
+});
+test('full-time unmarried 22-year-old counts, married and 23-year-old do not',()=>{
+  const child={role:'child',birthDate:'2004-10-01',married:false,fullTimeStudent:true};
+  assert.equal(includedFamily([child],'2026-09-29').included.length,1);
+  assert.equal(includedFamily([{...child,married:true}],'2026-09-29').included.length,0);
+  assert.equal(includedFamily([child],'2027-10-01').included.length,0);
+});
+test('powerful car cutoff is 250 hp, and five-year cutoff is inclusive',()=>{
+  const context={applicationYear:2026,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false,fourOrMoreChildren:false};
+  assert.equal(checkCars([{manufactureYear:2021,horsepower:250}],context).status,'no');
+  assert.equal(checkCars([{manufactureYear:2020,horsepower:250}],context).status,'yes');
+  assert.equal(checkCars([{manufactureYear:2021,horsepower:249}],context).status,'yes');
+});
+test('two cars allowed for qualifying family, but not three',()=>{
+  const context={applicationYear:2026,multipleChildren:true,disabledFamilyMember:false,supportVehicle:false,fourOrMoreChildren:false};
+  assert.equal(checkCars([{manufactureYear:2015,horsepower:80},{manufactureYear:2016,horsepower:90}],context).status,'yes');
+  assert.equal(checkCars([{manufactureYear:2015,horsepower:80},{manufactureYear:2016,horsepower:90},{manufactureYear:2017,horsepower:70}],context).status,'no');
+});
