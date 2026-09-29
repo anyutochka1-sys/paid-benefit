@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {additionalIncomeForApplication} from './extra-income.mjs';
+import {additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs';
 
 test('tax-year rental income is spread across the five overlapping months',()=>{
   const r=additionalIncomeForApplication([{personIndex:0,type:'rent',taxYear:2025,amount:120000}],'2026-09');
@@ -47,6 +47,19 @@ test('employer birth aid excludes only the verified tax-free part paid in the fi
   assert.equal(additionalIncomeForApplication([{...base,birthAidFirstYear:true}],'2026-09').status,'unknown');
   assert.equal(additionalIncomeForApplication([{...base,birthAidFirstYear:true,taxExemptAmount:130000}],'2026-09').status,'unknown');
   assert.equal(additionalIncomeForApplication([{...base,birthAidFirstYear:true,taxExemptAmount:100000,to:'2026-04'}],'2026-09').status,'unknown');
+});
+
+test('foreign income uses the CBR rate on the last day of the twelfth lookback month',()=>{
+  assert.equal(foreignRateDate('2026-09'),'2026-07-31');
+  assert.equal(foreignRateDate('2026-10'),'2026-08-31');
+  const entry={personIndex:0,type:'foreignEarned',from:'2026-05',to:'2026-07',amount:100,currency:'USD',rublesPerUnit:80,rateDate:'2026-07-31'};
+  const september=additionalIncomeForApplication([entry],'2026-09');
+  assert.equal(september.amount,24000);
+  assert.equal(september.byPerson.get(0)['2026-06'].qualifying,8000);
+  const october=additionalIncomeForApplication([entry],'2026-10');
+  assert.equal(october.status,'unknown');
+  assert.match(october.issues[0],/2026-08-31/);
+  assert.equal(additionalIncomeForApplication([{...entry,rateDate:'2026-08-31',rublesPerUnit:81}],'2026-10').amount,24300);
 });
 
 test('income of an excluded spouse is omitted from the household',()=>{
