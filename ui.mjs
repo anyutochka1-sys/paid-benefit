@@ -13,6 +13,7 @@ import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
 import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs';
 import {pregnancyTier} from './pregnancy.mjs';
+import {confirmedRegionalWage} from './rosstat-wages.mjs';
 const $ = id => document.getElementById(id);
 function updatePmSelection() {
   const year=Number($('start').value.slice(0,4));
@@ -25,6 +26,7 @@ function updatePmSelection() {
   pmAreas(year,region.value).forEach(name=>area.add(new Option(name,name)));
   if([...area.options].some(o=>o.value===oldArea))area.value=oldArea;
   area.closest('label').hidden=area.options.length===1;
+  if(region.value!==oldRegion){alimonyWageRecords.clear();lastWageRegion=region.value;renderAlimonyWageYears()}
   render();
 }
 const types = [
@@ -55,11 +57,20 @@ $('income-people').after(benefitsSection);
 const alimonySection=document.createElement('section');
 alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><label id="spouse-status-field" hidden>Статус нынешнего супруга на дату заявления<select id="spouse-status"><option value="unknown">Уточните</option><option value="ordinary">Входит в состав семьи</option><option value="parentalRightsLost">Лишён / ограничен в правах на ребёнка из заявления</option><option value="stateCare">На полном государственном обеспечении</option><option value="conscript">Служба по призыву / военный курсант без контракта</option><option value="imprisoned">Отбывает лишение свободы</option><option value="forcedTreatment">На принудительном лечении по решению суда</option><option value="custody">Заключён под стражу</option><option value="missing">Признан безвестно отсутствующим / объявлен умершим</option><option value="wanted">Находится в розыске</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><p class="hint">Отметьте детей одного алиментного обязательства в их карточках. Если дети от разных вторых родителей, потребуется отдельный расчёт по каждому обязательству. Статус второго родителя укажите в карточке ребёнка. Лишение свободы и лишение родительских прав сами по себе не означают статус единственного родителя.</p><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
 const alimonyWageRecords=new Map(),wageFields=alimonySection.querySelector('#alimony-wage-fields');
+let rosstatAnnualTable=null,lastWageRegion='';
+function wageRecordFor(year) {
+  const manual=alimonyWageRecords.get(year);
+  if(manual)return manual;
+  const code=$('pm-region').value;
+  const name=pmRegions(2026).find(region=>region.code===code)?.name;
+  const automatic=confirmedRegionalWage(rosstatAnnualTable,year,code,name);
+  return automatic.status==='known'?automatic:null;
+}
 function renderAlimonyWageYears() {
   const year=Number(($('start').value||'2026-09').slice(0,4));
-  wageFields.innerHTML='<p class="hint">Введите окончательные годовые данные Росстата за оба года. Новые значения применяются с месяца после публикации; до этого используется предыдущий год. <a href="https://rosstat.gov.ru/labor_market_employment_salaries" target="_blank" rel="noopener">Раздел зарплат Росстата</a>.</p>';
-  for(const y of [year-2,year-1]) {
-    const record=alimonyWageRecords.get(y)||{},row=document.createElement('div');row.className='form-row';row.dataset.year=String(y);
+  wageFields.innerHTML='<p class="hint">Окончательные годовые данные Росстата подставляются после еженедельной сверки и подтверждения даты публикации. До этого их можно указать вручную; предварительные данные не подставляются. Для будущего года окно останется открытым до публикации. <a href="https://rosstat.gov.ru/labor_market_employment_salaries" target="_blank" rel="noopener">Раздел зарплат Росстата</a>.</p>';
+  for(const y of [year-2,year-1,year]) {
+    const record=wageRecordFor(y)||{},row=document.createElement('div');row.className='form-row';row.dataset.year=String(y);
     row.innerHTML=`<strong>За ${y} год</strong><label>Средняя зарплата региона, ₽<input class="wage-amount" type="number" min="0"></label><label>Месяц публикации окончательных данных Росстата<input class="wage-published" type="month"></label><label class="check"><input class="wage-final" type="checkbox"> Это окончательные годовые данные</label>`;
     row.querySelector('.wage-amount').value=record.amount??'';
     row.querySelector('.wage-published').value=record.publishedMonth||'';
@@ -426,7 +437,7 @@ function render() {
       childrenForAlimony:alimonyChildren.length,
       declaredMonthly:$('alimony-kind').value==='notary'&&maritalStatus==='divorced'?($('notary-amount').value===''?NaN:Number($('notary-amount').value)):(receiving?(alimonyMonthly===''?NaN:Number(alimonyMonthly)):0),
       declaredByMonth:$('alimony-kind').value==='informal' && receiving && alimonyFrom && alimonyTo && alimonyMonthly!==''?courtAmounts:undefined,
-      receivedByMonth:courtAmounts,wageRecords:[...alimonyWageRecords.values()]
+      receivedByMonth:courtAmounts,wageRecords:[year-2,year-1].map(wageRecordFor).filter(Boolean)
     },month):{status:'unknown',reason:'Укажите семейное положение'};
     if(!alimonyChildren.length && !receiving) {alimony.status='known';alimony.amount=0;alimony.method='no-eligible-child'}
     if(!alimonyChildren.length && receiving) {alimony.status='unknown';alimony.reason='Уточните, кому перечислялись алименты: на ребёнка вне состава семьи они не учитываются'}
@@ -503,7 +514,7 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
  $('add-adult').onclick=()=>{if(incomePeople.length===1)incomePeople.push({label:'Супруг(а)',months:{},total:null,incomeType:'employment'});renderIncomeForm();render()};
  $('income-mode').addEventListener('input',()=>{renderIncomeForm();render()});
  $('start').addEventListener('input',()=>{renderIncomeForm();renderExtraRows();renderAlimonyWageYears();updatePmSelection()});
- $('pm-region').addEventListener('input',updatePmSelection);
+ $('pm-region').addEventListener('input',()=>{const code=$('pm-region').value;if(code!==lastWageRegion)alimonyWageRecords.clear();lastWageRegion=code;updatePmSelection();renderAlimonyWageYears()});
  $('pm-area').addEventListener('input',render);
 ['applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','large-family','grace-used','disability','support-car','rural'].forEach(id=>$(id).addEventListener('input',render));
 renderIncomeForm();
@@ -531,3 +542,4 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>showStep(currentStep+1);
 showStep(0);
+fetch('./data/rosstat-wages.json').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
