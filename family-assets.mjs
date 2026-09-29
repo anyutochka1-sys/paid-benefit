@@ -15,7 +15,14 @@ export function ageAt(birthDate, applicationDate) {
 export function includedFamily(people, applicationDate) {
   const included=[], excluded=[], unanswered=[];
   for (const person of people) {
-    if (['applicant', 'spouse'].includes(person.role)) { included.push(person); continue; }
+    if (person.role==='applicant') { included.push(person); continue; }
+    if (person.role==='spouse') {
+      if(person.familyStatus==='unknown') unanswered.push({person,reason:'Уточните статус супруга по пункту 46'});
+      else if(['parentalRightsLost','stateCare','conscript','imprisoned','forcedTreatment','custody','missing','wanted'].includes(person.familyStatus))
+        excluded.push({person,reason:'Супруг исключён из состава семьи по пункту 46'});
+      else included.push(person);
+      continue;
+    }
     if (!['child', 'ward'].includes(person.role)) { unanswered.push({person, reason:'Неизвестная роль в семье'}); continue; }
     if (!person.birthDate || person.married === undefined) { unanswered.push({person, reason:'Нужны дата рождения и семейное положение'}); continue; }
     const age=ageAt(person.birthDate, applicationDate);
