@@ -13,7 +13,7 @@ export const ADDITIONAL_TYPES = {
   rationCompensation:{label:'Денежная компенсация вместо продовольственного пайка',period:'monthly',qualifies:true},
   judgeAllowance:{label:'Пожизненное содержание судьи в отставке',period:'monthly',qualifies:true},
   serviceSeverance:{label:'Единовременное пособие при увольнении со службы',period:'monthly',qualifies:false},
-  otherBenefit:{label:'Иное пособие / компенсация, учитываемое в доходе',period:'monthly',qualifies:false},
+  otherBenefit:{label:'Другое пособие или компенсация',period:'monthly',qualifies:false},
   unemploymentBenefit:{label:'Пособие по безработице',period:'monthly',qualifies:false},
   lottery:{label:'Выигрыш в лотерею / тотализаторе',period:'monthly',qualifies:false},
   selfEmployed:{label:'Самозанятость',period:'monthly',qualifies:true},
@@ -25,12 +25,27 @@ export const ADDITIONAL_TYPES = {
   copyright:{label:'Авторский доход',period:'annual',qualifies:true}
 };
 
+// Decree 2330 p. 53. Only unmistakable categories are offered here; a
+// conditional payment (for example some uses of maternity capital) must be
+// classified after its statutory purpose is known.
+export const OTHER_BENEFIT_KINDS = {
+  counted:{label:'Иное учитываемое пособие / компенсация',excluded:false},
+  maternityCapitalMonthly:{label:'Ежемесячная выплата из материнского капитала на ребёнка до 3 лет',excluded:true},
+  socialContract:{label:'Государственная социальная помощь по социальному контракту',excluded:true},
+  taxRefund:{label:'Возврат НДФЛ из-за налогового вычета',excluded:true},
+  funeral:{label:'Социальное пособие на погребение',excluded:true},
+  emergencyAid:{label:'Единовременная помощь в связи с ЧС или терактом',excluded:true},
+  childTreatmentAid:{label:'Единовременная материальная помощь на лечение ребёнка',excluded:true},
+};
+
 export function additionalIncomeForApplication(entries,applicationMonth,excludedPersonIndices=[]) {
-  const window=incomeWindow(applicationMonth),byPerson=new Map(),issues=[];
+  const window=incomeWindow(applicationMonth),byPerson=new Map(),issues=[],excluded=[];
   for(const entry of entries) {
     if(excludedPersonIndices.includes(entry.personIndex))continue;
     const definition=ADDITIONAL_TYPES[entry.type];
     if(!definition || !Number.isFinite(entry.amount) || entry.amount<0) {issues.push('Уточните вид и сумму дополнительного дохода');continue}
+    const benefitKind=entry.type==='otherBenefit'?OTHER_BENEFIT_KINDS[entry.benefitKind]:null;
+    if(entry.type==='otherBenefit'&&!benefitKind) {issues.push('Уточните вид другого пособия: часть выплат исключается по пункту 53');continue}
     if(entry.type==='securities'&&(!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount)) {
       issues.push('Уточните расходы по операциям с ценными бумагами; они не могут превышать введённую выручку');continue;
     }
@@ -39,6 +54,10 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
       : window.filter(m=>entry.from && entry.to && m>=entry.from && m<=entry.to);
     if(definition.period==='annual'&&!Number.isInteger(entry.taxYear) || definition.period==='monthly'&&(!entry.from||!entry.to||entry.from>entry.to)) {
       issues.push('Уточните налоговый год или месяцы получения дохода');continue;
+    }
+    if(benefitKind?.excluded) {
+      excluded.push({type:entry.benefitKind,label:benefitKind.label,amount:entry.amount*months.length});
+      continue;
     }
     const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:entry.amount;
     const value=definition.period==='annual'?relevantAmount/12:relevantAmount;
@@ -50,5 +69,5 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     byPerson.set(entry.personIndex,person);
   }
   const total=[...byPerson.values()].flatMap(person=>Object.values(person)).reduce((s,v)=>s+v.total,0);
-  return {status:issues.length?'unknown':'known',amount:issues.length?null:total,byPerson,issues};
+  return {status:issues.length?'unknown':'known',amount:issues.length?null:total,byPerson,issues,excluded};
 }
