@@ -19,6 +19,11 @@ test('imprisoned spouse is excluded from family size under paragraph 46',()=>{
   assert.equal(includedFamily([{...people[0]},{role:'spouse',familyStatus:'ordinary'}],'2026-09-29').included.length,2);
   assert.equal(includedFamily([{...people[0]},{role:'spouse',familyStatus:'unknown'}],'2026-09-29').unanswered.length,1);
 });
+test('a child who died before filing cannot be included or claimed',()=>{
+  const child={role:'child',birthDate:'2024-02-01',deathDate:'2026-02-01',married:false,russianCitizen:true,livesInRussia:true};
+  assert.equal(includedFamily([child],'2026-09-29').excluded.length,1);
+  assert.equal(childCanApply(child,'2026-09-29').status,'no');
+});
 test('powerful car cutoff is 250 hp, and five-year cutoff is inclusive',()=>{
   const context={applicationYear:2026,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false,fourOrMoreChildren:false};
   assert.equal(checkCars([{manufactureYear:2021,horsepower:250}],context).status,'no');
