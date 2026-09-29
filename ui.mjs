@@ -25,7 +25,7 @@ const benefitsSection=document.createElement('section');
 benefitsSection.innerHTML='<div class="section-heading"><h3>Уже получаете единое пособие на ребёнка?</h3><button id="add-benefit" type="button">+ Указать выплату</button></div><p class="hint">Не добавляйте это пособие к зарплате или общей сумме дохода. Укажите ребёнка, сумму и месяцы поступления. Если размер менялся, добавьте отдельный период. При продлении на того же ребёнка прежние выплаты исключаются, при заявлении только на другого — учитываются. Одинаковые выплаты в разных строках не дублируйте.</p><div id="benefits"></div>';
 $('income-people').after(benefitsSection);
 const alimonySection=document.createElement('section');
-alimonySection.innerHTML='<h3>Алименты</h3><label>Семейное положение заявителя<select id="marital-status"><option value="other">Не в разводе / нет алиментов</option><option value="divorced">В разводе</option><option value="single">Единственный родитель</option></select></label><div id="alimony-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>На каком основании алименты?<select id="alimony-kind"><option value="">Выберите</option><option value="court">Решение суда / судебный приказ / приставы</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label>Детей, на которых полагаются алименты<input id="alimony-child-count" type="number" min="1" value="1"></label><label>Сумма алиментов за месяц, ₽<input id="alimony-monthly" type="number" min="0" placeholder="0, если ничего не поступало"></label><label>С какого месяца поступает сумма<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div><p class="hint">При судебном решении учитываются фактически полученные суммы, даже ноль; укажите месяцы и изменения отдельными периодами в дальнейшем. При нотариальном соглашении или без оформления для разведённого заявителя действует минимум ¼, ⅓ или ½ региональной зарплаты на 1, 2 или 3+ детей; месяц развода входит. Без подтверждённых окончательных данных Росстата точного вывода нет. Не включайте алименты повторно в поле зарплаты.</p>';
+alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label>Сколько детей в этом алиментном обязательстве<input id="alimony-child-count" type="number" min="1" value="1"></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><label>Есть ли по всем указанным детям второй родитель?<select id="second-parent"><option value="">Уточните</option><option value="yes">Да, у всех</option><option value="no">Нет, я единственный родитель для всех</option><option value="mixed">У детей разные обстоятельства</option></select></label><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
 benefitsSection.after(alimonySection);
 const maternitySection=document.createElement('section');
 maternitySection.innerHTML='<div class="section-heading"><h3>Пособие по беременности и родам (БиР)</h3><button id="add-maternity" type="button">+ Указать выплату</button></div><p class="hint">Вводите всю сумму разовой выплаты отдельно от зарплаты. Она распределяется по месяцам начисления, а не учитывается целиком в месяце поступления. Для обычного периода выставлено 5 месяцев; при продлении уточните срок по документу.</p><div id="maternity-payments"></div>';
@@ -46,7 +46,20 @@ function renderMaternityRows() {
   });
 }
 $('add-maternity').onclick=()=>{maternityPayments.push({personIndex:0,amount:null,startMonth:'',chargedMonths:5});renderMaternityRows();render()};
-alimonySection.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{ $('alimony-fields').hidden=$('marital-status').value!=='divorced';$('alimony-wage-fields').hidden=$('alimony-kind').value==='court';render()}));
+let savedSpouse=null;
+function refreshMaritalForm() {
+  const status=$('marital-status').value;
+  $('alimony-fields').hidden=!status;
+  $('alimony-actual-fields').hidden=$('alimony-received').value!=='yes';
+  $('alimony-divorced-fields').hidden=status!=='divorced';
+  $('alimony-wage-fields').hidden=status!=='divorced'||['court','court-order','bailiffs'].includes($('alimony-kind').value)||$('second-parent').value==='no';
+  $('notary-amount-field').hidden=status!=='divorced'||$('alimony-kind').value!=='notary';
+  if(status==='married' && incomePeople.length===1) {incomePeople.push(savedSpouse||{label:'Супруг(а)',months:{},total:null,incomeType:'employment'});renderIncomeForm()}
+  if(status && status!=='married' && incomePeople.length>1) {savedSpouse=incomePeople.pop();renderIncomeForm()}
+  $('add-adult').hidden=!!status;
+  render();
+}
+alimonySection.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',refreshMaritalForm));
 function incomeMonths() {
   const start=monthIndex($('start').value||'2026-09');
   return Array.from({length:23},(_,i)=>monthString(start-13+i));
@@ -224,16 +237,19 @@ function render() {
     const maritalStatus=$('marital-status').value;
     const alimonyFrom=$('alimony-from').value, alimonyTo=$('alimony-to').value;
     const alimonyMonthly=$('alimony-monthly').value;
-    const courtAmounts=Object.fromEntries(incomeWindow(month).map(m=>[m,alimonyFrom && alimonyTo && m>=alimonyFrom && m<=alimonyTo ? Number(alimonyMonthly) : 0]));
-    const alimony=maritalStatus==='other'?{status:'known',amount:0}:alimonyForApplication({
-      maritalStatus:maritalStatus==='single'?'other':maritalStatus,singleParent:maritalStatus==='single',
+    const receiving=$('alimony-received').value==='yes';
+    const secondParent=$('second-parent').value;
+    const courtAmounts=Object.fromEntries(incomeWindow(month).map(m=>[m,receiving && alimonyFrom && alimonyTo && m>=alimonyFrom && m<=alimonyTo ? Number(alimonyMonthly) : 0]));
+    const alimony=maritalStatus?alimonyForApplication({
+      maritalStatus,singleParent:maritalStatus==='divorced'&&secondParent==='no',
       arrangement:$('alimony-kind').value,divorceMonth:$('divorce-month').value,
       childrenForAlimony:Number($('alimony-child-count').value),
-      declaredMonthly:alimonyMonthly===''?NaN:Number(alimonyMonthly),
-      declaredByMonth:alimonyFrom && alimonyTo && alimonyMonthly!==''?courtAmounts:undefined,
+      declaredMonthly:$('alimony-kind').value==='notary'&&maritalStatus==='divorced'?($('notary-amount').value===''?NaN:Number($('notary-amount').value)):(receiving?(alimonyMonthly===''?NaN:Number(alimonyMonthly)):0),
+      declaredByMonth:$('alimony-kind').value==='informal' && receiving && alimonyFrom && alimonyTo && alimonyMonthly!==''?courtAmounts:undefined,
       receivedByMonth:courtAmounts,officialWage:Number($('alimony-wage').value),wageFinal:$('alimony-final').checked
-    },month);
-    if(maritalStatus==='divorced' && $('alimony-kind').value==='court' && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните полученные алименты и период'}
+    },month):{status:'unknown',reason:'Укажите семейное положение'};
+    if(receiving && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните фактически поступившие алименты и период'}
+    if(maritalStatus==='divorced' && !['court','court-order','bailiffs'].includes($('alimony-kind').value) && !['yes','no'].includes(secondParent)) {alimony.status='unknown';alimony.reason='По каждому ребёнку нужно уточнить второго родителя и основание алиментов'}
     let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
     const incomeText=scenarios.length?scenarios.map((group,scenarioIndex)=>{
       const benefitResult=childBenefitIncome(benefitRows.payments,children,group.map(c=>c.id),month,filingDate);
