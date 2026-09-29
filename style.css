@@ -20,3 +20,10 @@ input,select { border-color:#cfc1ad }
 .wizard-actions button { min-width:130px }
 button:disabled { opacity:.45; cursor:not-allowed }
 [hidden] { display:none!important }
+.source-picker { border-top:1px solid var(--line); margin-top:20px; padding-top:18px }
+.source-picker fieldset { border:0; padding:0; margin:12px 0 }
+.source-picker legend { font-weight:700; margin-bottom:6px; color:var(--teal) }
+.source-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px 14px }
+.source-grid .check { flex-direction:row; align-items:center; margin:4px 0; font-weight:500 }
+@media(max-width:700px) { .source-grid { grid-template-columns:1fr } }
+[hidden] { display:none!important }
