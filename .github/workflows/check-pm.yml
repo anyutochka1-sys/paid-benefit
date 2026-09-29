@@ -1,0 +1,45 @@
+name: Сверка прожиточного минимума СФР
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Сверить суммы с таблицей СФР
+        run: |
+          python3 scripts/check_pm.py --update | tee pm-changes.txt
+          cat pm-changes.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Проверить защиту от изменений структуры
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      - name: Проверить расчёты после изменения данных
+        run: node --test *.test.mjs
+      - name: Подготовить предложение изменений
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- regional-pm-data.mjs; then
+            echo 'Официальные суммы не изменились.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B bot/pm-2026-review
+          git add regional-pm-data.mjs
+          git commit -m 'Review revised 2026 SFR subsistence minimum'
+          git push --force-with-lease origin HEAD:refs/heads/bot/pm-2026-review
+          if [ "$(gh pr list --head bot/pm-2026-review --json number --jq 'length')" = '0' ]; then
+            gh pr create --base main --head bot/pm-2026-review \
+              --title 'Проверить обновление ПМ СФР за 2026 год' \
+              --body 'Еженедельная сверка официальной таблицы СФР обнаружила изменения. Проверьте цифры, нормативные акты и влияние на контрольные случаи перед объединением.'
+          fi
