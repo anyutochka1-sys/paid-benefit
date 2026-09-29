@@ -30,6 +30,7 @@ export const ADDITIONAL_TYPES = {
 // classified after its statutory purpose is known.
 export const OTHER_BENEFIT_KINDS = {
   counted:{label:'Иное учитываемое пособие / компенсация',excluded:false},
+  employerBirthAid:{label:'Единовременная материальная помощь работодателя при рождении / усыновлении / опеке',excluded:false},
   maternityCapitalMonthly:{label:'Ежемесячная выплата из материнского капитала на ребёнка до 3 лет',excluded:true},
   socialContract:{label:'Государственная социальная помощь по социальному контракту',excluded:true},
   taxRefund:{label:'Возврат НДФЛ из-за налогового вычета',excluded:true},
@@ -46,6 +47,13 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(!definition || !Number.isFinite(entry.amount) || entry.amount<0) {issues.push('Уточните вид и сумму дополнительного дохода');continue}
     const benefitKind=entry.type==='otherBenefit'?OTHER_BENEFIT_KINDS[entry.benefitKind]:null;
     if(entry.type==='otherBenefit'&&!benefitKind) {issues.push('Уточните вид другого пособия: часть выплат исключается по пункту 53');continue}
+    if(entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid') {
+      if(entry.from!==entry.to || !entry.from) {issues.push('Помощь работодателя при рождении укажите в одном месяце выплаты');continue}
+      if(typeof entry.birthAidFirstYear!=='boolean') {issues.push('Уточните, выплачена ли помощь работодателя в течение первого года после рождения, усыновления или установления опеки');continue}
+      if(entry.birthAidFirstYear && (!Number.isFinite(entry.taxExemptAmount)||entry.taxExemptAmount<0||entry.taxExemptAmount>entry.amount)) {
+        issues.push('Уточните освобождённую от НДФЛ часть помощи работодателя по справке');continue;
+      }
+    }
     if(entry.type==='securities'&&(!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount)) {
       issues.push('Уточните расходы по операциям с ценными бумагами; они не могут превышать введённую выручку');continue;
     }
@@ -59,7 +67,9 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
       excluded.push({type:entry.benefitKind,label:benefitKind.label,amount:entry.amount*months.length});
       continue;
     }
-    const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:entry.amount;
+    const birthExclusion=entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid'&&entry.birthAidFirstYear?entry.taxExemptAmount:0;
+    if(birthExclusion && months.length) excluded.push({type:'employerBirthAid',label:'Необлагаемая часть помощи работодателя при рождении',amount:birthExclusion});
+    const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:entry.amount-birthExclusion;
     const value=definition.period==='annual'?relevantAmount/12:relevantAmount;
     const person=byPerson.get(entry.personIndex)||{};
     for(const month of months) {
