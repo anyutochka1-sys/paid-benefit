@@ -1,7 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {incomeForMonth,childTier} from './income.mjs';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs';
 import {incomeWindow} from './engine.mjs';
+
+test('one steady salary fills specified months and zeros outside its period',()=>{
+  const months=regularIncomeMonths({regularAmount:25000,regularFrom:'2026-01',regularTo:'2026-06'},'2026-09');
+  assert.equal(months['2026-01'],25000);
+  assert.equal(months['2026-07'],0);
+  assert.equal(incomeForMonth([{label:'Мать',mode:'monthly',months}],'2026-09').total,150000);
+  assert.deepEqual(regularIncomeMonths({regularAmount:null,regularFrom:'2026-01',regularTo:'2026-06'},'2026-09'),{});
+});
 
 test('a bonus leaving the lookback window changes a three-month forecast',()=>{
   const months=Object.fromEntries(new Set([...incomeWindow('2026-09'),...incomeWindow('2026-12')]).values().map(m=>[m,0]));
