@@ -1,6 +1,9 @@
 name: Сверка годовой зарплаты Росстата
 
 on:
+  push:
+    paths:
+      - .github/workflows/check-rosstat.yml
   schedule:
     - cron: '17 3 * * 3'
   workflow_dispatch:
