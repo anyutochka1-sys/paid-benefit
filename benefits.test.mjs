@@ -18,6 +18,11 @@ test('the same benefit counts when applying only for a sibling',()=>{
   assert.equal(result.total,19243*12);
   assert.equal(result.included.length,12);
 });
+test('pregnancy application counts an existing child award even if child renewal excludes it',()=>{
+  const pregnant=childBenefitIncome(payments,children,[],'2026-09');
+  const childRenewal=childBenefitIncome(payments,children,['a'],'2026-09');
+  assert.deepEqual([pregnant.total,childRenewal.total],[230916,0]);
+});
 test('payments on two children split according to selected application',()=>{
   const result=childBenefitIncome([...payments,{childId:'b',month:'2026-07',amount:10000}],children,['a'],'2026-09');
   assert.equal(result.total,10000);
