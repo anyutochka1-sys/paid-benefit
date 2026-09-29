@@ -1,0 +1,43 @@
+import {incomeWindow} from './engine.mjs';
+
+// Decree 2330 p. 47, 49, 50. Annual categories under p. 50 are spread over
+// twelve months of the tax year; exact exclusions under p. 53 are separate.
+export const ADDITIONAL_TYPES = {
+  pension:{label:'Пенсия / больничный',period:'monthly',qualifies:true},
+  scholarship:{label:'Стипендия',period:'monthly',qualifies:true},
+  military:{label:'Денежное довольствие',period:'monthly',qualifies:true},
+  otherBenefit:{label:'Иное пособие / компенсация, учитываемое в доходе',period:'monthly',qualifies:false},
+  unemploymentBenefit:{label:'Пособие по безработице',period:'monthly',qualifies:false},
+  lottery:{label:'Выигрыш в лотерею / тотализаторе',period:'monthly',qualifies:false},
+  selfEmployed:{label:'Самозанятость',period:'monthly',qualifies:true},
+  foreignEarned:{label:'Заработок из-за рубежа (рублёвый эквивалент)',period:'monthly',qualifies:true},
+  securities:{label:'Ценные бумаги / дивиденды',period:'annual',qualifies:false},
+  business:{label:'Доход ИП за налоговый год',period:'annual',qualifies:true},
+  propertySale:{label:'Налоговая база от продажи имущества',period:'annual',qualifies:false},
+  rent:{label:'Аренда имущества',period:'annual',qualifies:false},
+  copyright:{label:'Авторский доход',period:'annual',qualifies:true}
+};
+
+export function additionalIncomeForApplication(entries,applicationMonth,excludedPersonIndices=[]) {
+  const window=incomeWindow(applicationMonth),byPerson=new Map(),issues=[];
+  for(const entry of entries) {
+    if(excludedPersonIndices.includes(entry.personIndex))continue;
+    const definition=ADDITIONAL_TYPES[entry.type];
+    if(!definition || !Number.isFinite(entry.amount) || entry.amount<0) {issues.push('Уточните вид и сумму дополнительного дохода');continue}
+    const months=definition.period==='annual'
+      ? window.filter(m=>Number(m.slice(0,4))===entry.taxYear)
+      : window.filter(m=>entry.from && entry.to && m>=entry.from && m<=entry.to);
+    if(definition.period==='annual'&&!Number.isInteger(entry.taxYear) || definition.period==='monthly'&&(!entry.from||!entry.to||entry.from>entry.to)) {
+      issues.push('Уточните налоговый год или месяцы получения дохода');continue;
+    }
+    const value=definition.period==='annual'?entry.amount/12:entry.amount;
+    const person=byPerson.get(entry.personIndex)||{};
+    for(const month of months) {
+      const previous=person[month]||{total:0,qualifying:0};
+      person[month]={total:previous.total+value,qualifying:previous.qualifying+(definition.qualifies?value:0)};
+    }
+    byPerson.set(entry.personIndex,person);
+  }
+  const total=[...byPerson.values()].flatMap(person=>Object.values(person)).reduce((s,v)=>s+v.total,0);
+  return {status:issues.length?'unknown':'known',amount:issues.length?null:total,byPerson,issues};
+}
