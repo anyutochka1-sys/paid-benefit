@@ -17,13 +17,21 @@ export const ADDITIONAL_TYPES = {
   unemploymentBenefit:{label:'Пособие по безработице',period:'monthly',qualifies:false},
   lottery:{label:'Выигрыш в лотерею / тотализаторе',period:'monthly',qualifies:false},
   selfEmployed:{label:'Самозанятость',period:'monthly',qualifies:true},
-  foreignEarned:{label:'Заработок из-за рубежа (рублёвый эквивалент)',period:'monthly',qualifies:true},
+  foreignEarned:{label:'Заработок в иностранной валюте',period:'monthly',qualifies:true},
   securities:{label:'Ценные бумаги / дивиденды',period:'annual',qualifies:false},
   business:{label:'Доход ИП за налоговый год',period:'annual',qualifies:true},
   propertySale:{label:'Налоговая база от продажи имущества',period:'annual',qualifies:false},
   rent:{label:'Аренда имущества',period:'annual',qualifies:false},
   copyright:{label:'Авторский доход',period:'annual',qualifies:true}
 };
+
+// Decree 2330 p. 55: one CBR rate on the final calendar date of the twelfth
+// income-window month, rather than a different rate for each payment.
+export function foreignRateDate(applicationMonth) {
+  const lastMonth=incomeWindow(applicationMonth).at(-1);
+  const [year,month]=lastMonth.split('-').map(Number);
+  return new Date(Date.UTC(year,month,0)).toISOString().slice(0,10);
+}
 
 // Decree 2330 p. 53. Only unmistakable categories are offered here; a
 // conditional payment (for example some uses of maternity capital) must be
@@ -63,6 +71,13 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(definition.period==='annual'&&!Number.isInteger(entry.taxYear) || definition.period==='monthly'&&(!entry.from||!entry.to||entry.from>entry.to)) {
       issues.push('Уточните налоговый год или месяцы получения дохода');continue;
     }
+    if(entry.type==='foreignEarned'&&months.length) {
+      const date=foreignRateDate(applicationMonth);
+      if(!/^[A-Z]{3}$/.test(entry.currency||'') || entry.rateDate!==date || !Number.isFinite(entry.rublesPerUnit) || entry.rublesPerUnit<=0) {
+        issues.push(`Для заработка в валюте укажите буквенный код валюты и курс ЦБ в рублях за 1 единицу на ${date}; прошлый курс для другого месяца подачи не подходит`);
+        continue;
+      }
+    }
     if(benefitKind?.excluded) {
       excluded.push({type:entry.benefitKind,label:benefitKind.label,amount:entry.amount*months.length});
       continue;
@@ -70,7 +85,7 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     const birthExclusion=entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid'&&entry.birthAidFirstYear?entry.taxExemptAmount:0;
     if(birthExclusion && months.length) excluded.push({type:'employerBirthAid',label:'Необлагаемая часть помощи работодателя при рождении',amount:birthExclusion});
     const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:entry.amount-birthExclusion;
-    const value=definition.period==='annual'?relevantAmount/12:relevantAmount;
+    const value=(definition.period==='annual'?relevantAmount/12:relevantAmount)*(entry.type==='foreignEarned'&&months.length?entry.rublesPerUnit:1);
     const person=byPerson.get(entry.personIndex)||{};
     for(const month of months) {
       const previous=person[month]||{total:0,qualifying:0};
