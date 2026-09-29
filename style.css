@@ -1,3 +1,22 @@
 :root { font-family: Inter, system-ui, sans-serif; color:#172c35; background:#f1f4f1; } * { box-sizing:border-box } body { margin:0 } main { max-width:1000px; padding:32px 20px 80px; margin:auto } header { padding:42px 0 28px } h1 { font-size:clamp(2.2rem,6vw,4rem); max-width:720px; letter-spacing:-.045em; line-height:1.08; margin:14px 0 } h2 { margin:0 0 20px; font-size:1.45rem } p { line-height:1.55 } .eyebrow { color:#287865; font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:.75rem } header p { max-width:650px; color:#53666c; font-size:1.1rem } .panel { background:white; padding:28px; border-radius:20px; margin:18px 0; box-shadow:0 8px 32px #123f2e0a } label { display:flex; flex-direction:column; gap:8px; font-weight:600; margin:14px 0 } input,select { font:inherit; border:1px solid #bdcbc6; border-radius:10px; padding:11px; background:white; width:100% } input:focus,select:focus { outline:2px solid #287865 } button { background:#176b59; color:white; border:0; border-radius:10px; padding:11px 16px; cursor:pointer; font-weight:700 } .hint,footer { color:#61737a; font-size:.9rem } .section-heading { display:flex; justify-content:space-between; align-items:start; gap:12px } .reason { display:grid; grid-template-columns:2fr 1fr 1fr 1.1fr auto; gap:10px; align-items:end; border-top:1px solid #e4ebe6; padding:16px 0 } .reason label { margin:0; font-size:.85rem } .reason .check { align-self:center; display:flex; flex-direction:row; align-items:center } .check input { width:auto } .remove { background:#edf2ef; color:#275b51 } .result { display:grid; grid-template-columns:1fr 2fr; padding:15px; border-top:1px solid #e4ebe6; gap:12px } .result strong { display:block } .ok { color:#16704e } .bad { color:#a54831 } .unknown { color:#756428 } footer { padding-top:20px } @media(max-width:700px) { .reason { grid-template-columns:1fr 1fr } .reason label:first-child { grid-column:span 2 } .result { grid-template-columns:1fr } }
 .form-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)) auto; gap:10px; align-items:end; padding:14px 0; border-top:1px solid #e4ebe6 } .form-row label { margin:0; font-size:.85rem } .form-row .check { flex-direction:row; align-items:center } .result small { display:block; color:#708188; font-weight:400; margin-top:4px } @media(max-width:700px) { .form-row { grid-template-columns:1fr 1fr } .form-row .check { grid-column:span 2 } }
 .income-person { border-top:1px solid #e4ebe6; margin-top:20px; padding-top:16px } .income-person h3 { margin:0 0 12px } .income-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px 16px } .income-grid label { font-size:.85rem; margin:0 } .demo-pm { border-top:1px solid #e4ebe6; margin-top:22px; padding-top:15px } details { margin:18px 0 } summary { color:#176b59; cursor:pointer; font-weight:700 } details li { margin:9px 0; line-height:1.5 } a { color:#176b59 } @media(max-width:700px) { .income-grid { grid-template-columns:1fr 1fr } }
+/* «Анна про пособия»: точная палитра уже используемого фирменного проекта. */
+:root { --cream:#fbf3e7; --paper:#fffaf2; --ink:#26342f; --teal:#125b56; --terr:#c65336; --must:#d7a42d; --burg:#7d303b; --olive:#6f7841; --line:#dfd1bd; color:var(--ink); background:var(--cream) }
+.panel { background:var(--paper); border:1px solid var(--line); box-shadow:0 8px 28px #382e200d }
+h1,h2 { font-family:Georgia,serif; color:var(--teal) }
+.eyebrow { color:var(--terr) }
+button { background:var(--terr) }
+.remove { background:#f2dfbd; color:#70491e }
+a,summary { color:var(--teal) }
+input:focus,select:focus { outline-color:var(--terr) }
+input,select { border-color:#cfc1ad }
+.hint,footer { color:#68716d }
+.ok { color:var(--teal) } .bad { color:var(--burg) } .unknown { color:#795c13 }
+#progress { display:flex; gap:7px; overflow-x:auto; padding:0 0 12px; margin-bottom:8px }
+#progress span { white-space:nowrap; background:#f2dfbd; color:#70491e; padding:9px 13px; border-radius:999px; font-size:.8rem; font-weight:700 }
+#progress span.active { background:var(--teal); color:white }
+.wizard-actions { display:flex; justify-content:space-between; gap:12px; margin-top:18px }
+.wizard-actions button { min-width:130px }
+button:disabled { opacity:.45; cursor:not-allowed }
+[hidden] { display:none!important }
