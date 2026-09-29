@@ -6,7 +6,7 @@ export function alimonyForApplication(entry, applicationMonth) {
   const window=incomeWindow(applicationMonth);
   const actual=window.reduce((sum,m)=>sum+(Number(entry.receivedByMonth?.[m])||0),0);
   if(entry.singleParent || entry.maritalStatus!=='divorced') return {status:'known',amount:actual,method:'actual'};
-  if(entry.arrangement==='court') return {status:'known',amount:actual,method:'court-actual'};
+  if(['court','court-order','bailiffs'].includes(entry.arrangement)) return {status:'known',amount:actual,method:entry.arrangement==='bailiffs'?'fssp-actual':'court-actual'};
   if(!['notary','informal'].includes(entry.arrangement)) return {status:'unknown',reason:'Нужно уточнить основание алиментов'};
   if(!entry.officialWage || entry.wageFinal!==true || !entry.divorceMonth || !Number.isFinite(entry.childrenForAlimony) || entry.childrenForAlimony<1)
     return {status:'unknown',reason:'Нужны дата развода и применимые окончательные данные Росстата'};
