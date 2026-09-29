@@ -3,6 +3,8 @@ import { includedFamily, childCanApply, checkCars, ageAt } from './family-assets
 import {incomeForMonth,childTier} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest} from './property.mjs';
 import {childBenefitIncome} from './benefits.mjs';
+import {alimonyForApplication} from './alimony.mjs';
+import {newbornShortcut} from './newborn.mjs';
 const $ = id => document.getElementById(id);
 const types = [
   ['unemployment','Официальная безработица'], ['pregnancy','Беременность'],
@@ -15,9 +17,15 @@ const applicationChoice=document.createElement('div');
 applicationChoice.innerHTML='<label>Как подаёте на детей?<select id="application-mode"><option value="together">Одним заявлением на всех отмеченных</option><option value="separate">Отдельное заявление на каждого отмеченного</option></select></label><p class="hint">Для каждого отдельного заявления выплаты на остальных детей могут войти в доход. Даты подачи пока одинаковы; при разных месяцах сравните соответствующие строки календаря.</p>';
 $('children').after(applicationChoice);
 applicationChoice.querySelector('select').addEventListener('input',render);
+const pregnancyChoice=document.createElement('label');pregnancyChoice.className='check';pregnancyChoice.innerHTML='<input id="mother-pregnancy-benefit" type="checkbox"> Мать получала единое пособие по беременности перед рождением младшего';
+applicationChoice.after(pregnancyChoice);pregnancyChoice.querySelector('input').addEventListener('input',render);
 const benefitsSection=document.createElement('section');
 benefitsSection.innerHTML='<div class="section-heading"><h3>Уже получаете единое пособие на ребёнка?</h3><button id="add-benefit" type="button">+ Указать выплату</button></div><p class="hint">Не добавляйте это пособие к зарплате или общей сумме дохода. Укажите ребёнка, сумму и месяцы поступления. Если размер менялся, добавьте отдельный период. При продлении на того же ребёнка прежние выплаты исключаются, при заявлении только на другого — учитываются. Одинаковые выплаты в разных строках не дублируйте.</p><div id="benefits"></div>';
 $('income-people').after(benefitsSection);
+const alimonySection=document.createElement('section');
+alimonySection.innerHTML='<h3>Алименты</h3><label>Семейное положение заявителя<select id="marital-status"><option value="other">Не в разводе / нет алиментов</option><option value="divorced">В разводе</option><option value="single">Единственный родитель</option></select></label><div id="alimony-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>На каком основании алименты?<select id="alimony-kind"><option value="">Выберите</option><option value="court">Решение суда / судебный приказ / приставы</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label>Детей, на которых полагаются алименты<input id="alimony-child-count" type="number" min="1" value="1"></label><label>Сумма алиментов за месяц, ₽<input id="alimony-monthly" type="number" min="0" placeholder="0, если ничего не поступало"></label><label>С какого месяца поступает сумма<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div><p class="hint">При судебном решении учитываются фактически полученные суммы, даже ноль; укажите месяцы и изменения отдельными периодами в дальнейшем. При нотариальном соглашении или без оформления для разведённого заявителя действует минимум ¼, ⅓ или ½ региональной зарплаты на 1, 2 или 3+ детей; месяц развода входит. Без подтверждённых окончательных данных Росстата точного вывода нет. Не включайте алименты повторно в поле зарплаты.</p>';
+benefitsSection.after(alimonySection);
+alimonySection.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{ $('alimony-fields').hidden=$('marital-status').value!=='divorced';$('alimony-wage-fields').hidden=$('alimony-kind').value==='court';render()}));
 function incomeMonths() {
   const start=monthIndex($('start').value||'2026-09');
   return Array.from({length:23},(_,i)=>monthString(start-13+i));
@@ -59,7 +67,7 @@ function addReason() {
 function addChild() {
   const row=document.createElement('div'); row.className='form-row';
   row.dataset.childId=`child-${nextChildId++}`;
-  row.innerHTML='<label>Имя или обозначение ребёнка<input class="child-name" type="text" placeholder="Например, старший"></label><label>Дата рождения<input class="birth" type="date"></label><label class="check"><input class="applying" type="checkbox" checked> Подаю на этого ребёнка</label><label>Очное обучение<select class="student"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>В браке<select class="married"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>Гражданин РФ и проживает в России<select class="citizen"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Имя или обозначение ребёнка<input class="child-name" type="text" placeholder="Например, старший"></label><label>Дата рождения<input class="birth" type="date"></label><label class="check"><input class="applying" type="checkbox" checked> Подаю на этого ребёнка</label><details><summary>Уже назначено пособие на этого ребёнка?</summary><label>Размер действующего пособия<select class="award-tier"><option value="">Не назначено / не знаю</option><option value="50">50%</option><option value="75">75%</option><option value="100">100%</option></select></label><label>Дата последнего решения<input class="award-decision" type="date"></label><label>Действует по<input class="award-end" type="date"></label></details><label>Очное обучение<select class="student"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>В браке<select class="married"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>Гражданин РФ и проживает в России<select class="citizen"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><button class="remove" type="button">Убрать</button>';
   row.querySelector('.remove').onclick=()=>{row.remove();renderBenefitRows();render()};
   row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{renderBenefitRows();render()}));
   $('children').append(row); renderBenefitRows(); render();
@@ -124,6 +132,9 @@ function childData() {
   return [...document.querySelectorAll('#children .form-row')].map(row=>({
     id:row.dataset.childId,role:'child',birthDate:row.querySelector('.birth').value,
     applying:row.querySelector('.applying').checked,
+    awardTier:row.querySelector('.award-tier').value?Number(row.querySelector('.award-tier').value):undefined,
+    awardDecision:row.querySelector('.award-decision').value,
+    awardEnd:row.querySelector('.award-end').value,
     fullTimeStudent:yn(row.querySelector('.student').value),married:yn(row.querySelector('.married').value),
     russianCitizen:yn(row.querySelector('.citizen').value),livesInRussia:yn(row.querySelector('.citizen').value)
   }));
@@ -182,16 +193,32 @@ function render() {
     const scenarios=$('application-mode').value==='separate'?selected.map(c=>[c]):[selected];
     const benefitRows=benefitRowsForWindow(month);
     const pmPerson=Number($('pm-person').value),pmChild=Number($('pm-child').value);
+    const maritalStatus=$('marital-status').value;
+    const alimonyFrom=$('alimony-from').value, alimonyTo=$('alimony-to').value;
+    const alimonyMonthly=$('alimony-monthly').value;
+    const courtAmounts=Object.fromEntries(incomeWindow(month).map(m=>[m,alimonyFrom && alimonyTo && m>=alimonyFrom && m<=alimonyTo ? Number(alimonyMonthly) : 0]));
+    const alimony=maritalStatus==='other'?{status:'known',amount:0}:alimonyForApplication({
+      maritalStatus:maritalStatus==='single'?'other':maritalStatus,singleParent:maritalStatus==='single',
+      arrangement:$('alimony-kind').value,divorceMonth:$('divorce-month').value,
+      childrenForAlimony:Number($('alimony-child-count').value),
+      declaredMonthly:alimonyMonthly===''?NaN:Number(alimonyMonthly),
+      declaredByMonth:alimonyFrom && alimonyTo && alimonyMonthly!==''?courtAmounts:undefined,
+      receivedByMonth:courtAmounts,officialWage:Number($('alimony-wage').value),wageFinal:$('alimony-final').checked
+    },month);
+    if(maritalStatus==='divorced' && $('alimony-kind').value==='court' && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните полученные алименты и период'}
     const incomeText=scenarios.length?scenarios.map((group,scenarioIndex)=>{
       const benefitResult=childBenefitIncome(benefitRows.payments,children,group.map(c=>c.id),month,filingDate);
       const benefitUnknown=[...benefitRows.missing,...benefitResult.missing];
-      const combinedIncome=incomeResult.total===null || benefitResult.total===null || benefitUnknown.length ? null : incomeResult.total+benefitResult.total;
+      const combinedIncome=incomeResult.total===null || benefitResult.total===null || benefitUnknown.length || alimony.status!=='known' ? null : incomeResult.total+benefitResult.total+alimony.amount;
       const tier=year===2026 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length && !children.some(c=>c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && c.fullTimeStudent)
         ?childTier({income12:combinedIncome,familySize:members.included.length,childrenApplying:group.length,pmPerson,pmChild}):null;
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
       const label=$('application-mode').value==='separate'?`Заявление на ребёнка ${childNumber} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
       const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
-      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. ${benefitText} ${tier?.status==='estimate'?`Ступень по указанному доходу: ${tier.tier}%.`:tier?.status==='income-too-high'?'Выше указанного ПМ.':'Ступень пока неизвестна.'}`;
+      const olderAwards=children.filter(c=>c.awardTier && c.awardEnd && c.awardDecision).map(c=>({childId:c.id,tier:c.awardTier,endsOn:c.awardEnd,decisionDate:c.awardDecision}));
+      const newborns=group.filter(c=>c.birthDate && c.birthDate<=filingDate).map(c=>({child:c,result:newbornShortcut({birthDate:c.birthDate,applicationDate:filingDate,olderAwards:olderAwards.filter(a=>a.childId!==c.id),motherPregnancyBenefit:$('mother-pregnancy-benefit').checked})})).filter(x=>x.result.status==='simplified');
+      const newbornText=newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'';
+      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+alimony.reason+')'}. ${newbornText} ${tier?.status==='estimate'?`Ступень по указанному доходу: ${tier.tier}%.`:tier?.status==='income-too-high'?'Выше указанного ПМ.':'Ступень пока неизвестна.'}`;
     }).join(' '):'Отметьте хотя бы одного ребёнка для заявления.';
     if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
     // An entered 12-week condition is applicable only to the selected month.
