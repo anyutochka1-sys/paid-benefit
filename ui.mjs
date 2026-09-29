@@ -403,7 +403,7 @@ function render() {
       const newborns=group.filter(c=>c.birthDate && c.birthDate<=filingDate).map(c=>({child:c,result:newbornShortcut({birthDate:c.birthDate,applicationDate:filingDate,olderAwards:olderAwards.filter(a=>a.childId!==c.id),sameRecipient:yn($('same-recipient').value),motherPregnancyBenefit:$('mother-pregnancy-benefit').checked})})).filter(x=>x.result.status==='simplified');
       const regularChildren=group.length-newborns.length;
       if(regularChildren)shortcutOnly=false;
-      let tier=year===2026 && regularChildren>0 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length && !children.some(c=>c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && c.fullTimeStudent)
+      let tier=year===2026 && regularChildren>0 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length
         ?childTier({income12:combinedIncome,familySize:members.included.length,childrenApplying:regularChildren,pmPerson,pmChild}):null;
       const grace=tier?.status==='income-too-high'?largeFamilyGrace({applicationMonth:month,perCapita:tier.base,pmPerson,isLargeFamily:$('large-family').checked,usedBefore:yn($('grace-used').value),awardEndMonths:children.filter(c=>c.awardRecipient==='self'&&c.awardEnd).map(c=>c.awardEnd.slice(0,7))}):null;
       if(grace?.status==='eligible')tier={...tier,status:'estimate',tier:50,grace:true};
@@ -420,17 +420,24 @@ function render() {
     // An entered 12-week condition is applicable only to the selected month.
     const adults=countedAdults.map(({person,index:j})=>{
       const income=Object.fromEntries(incomeWindow(month).map(m=>[m,[...(Number.isFinite(baseMonths(person)[m])?[{type:person.incomeType,amount:baseMonths(person)[m]}]:[]),...(supplemental.byPerson.get(j)?.[m]?.qualifying?[{type:'employment',amount:supplemental.byPerson.get(j)[m].qualifying}]:[])]]));
-      const soleParent=j===0&&children.some(c=>members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18&&(c.role==='ward'?['never','divorced','widowed'].includes($('marital-status').value):soleParentStatus([c])==='sole'));
+      const includedMinorWards=children.filter(c=>c.role==='ward'&&members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18);
+      const guardianUnknown=j===0&&includedMinorWards.length>0&&$('sole-guardian').value==='';
+      const soleParent=j===0&&(children.some(c=>members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18&&c.role!=='ward'&&soleParentStatus([c])==='sole')||includedMinorWards.length>0&&$('sole-guardian').value==='yes');
       const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),pregnancyWeeksAtApplication:j===0&&i===0?Number($('weeks').value):0,income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
       const amountKnown=!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person)[m])):month===start&&Number.isFinite(person.total);
       const earned=sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
-      return {...result,earned,passed:earned>=result.minimum,known:sourceComplete&&amountKnown&&person.incomeType!=='other'&&supplemental.status==='known',label:person.label};
+      return {...result,earned,passed:earned>=result.minimum,known:sourceComplete&&amountKnown&&!guardianUnknown&&person.incomeType!=='other'&&supplemental.status==='known',label:person.label};
     });
     const adultText=adults.map(a=>`${a.label}: ${a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`).join('; ');
     const applicantCheck=$('applicant-citizen').value==='no'||$('applicant-residence').value==='no'?'no':$('applicant-citizen').value&&$('applicant-residence').value?'yes':'unknown';
+    const addressBasis=$('residence-basis').value;
+    const addressReview=!addressBasis||addressBasis!=='permanent'&&$('address-proof').value!=='yes';
+    const priorMeasureReview=$('prior-measure').value!=='no';
+    const contextReview=addressReview||priorMeasureReview;
+    const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'не указаны'}.`;
     const explicitBlockers=applicantCheck==='no'||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
-    const headline=shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':explicitBlockers?'Есть препятствие по введённым данным':scenarioComplete&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
-    output.push(`<div class="result"><strong>${filingDate}<small> · доходы ${incomeWindow(month)[0]} — ${incomeWindow(month).at(-1)}</small></strong><span class="${explicitBlockers?'bad':'unknown'}">${headline}. ${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. Минимальный доход: ${adultText}. ${incomeText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}</span></div>`);
+    const headline=shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':explicitBlockers?'Есть препятствие по введённым данным':scenarioComplete&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
+    output.push(`<div class="result"><strong>${filingDate}<small> · доходы ${incomeWindow(month)[0]} — ${incomeWindow(month).at(-1)}</small></strong><span class="${explicitBlockers?'bad':'unknown'}">${headline}. ${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}</span></div>`);
   }
   $('results').innerHTML=output.join('');
 }
@@ -443,7 +450,7 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
  $('start').addEventListener('input',()=>{renderIncomeForm();updatePmSelection()});
  $('pm-region').addEventListener('input',updatePmSelection);
  $('pm-area').addEventListener('input',render);
-['applicant-citizen','applicant-residence','day','weeks','large-family','grace-used','disability','support-car','rural'].forEach(id=>$(id).addEventListener('input',render));
+['applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','sole-guardian','day','weeks','large-family','grace-used','disability','support-car','rural'].forEach(id=>$(id).addEventListener('input',render));
 renderIncomeForm();
 updatePmSelection();
 
