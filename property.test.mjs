@@ -7,6 +7,17 @@ test('one apartment unlimited, two exceed 24 square metres per person only above
   assert.equal(checkProperty([{type:'apartment',area:48},{type:'apartment',area:48}],context).status,'yes');
   assert.equal(checkProperty([{type:'apartment',area:48},{type:'apartment',area:49}],context).status,'no');
 });
+test('apartments and houses have separate area limits, not one combined limit',()=>{
+  assert.equal(checkProperty([{type:'apartment',area:140},{type:'house',area:250}],context).status,'yes');
+  assert.equal(checkProperty([{type:'apartment',area:140},{type:'house',area:100},{type:'house',area:61}],context).status,'no');
+  assert.equal(checkProperty([{type:'apartment',area:140},{type:'house',area:100},{type:'house',area:60}],context).status,'yes');
+});
+test('housing and land exceptions are evaluated per object',()=>{
+  assert.equal(checkProperty([{type:'apartment',area:90},{type:'apartment',area:90,uninhabitable:true}],context).status,'yes');
+  assert.equal(checkProperty([{type:'land',hectares:.3,farEastHectare:true}],context).status,'yes');
+  assert.equal(checkProperty([{type:'land',hectares:.3,agriculturalExcluded:true}],context).status,'yes');
+  assert.equal(checkProperty([{type:'apartment',area:90},{type:'apartment',area:90,familyShare:.3}],context).status,'yes');
+});
 test('rural land has a one-hectare limit and supported land is excluded',()=>{
   assert.equal(checkProperty([{type:'land',hectares:.5}],context).status,'no');
   assert.equal(checkProperty([{type:'land',hectares:.5}],{...context,rural:true}).status,'yes');
