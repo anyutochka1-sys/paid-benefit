@@ -12,10 +12,29 @@ test('tax-year rental income is spread across the five overlapping months',()=>{
 test('monthly pension qualifies for adult minimum while unrelated benefits do not',()=>{
   const r=additionalIncomeForApplication([
     {personIndex:0,type:'pension',from:'2026-01',to:'2026-03',amount:10000},
-    {personIndex:0,type:'otherBenefit',from:'2026-01',to:'2026-03',amount:5000}
+    {personIndex:0,type:'otherBenefit',benefitKind:'counted',from:'2026-01',to:'2026-03',amount:5000}
   ],'2026-09');
   assert.equal(r.amount,45000);
   assert.equal(r.byPerson.get(0)['2026-02'].qualifying,10000);
+});
+
+test('social contract and monthly maternity-capital payment are excluded under paragraph 53',()=>{
+  const entries=[
+    {personIndex:0,type:'otherBenefit',benefitKind:'socialContract',from:'2026-01',to:'2026-01',amount:90000},
+    {personIndex:0,type:'otherBenefit',benefitKind:'maternityCapitalMonthly',from:'2026-01',to:'2026-03',amount:15000},
+    {personIndex:0,type:'pension',from:'2026-01',to:'2026-03',amount:10000}
+  ];
+  const result=additionalIncomeForApplication(entries,'2026-09');
+  assert.equal(result.status,'known');
+  assert.equal(result.amount,30000);
+  assert.equal(result.excluded.reduce((sum,item)=>sum+item.amount,0),135000);
+});
+
+test('an unspecified other benefit cannot silently enter or leave household income',()=>{
+  const entry={personIndex:0,type:'otherBenefit',from:'2026-01',to:'2026-01',amount:50000};
+  const result=additionalIncomeForApplication([entry],'2026-09');
+  assert.equal(result.status,'unknown');
+  assert.equal(result.amount,null);
 });
 
 test('income of an excluded spouse is omitted from the household',()=>{
