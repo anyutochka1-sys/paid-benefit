@@ -9,10 +9,11 @@ function addSixCalendarMonths(date) {
 
 // Decree 2330 p. 3, 13, 14 and 19(1). The last previous award controls
 // both the amount and expiry; without its decision details we return unknown.
-export function newbornShortcut({birthDate,applicationDate,olderAwards=[],sameRecipient=true,motherPregnancyBenefit=false}) {
+export function newbornShortcut({birthDate,applicationDate,olderAwards=[],sameRecipient,motherPregnancyBenefit=false}) {
   if(!birthDate || !applicationDate)return {status:'unknown',reason:'Нужны дата рождения и дата обращения'};
   if(applicationDate<birthDate)return {status:'not-yet-born'};
   if(applicationDate>addSixCalendarMonths(birthDate))return {status:'ordinary',reason:'Позже 6 месяцев со дня рождения'};
+  if(sameRecipient===undefined)return {status:'unknown',reason:'Уточните, тот же ли получатель пособия на старшего'};
   if(!sameRecipient)return {status:'ordinary',reason:'Выплату на старшего получает другое лицо'};
   const active=olderAwards.filter(a=>a.endsOn && a.endsOn>=applicationDate && Number.isFinite(a.tier) && [50,75,100].includes(a.tier));
   if(!active.length)return {status:'ordinary',reason:'Нет действующего назначения на старшего ребёнка этому получателю'};
