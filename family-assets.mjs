@@ -52,6 +52,16 @@ export function childCanApply(person, applicationDate) {
   return {status:'yes'};
 }
 
+// Decree 2330 p. 31(r): the applicant's own court status for this child.
+// The status of the other parent is a separate question and cannot block this applicant.
+export function applicantParentalRights(child) {
+  if (!child.applying || child.role === 'ward') return {status:'not-applicable'};
+  if (child.applicantRights === 'lost' || child.applicantRights === 'restricted')
+    return {status:'block', reason:'Заявитель лишён или ограничен в родительских правах в отношении этого ребёнка'};
+  if (child.applicantRights === 'intact') return {status:'clear'};
+  return {status:'unknown', reason:'Уточните родительские права заявителя в отношении ребёнка из заявления'};
+}
+
 export function checkCars(cars, context) {
   if (!Array.isArray(cars) || context.applicationYear === undefined ||
     context.multipleChildren === undefined || context.disabledFamilyMember === undefined ||
