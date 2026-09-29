@@ -5,7 +5,14 @@ import {incomeWindow} from './engine.mjs';
 export const ADDITIONAL_TYPES = {
   pension:{label:'Пенсия / больничный',period:'monthly',qualifies:true},
   scholarship:{label:'Стипендия',period:'monthly',qualifies:true},
+  academicMedical:{label:'Компенсация при академическом отпуске по медицинским показаниям',period:'monthly',qualifies:true},
+  guardianReward:{label:'Вознаграждение приёмного родителя / возмездного опекуна',period:'monthly',qualifies:true},
+  successorPayment:{label:'Выплата правопреемнику умершего застрахованного лица',period:'monthly',qualifies:false},
+  publicDuty:{label:'Компенсация за государственные или общественные обязанности',period:'monthly',qualifies:false},
   military:{label:'Денежное довольствие',period:'monthly',qualifies:true},
+  rationCompensation:{label:'Денежная компенсация вместо продовольственного пайка',period:'monthly',qualifies:true},
+  judgeAllowance:{label:'Пожизненное содержание судьи в отставке',period:'monthly',qualifies:true},
+  serviceSeverance:{label:'Единовременное пособие при увольнении со службы',period:'monthly',qualifies:false},
   otherBenefit:{label:'Иное пособие / компенсация, учитываемое в доходе',period:'monthly',qualifies:false},
   unemploymentBenefit:{label:'Пособие по безработице',period:'monthly',qualifies:false},
   lottery:{label:'Выигрыш в лотерею / тотализаторе',period:'monthly',qualifies:false},
@@ -24,13 +31,17 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(excludedPersonIndices.includes(entry.personIndex))continue;
     const definition=ADDITIONAL_TYPES[entry.type];
     if(!definition || !Number.isFinite(entry.amount) || entry.amount<0) {issues.push('Уточните вид и сумму дополнительного дохода');continue}
+    if(entry.type==='securities'&&(!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount)) {
+      issues.push('Уточните расходы по операциям с ценными бумагами; они не могут превышать введённую выручку');continue;
+    }
     const months=definition.period==='annual'
       ? window.filter(m=>Number(m.slice(0,4))===entry.taxYear)
       : window.filter(m=>entry.from && entry.to && m>=entry.from && m<=entry.to);
     if(definition.period==='annual'&&!Number.isInteger(entry.taxYear) || definition.period==='monthly'&&(!entry.from||!entry.to||entry.from>entry.to)) {
       issues.push('Уточните налоговый год или месяцы получения дохода');continue;
     }
-    const value=definition.period==='annual'?entry.amount/12:entry.amount;
+    const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:entry.amount;
+    const value=definition.period==='annual'?relevantAmount/12:relevantAmount;
     const person=byPerson.get(entry.personIndex)||{};
     for(const month of months) {
       const previous=person[month]||{total:0,qualifying:0};
