@@ -1,7 +1,7 @@
 import { incomeWindow, minimumIncomeTest, monthIndex, monthString, RULES } from './engine.mjs';
 import { includedFamily, childCanApply, checkCars, ageAt } from './family-assets.mjs';
 import {incomeForMonth,childTier} from './income.mjs';
-import {checkProperty,checkOtherVehicles,checkDepositInterest} from './property.mjs';
+import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 import {childBenefitIncome} from './benefits.mjs';
 import {alimonyForApplication} from './alimony.mjs';
 import {newbornShortcut} from './newborn.mjs';
@@ -121,7 +121,7 @@ function addOtherVehicle() {
 }
 function addDeposit() {
   const row=document.createElement('div');row.className='form-row';
-  row.innerHTML='<label>Год получения процентов<input class="tax-year" type="number" min="2024" max="2030"></label><label>Выплачено процентов, ₽<input class="interest" type="number" min="0"></label><label>Счёт закрыт в месяце<input class="closed" type="month"></label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Год получения процентов<input class="tax-year" type="number" min="2024" max="2030"></label><label>Выплачено процентов, ₽<input class="interest" type="number" min="0"></label><label>Счёт закрыт в месяце<input class="closed" type="month"></label><label class="check"><input class="nominal" type="checkbox"> Номинальный счёт ребёнка под опекой</label><button class="remove" type="button">Убрать</button>';
   bindRow(row);$('deposits').append(row);render();
 }
 function bindRow(row) {
@@ -168,7 +168,8 @@ function depositData() {
   return [...document.querySelectorAll('#deposits .form-row')].map(row=>({
     taxYear:row.querySelector('.tax-year').value===''?undefined:Number(row.querySelector('.tax-year').value),
     interestForRelevantTaxYear:row.querySelector('.interest').value===''?undefined:Number(row.querySelector('.interest').value),
-    closedMonth:row.querySelector('.closed').value||undefined
+    closedMonth:row.querySelector('.closed').value||undefined,
+    nominalWardAccount:row.querySelector('.nominal').checked
   }));
 }
 function render() {
@@ -186,7 +187,7 @@ function render() {
     const carCheck=checkCars(cars,{applicationYear:year,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportVehicle:$('support-car').checked,fourOrMoreChildren});
     const propertyCheck=checkProperty(properties,{familySize:members.included.length,rural:$('rural').checked,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportVehicle:$('support-car').checked});
     const otherCheck=checkOtherVehicles(otherVehicles,{applicationYear:year,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportMotorcycle:$('support-car').checked,supportMachine:$('support-car').checked});
-    const allDepositsKnown=deposits.every(d=>d.taxYear===year-1 && Number.isFinite(d.interestForRelevantTaxYear));
+    const allDepositsKnown=deposits.filter(d=>!d.nominalWardAccount).every(d=>d.taxYear===year-1 && Number.isFinite(d.interestForRelevantTaxYear));
     const depositCheck=allDepositsKnown&&Number($('pm-person').value)>0?checkDepositInterest(deposits,{applicationMonth:month,perCapitaMinimum:Number($('pm-person').value)}):{status:'unknown'};
     const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые дети)':''}. Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}. Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по базовым порогам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по базовым порогам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
     const incomeResult=incomeForMonth(incomePeople.map(p=>({...p,mode:$('income-mode').value,baseApplicationMonth:start})),month);
@@ -194,6 +195,7 @@ function render() {
     const scenarios=$('application-mode').value==='separate'?selected.map(c=>[c]):[selected];
     const benefitRows=benefitRowsForWindow(month);
     const pmPerson=Number($('pm-person').value),pmChild=Number($('pm-child').value);
+    const depositIncome=depositIncomeForApplication(deposits,{applicationMonth:month,perCapitaMinimum:pmPerson});
     const maritalStatus=$('marital-status').value;
     const alimonyFrom=$('alimony-from').value, alimonyTo=$('alimony-to').value;
     const alimonyMonthly=$('alimony-monthly').value;
@@ -210,7 +212,7 @@ function render() {
     const incomeText=scenarios.length?scenarios.map((group,scenarioIndex)=>{
       const benefitResult=childBenefitIncome(benefitRows.payments,children,group.map(c=>c.id),month,filingDate);
       const benefitUnknown=[...benefitRows.missing,...benefitResult.missing];
-      const combinedIncome=incomeResult.total===null || benefitResult.total===null || benefitUnknown.length || alimony.status!=='known' ? null : incomeResult.total+benefitResult.total+alimony.amount;
+      const combinedIncome=incomeResult.total===null || benefitResult.total===null || benefitUnknown.length || alimony.status!=='known' || depositIncome.status!=='known' ? null : incomeResult.total+benefitResult.total+alimony.amount+depositIncome.amount;
       const olderAwards=children.filter(c=>c.awardTier && c.awardEnd && c.awardDecision).map(c=>({childId:c.id,tier:c.awardTier,endsOn:c.awardEnd,decisionDate:c.awardDecision}));
       const newborns=group.filter(c=>c.birthDate && c.birthDate<=filingDate).map(c=>({child:c,result:newbornShortcut({birthDate:c.birthDate,applicationDate:filingDate,olderAwards:olderAwards.filter(a=>a.childId!==c.id),sameRecipient:yn($('same-recipient').value),motherPregnancyBenefit:$('mother-pregnancy-benefit').checked})})).filter(x=>x.result.status==='simplified');
       const regularChildren=group.length-newborns.length;
@@ -221,7 +223,7 @@ function render() {
       const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
       const newbornText=newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'';
       const regularText=regularChildren?`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?'доход выше указанного ПМ.':'ступень пока неизвестна.'}`:'';
-      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+alimony.reason+')'}. ${newbornText} ${regularText}`;
+      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+alimony.reason+')'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. ${newbornText} ${regularText}`;
     }).join(' '):'Отметьте хотя бы одного ребёнка для заявления.';
     if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
     // An entered 12-week condition is applicable only to the selected month.
