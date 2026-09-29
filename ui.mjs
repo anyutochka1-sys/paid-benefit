@@ -4,12 +4,21 @@ import {incomeForMonth,childTier} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 import {childBenefitIncome} from './benefits.mjs';
 import {alimonyForApplication} from './alimony.mjs';
+import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs';
 import {maternityIncomeForApplication} from './maternity.mjs';
 const $ = id => document.getElementById(id);
 const types = [
   ['unemployment','Официальная безработица'], ['pregnancy','Беременность'],
-  ['careUnderThree','Уход за ребёнком до 3 лет']
+  ['careUnderThree','Уход за ребёнком до 3 лет'],
+  ['fullTimeStudent','Очное обучение до 23 лет'],
+  ['careDisabledChild','Уход за ребёнком-инвалидом или инвалидом с детства I группы'],
+  ['careDisabledAdult','Уход за инвалидом I группы или нуждающимся в уходе пожилым родственником'],
+  ['treatment','Непрерывное лечение свыше 3 месяцев'],
+  ['military','Военная служба и до 3 месяцев после'],
+  ['incarceration','Лишение свободы, арест и до 3 месяцев после'],
+  ['indigenous','Традиционная деятельность КМНС'],
+  ['pensionRecipient','Получение пенсии (старость, инвалидность, потеря кормильца)']
 ];
 const incomePeople=[{label:'Заявитель',months:{},total:null,incomeType:'employment'}];
 let nextChildId=1;
@@ -25,7 +34,7 @@ const benefitsSection=document.createElement('section');
 benefitsSection.innerHTML='<div class="section-heading"><h3>Уже получаете единое пособие на ребёнка?</h3><button id="add-benefit" type="button">+ Указать выплату</button></div><p class="hint">Не добавляйте это пособие к зарплате или общей сумме дохода. Укажите ребёнка, сумму и месяцы поступления. Если размер менялся, добавьте отдельный период. При продлении на того же ребёнка прежние выплаты исключаются, при заявлении только на другого — учитываются. Одинаковые выплаты в разных строках не дублируйте.</p><div id="benefits"></div>';
 $('income-people').after(benefitsSection);
 const alimonySection=document.createElement('section');
-alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label>Сколько детей в этом алиментном обязательстве<input id="alimony-child-count" type="number" min="1" value="1"></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><label>Есть ли по всем указанным детям второй родитель?<select id="second-parent"><option value="">Уточните</option><option value="yes">Да, у всех</option><option value="no">Нет, я единственный родитель для всех</option><option value="mixed">У детей разные обстоятельства</option></select></label><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
+alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label>Сколько детей в этом алиментном обязательстве<input id="alimony-child-count" type="number" min="1" value="1"></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><p class="hint">Статус второго родителя укажите в карточке каждого ребёнка. Лишение свободы и лишение родительских прав сами по себе не означают статус единственного родителя.</p><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
 benefitsSection.after(alimonySection);
 const maternitySection=document.createElement('section');
 maternitySection.innerHTML='<div class="section-heading"><h3>Пособие по беременности и родам (БиР)</h3><button id="add-maternity" type="button">+ Указать выплату</button></div><p class="hint">Вводите всю сумму разовой выплаты отдельно от зарплаты. Она распределяется по месяцам начисления, а не учитывается целиком в месяце поступления. Для обычного периода выставлено 5 месяцев; при продлении уточните срок по документу.</p><div id="maternity-payments"></div>';
@@ -52,7 +61,7 @@ function refreshMaritalForm() {
   $('alimony-fields').hidden=!status;
   $('alimony-actual-fields').hidden=$('alimony-received').value!=='yes';
   $('alimony-divorced-fields').hidden=status!=='divorced';
-  $('alimony-wage-fields').hidden=status!=='divorced'||['court','court-order','bailiffs'].includes($('alimony-kind').value)||$('second-parent').value==='no';
+  $('alimony-wage-fields').hidden=status!=='divorced'||['court','court-order','bailiffs'].includes($('alimony-kind').value)||soleParentStatus(childData().filter(c=>c.alimonyApplies))==='sole';
   $('notary-amount-field').hidden=status!=='divorced'||$('alimony-kind').value!=='notary';
   if(status==='married' && incomePeople.length===1) {incomePeople.push(savedSpouse||{label:'Супруг(а)',months:{},total:null,incomeType:'employment'});renderIncomeForm()}
   if(status && status!=='married' && incomePeople.length>1) {savedSpouse=incomePeople.pop();renderIncomeForm()}
@@ -96,7 +105,7 @@ function renderIncomeForm() {
 }
 function addReason() {
   const row = document.createElement('div'); row.className='reason';
-  row.innerHTML=`<label>У кого была причина<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><label>Причина<select class="type">${types.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="check"><input class="registered" type="checkbox">Стою на учёте в ЦЗН</label><button class="remove" type="button">Убрать</button>`;
+  row.innerHTML=`<label>У кого была причина<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><label>Причина<select class="type">${types.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="check"><input class="registered" type="checkbox"> Состоял(а) на учёте в ЦЗН</label><p class="hint">Для службы и лишения свободы включите в даты не более трёх месяцев после окончания. Основание и период должны подтверждаться документами.</p><button class="remove" type="button">Убрать</button>`;
   row.querySelector('.remove').onclick=()=>{row.remove();render()};
   row.querySelector('.type').onchange=()=>{row.querySelector('.check').hidden=row.querySelector('.type').value!=='unemployment';render()};
   row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
@@ -105,7 +114,7 @@ function addReason() {
 function addChild() {
   const row=document.createElement('div'); row.className='form-row';
   row.dataset.childId=`child-${nextChildId++}`;
-  row.innerHTML='<label>Имя или обозначение ребёнка<input class="child-name" type="text" placeholder="Например, старший"></label><label>Дата рождения<input class="birth" type="date"></label><label class="check"><input class="applying" type="checkbox" checked> Подаю на этого ребёнка</label><details><summary>Уже назначено пособие на этого ребёнка?</summary><label>Размер действующего пособия<select class="award-tier"><option value="">Не назначено / не знаю</option><option value="50">50%</option><option value="75">75%</option><option value="100">100%</option></select></label><label>Дата последнего решения<input class="award-decision" type="date"></label><label>Действует по<input class="award-end" type="date"></label></details><label>Очное обучение<select class="student"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>В браке<select class="married"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>Гражданин РФ и проживает в России<select class="citizen"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Имя или обозначение ребёнка<input class="child-name" type="text" placeholder="Например, старший"></label><label>Дата рождения<input class="birth" type="date"></label><label class="check"><input class="applying" type="checkbox" checked> Подаю на этого ребёнка</label><label class="check"><input class="alimony-applies" type="checkbox" checked> Этот ребёнок входит в указанное ниже алиментное обязательство</label><label>Статус второго родителя этого ребёнка<select class="second-parent-status"><option value="">Уточните</option><option value="recorded">Указан в записи о рождении</option><option value="blank">Не указан в записи о рождении</option><option value="mother-statement">Записан по заявлению матери</option><option value="dead">Умер</option><option value="declared-dead">Объявлен умершим судом</option><option value="missing">Признан безвестно отсутствующим</option><option value="imprisoned">Лишён свободы</option><option value="deprived-rights">Лишён родительских прав</option></select></label><details><summary>Уже назначено пособие на этого ребёнка?</summary><label>Размер действующего пособия<select class="award-tier"><option value="">Не назначено / не знаю</option><option value="50">50%</option><option value="75">75%</option><option value="100">100%</option></select></label><label>Дата последнего решения<input class="award-decision" type="date"></label><label>Действует по<input class="award-end" type="date"></label></details><label>Очное обучение<select class="student"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>В браке<select class="married"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>Гражданин РФ и проживает в России<select class="citizen"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><button class="remove" type="button">Убрать</button>';
   row.querySelector('.remove').onclick=()=>{row.remove();renderBenefitRows();render()};
   row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{renderBenefitRows();render()}));
   $('children').append(row); renderBenefitRows(); render();
@@ -146,7 +155,7 @@ function addCar() {
 }
 function addProperty() {
   const row=document.createElement('div');row.className='form-row';
-  row.innerHTML='<label>Вид<select class="type"><option value="apartment">Квартира</option><option value="house">Дом</option><option value="garden">Садовый дом</option><option value="nonresidential">Нежилое помещение</option><option value="garage">Гараж / машино-место</option><option value="land">Участок</option></select></label><label class="area-field">Площадь, м²<input class="area" type="number" min="0"></label><label class="land-field">Площадь, га<input class="hectares" type="number" min="0" step="0.001"></label><label>Доля семьи, %<input class="share" type="number" min="0" max="100" placeholder="100"></label><label class="check"><input class="supported" type="checkbox"> Получено как целевая господдержка</label><label class="check"><input class="excluded" type="checkbox"> Под арестом / запрет действий / у опекаемого</label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Вид<select class="type"><option value="apartment">Квартира</option><option value="house">Дом</option><option value="garden">Садовый дом</option><option value="nonresidential">Нежилое помещение / здание / сооружение</option><option value="garage">Гараж / машино-место</option><option value="land">Участок</option></select></label><label class="area-field">Площадь, м²<input class="area" type="number" min="0"></label><label class="land-field">Площадь, га<input class="hectares" type="number" min="0" step="0.001"></label><label>Доля всей семьи в объекте, %<input class="share" type="number" min="0" max="100" placeholder="100"></label><details><summary>Исключения для этого объекта</summary><label class="check"><input class="supported" type="checkbox"> Предоставлен как целевая господдержка или полностью оплачен ею (без маткапитала)</label><label class="check"><input class="ward-owned" type="checkbox"> Принадлежит подопечному ребёнку</label><label class="check"><input class="excluded" type="checkbox"> Под арестом или запретом регистрации</label><label class="check"><input class="uninhabitable" type="checkbox"> Квартира признана непригодной для проживания</label><label class="check"><input class="severe-illness" type="checkbox"> В квартире живёт член семьи с заболеванием из установленного перечня</label><label class="check"><input class="agricultural" type="checkbox"> Земля сельхозназначения с оборотом по отдельному закону</label><label class="check"><input class="far-east" type="checkbox"> Дальневосточный / арктический гектар</label><label class="check"><input class="auxiliary" type="checkbox"> Хозяйственная постройка на ИЖС / ЛПХ / садовом участке либо общее имущество</label></details><button class="remove" type="button">Убрать</button>';
   bindRow(row); const toggle=()=>{const type=row.querySelector('.type').value;row.querySelector('.area-field').hidden=!['apartment','house'].includes(type);row.querySelector('.land-field').hidden=type!=='land';render()}; row.querySelector('.type').addEventListener('input',toggle);
   $('properties').append(row);toggle();
 }
@@ -170,6 +179,7 @@ function childData() {
   return [...document.querySelectorAll('#children .form-row')].map(row=>({
     id:row.dataset.childId,role:'child',birthDate:row.querySelector('.birth').value,
     applying:row.querySelector('.applying').checked,
+    alimonyApplies:row.querySelector('.alimony-applies').checked,secondParentStatus:row.querySelector('.second-parent-status').value,
     awardTier:row.querySelector('.award-tier').value?Number(row.querySelector('.award-tier').value):undefined,
     awardDecision:row.querySelector('.award-decision').value,
     awardEnd:row.querySelector('.award-end').value,
@@ -191,7 +201,13 @@ function propertyData() {
     area:row.querySelector('.area').value===''?undefined:Number(row.querySelector('.area').value),
     hectares:row.querySelector('.hectares').value===''?undefined:Number(row.querySelector('.hectares').value),
     familyShare:row.querySelector('.share').value===''?undefined:Number(row.querySelector('.share').value)/100,
-    supported:row.querySelector('.supported').checked,seized:row.querySelector('.excluded').checked
+    supported:row.querySelector('.supported').checked,seized:row.querySelector('.excluded').checked,
+    wardOwned:row.querySelector('.ward-owned').checked,
+    uninhabitable:row.querySelector('.uninhabitable').checked,
+    severeIllnessResidence:row.querySelector('.severe-illness').checked,
+    agriculturalExcluded:row.querySelector('.agricultural').checked,
+    farEastHectare:row.querySelector('.far-east').checked,
+    auxiliaryExcluded:row.querySelector('.auxiliary').checked
   }));
 }
 function otherVehicleData() {
@@ -238,10 +254,10 @@ function render() {
     const alimonyFrom=$('alimony-from').value, alimonyTo=$('alimony-to').value;
     const alimonyMonthly=$('alimony-monthly').value;
     const receiving=$('alimony-received').value==='yes';
-    const secondParent=$('second-parent').value;
+    const secondParent=soleParentStatus(children.filter(c=>c.alimonyApplies));
     const courtAmounts=Object.fromEntries(incomeWindow(month).map(m=>[m,receiving && alimonyFrom && alimonyTo && m>=alimonyFrom && m<=alimonyTo ? Number(alimonyMonthly) : 0]));
     const alimony=maritalStatus?alimonyForApplication({
-      maritalStatus,singleParent:maritalStatus==='divorced'&&secondParent==='no',
+      maritalStatus,singleParent:maritalStatus==='divorced'&&secondParent==='sole',
       arrangement:$('alimony-kind').value,divorceMonth:$('divorce-month').value,
       childrenForAlimony:Number($('alimony-child-count').value),
       declaredMonthly:$('alimony-kind').value==='notary'&&maritalStatus==='divorced'?($('notary-amount').value===''?NaN:Number($('notary-amount').value)):(receiving?(alimonyMonthly===''?NaN:Number(alimonyMonthly)):0),
@@ -249,7 +265,7 @@ function render() {
       receivedByMonth:courtAmounts,officialWage:Number($('alimony-wage').value),wageFinal:$('alimony-final').checked
     },month):{status:'unknown',reason:'Укажите семейное положение'};
     if(receiving && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните фактически поступившие алименты и период'}
-    if(maritalStatus==='divorced' && !['court','court-order','bailiffs'].includes($('alimony-kind').value) && !['yes','no'].includes(secondParent)) {alimony.status='unknown';alimony.reason='По каждому ребёнку нужно уточнить второго родителя и основание алиментов'}
+    if(maritalStatus==='divorced' && !['court','court-order','bailiffs'].includes($('alimony-kind').value) && !['sole','other'].includes(secondParent)) {alimony.status='unknown';alimony.reason=secondParent==='mixed'?'У детей разные вторые родители: укажите отдельные алиментные обязательства; общий расчёт сейчас недоступен':'Уточните статус второго родителя у детей, указанных в алиментном обязательстве'}
     let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
     const incomeText=scenarios.length?scenarios.map((group,scenarioIndex)=>{
       const benefitResult=childBenefitIncome(benefitRows.payments,children,group.map(c=>c.id),month,filingDate);
@@ -274,7 +290,8 @@ function render() {
     // An entered 12-week condition is applicable only to the selected month.
     const adults=incomePeople.map((person,j)=>{
       const income=Object.fromEntries(incomeWindow(month).map(m=>[m,Number.isFinite(person.months[m])?[{type:person.incomeType,amount:person.months[m]}]:[]]));
-      const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),pregnancyWeeksAtApplication:j===0&&i===0?Number($('weeks').value):0,income},month,RULES[year].mrot);
+      const soleParent=j===0&&children.some(c=>c.birthDate&&ageAt(c.birthDate,filingDate)<18&&soleParentStatus([c])==='sole');
+      const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),pregnancyWeeksAtApplication:j===0&&i===0?Number($('weeks').value):0,income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
       const amountKnown=$('income-mode').value==='monthly'?incomeWindow(month).every(m=>Number.isFinite(person.months[m])):month===start&&Number.isFinite(person.total);
       const earned=$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total:result.earned;
       return {...result,earned,passed:earned>=result.minimum,known:amountKnown&&person.incomeType!=='other',label:person.label};
