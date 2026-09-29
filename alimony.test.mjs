@@ -1,6 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {alimonyForApplication} from './alimony.mjs';
+import {alimonyForApplication,applicableRosstatWage} from './alimony.mjs';
+
+test('new final Rosstat year applies only from month after official publication',()=>{
+  const wageRecords=[
+    {year:2024,amount:80000,publishedMonth:'2025-05',final:true},
+    {year:2025,amount:100000,publishedMonth:'2026-06',final:true}
+  ];
+  assert.deepEqual([applicableRosstatWage(wageRecords,'2026-05').year,applicableRosstatWage(wageRecords,'2026-06').year,applicableRosstatWage(wageRecords,'2026-07').year],[2024,2024,2025]);
+  const base={maritalStatus:'divorced',arrangement:'informal',childrenForAlimony:1,divorceMonth:'2025-01',declaredMonthly:0,wageRecords};
+  assert.equal(alimonyForApplication(base,'2026-06').minimumMonthly,20000);
+  assert.equal(alimonyForApplication(base,'2026-07').minimumMonthly,25000);
+  assert.equal(alimonyForApplication({...base,wageRecords:[wageRecords[1]]},'2026-06').status,'unknown');
+});
 
 test('informal arrangement for one child uses 1/4 regional wage only after divorce',()=>{
   const r=alimonyForApplication({maritalStatus:'divorced',arrangement:'informal',childrenForAlimony:1,officialWage:100000,wageFinal:true,declaredMonthly:0,divorceMonth:'2026-02'},'2026-09');
