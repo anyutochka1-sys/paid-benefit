@@ -34,11 +34,15 @@ export function minimumIncomeTest(adult, applicationMonth, mrot) {
   const warnings = [];
   for (const reason of adult.reasons ?? []) {
     if (!reason.start || !reason.end) continue;
-    if (!['unemployment', 'pregnancy', 'careUnderThree'].includes(reason.type)) {
+    if (!['unemployment', 'pregnancy', 'careUnderThree', 'fullTimeStudent', 'careDisabledChild', 'careDisabledAdult', 'treatment', 'military', 'incarceration', 'indigenous', 'pensionRecipient'].includes(reason.type)) {
       warnings.push('Эта причина требует дополнительной проверки.');
       continue;
     }
     let months = monthRange(reason.start, reason.end).filter(m => window.includes(m));
+    if(reason.type==='treatment' && monthRange(reason.start,reason.end).length<=3) {
+      warnings.push('Непрерывное лечение должно длиться свыше трёх месяцев.');
+      continue;
+    }
     if (reason.type === 'unemployment') {
       if (!reason.registered) {
         warnings.push('Без регистрации в центре занятости безработица не засчитывается.');
