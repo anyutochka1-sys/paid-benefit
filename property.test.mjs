@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {checkProperty,checkOtherVehicles,checkDepositInterest} from './property.mjs';
+import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 const context={familySize:4,rural:false,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false};
 test('one apartment unlimited, two exceed 24 square metres per person only above threshold',()=>{
   assert.equal(checkProperty([{type:'apartment',area:200}],context).status,'yes');
@@ -21,4 +21,21 @@ test('deposit interest is compared in full, except accounts closed six months be
   const account={interestForRelevantTaxYear:30000};
   assert.equal(checkDepositInterest([account],{applicationMonth:'2026-09',perCapitaMinimum:20000}).status,'no');
   assert.equal(checkDepositInterest([{...account,closedMonth:'2026-03'}],{applicationMonth:'2026-09',perCapitaMinimum:20000}).status,'yes');
+});
+test('interest under the threshold is prorated by months of tax year in window',()=>{
+  const r=depositIncomeForApplication([{taxYear:2025,interestForRelevantTaxYear:18000}],{applicationMonth:'2026-09',perCapitaMinimum:20000});
+  assert.equal(r.months,5);
+  assert.equal(r.amount,7500);
+});
+test('interest above the threshold counts in full and independently denies',()=>{
+  const r=depositIncomeForApplication([{taxYear:2025,interestForRelevantTaxYear:30000}],{applicationMonth:'2026-09',perCapitaMinimum:20000});
+  assert.equal(r.method,'full-due-to-threshold');assert.equal(r.amount,30000);assert.equal(r.thresholdStatus,'no');
+});
+test('closed account avoids threshold but interest still enters prorated income',()=>{
+  const r=depositIncomeForApplication([{taxYear:2025,interestForRelevantTaxYear:30000,closedMonth:'2026-03'}],{applicationMonth:'2026-09',perCapitaMinimum:20000});
+  assert.equal(r.amount,12500);assert.equal(r.thresholdStatus,'yes');
+});
+test('ward nominal account is excluded from threshold and income',()=>{
+  const r=depositIncomeForApplication([{taxYear:2025,interestForRelevantTaxYear:30000,nominalWardAccount:true}],{applicationMonth:'2026-09',perCapitaMinimum:20000});
+  assert.equal(r.amount,0);assert.equal(r.thresholdStatus,'yes');
 });
