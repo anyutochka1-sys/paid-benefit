@@ -37,6 +37,18 @@ test('an unspecified other benefit cannot silently enter or leave household inco
   assert.equal(result.amount,null);
 });
 
+test('employer birth aid excludes only the verified tax-free part paid in the first year',()=>{
+  const base={personIndex:0,type:'otherBenefit',benefitKind:'employerBirthAid',from:'2026-03',to:'2026-03',amount:120000};
+  const verified=additionalIncomeForApplication([{...base,birthAidFirstYear:true,taxExemptAmount:100000}],'2026-09');
+  assert.equal(verified.amount,20000);
+  assert.equal(verified.excluded[0].amount,100000);
+  assert.equal(additionalIncomeForApplication([{...base,birthAidFirstYear:false}],'2026-09').amount,120000);
+  assert.equal(additionalIncomeForApplication([base],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,birthAidFirstYear:true}],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,birthAidFirstYear:true,taxExemptAmount:130000}],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,birthAidFirstYear:true,taxExemptAmount:100000,to:'2026-04'}],'2026-09').status,'unknown');
+});
+
 test('income of an excluded spouse is omitted from the household',()=>{
   const entries=[{personIndex:1,type:'pension',from:'2025-08',to:'2026-07',amount:15000}];
   assert.equal(additionalIncomeForApplication(entries,'2026-09',[1]).amount,0);
