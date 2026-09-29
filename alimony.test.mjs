@@ -15,3 +15,7 @@ test('court decision uses actual receipts even below wage floor',()=>{
 test('no final Rosstat wage is unknown, not silently estimated from preliminary',()=>{
   assert.equal(alimonyForApplication({maritalStatus:'divorced',arrangement:'notary',childrenForAlimony:2,officialWage:100000,wageFinal:false,declaredMonthly:5000,divorceMonth:'2025-01'},'2026-09').status,'unknown');
 });
+test('higher actual informal payments count only in months received',()=>{
+  const r=alimonyForApplication({maritalStatus:'divorced',arrangement:'informal',childrenForAlimony:1,officialWage:80000,wageFinal:true,declaredMonthly:0,declaredByMonth:{'2026-07':35000},divorceMonth:'2026-06'},'2026-09');
+  assert.equal(r.amount,20000+35000);
+});
