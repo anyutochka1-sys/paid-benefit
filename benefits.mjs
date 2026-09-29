@@ -22,6 +22,10 @@ export function childBenefitIncome(payments, children, applicationChildIds, appl
     }
     const excludedReason=selected.has(child.id)
       ? 'подача на этого ребёнка'
+      : child.deathDate && child.deathDate<=applicationDate
+        ? 'ребёнок умер до даты заявления'
+      : child.married
+        ? 'ребёнок не входит в состав семьи'
       : ageAt(child.birthDate,applicationDate)>=17
         ? 'ребёнку исполнилось 17 лет'
         : null;
