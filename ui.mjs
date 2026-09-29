@@ -420,8 +420,7 @@ function render() {
     }).join(' '):$('pregnancy-applying').checked?'Заявление на ребёнка не выбрано.':'Отметьте ребёнка или заявление по беременности.';
     let pregnancyText='';
     if($('pregnancy-applying').checked) {
-      if(selected.length) pregnancyText='Пособие беременной вместе с детским: совместная ступень пока не рассчитывается, требуется отдельная проверка обеих назначаемых выплат.';
-      else if(month!==start) pregnancyText='По беременности: для будущего месяца уточните срок на дату подачи и дату окончания беременности.';
+      if(month!==start) pregnancyText='Отдельное заявление по беременности: для будущего месяца уточните срок на дату подачи и дату окончания беременности.';
       else if($('pregnancy-registered').value!=='yes') pregnancyText=$('pregnancy-registered').value==='no'?'По беременности: нужна постановка на учёт в ранний срок.':'По беременности: уточните постановку на учёт до 12 недель.';
       else if($('weeks').value==='') pregnancyText='По беременности: укажите срок на дату подачи.';
       else if(Number($('weeks').value)<12) pregnancyText='По беременности: обратиться за назначением можно после наступления 12 недель.';
@@ -429,7 +428,7 @@ function render() {
         const pregnancyBenefits=childBenefitIncome(benefitRows.payments,children,[],month,filingDate);
         const pregnancyIncome=!sourceComplete||incomeResult.total===null||pregnancyBenefits.total===null||benefitRows.missing.length||pregnancyBenefits.missing.length||alimony.status!=='known'||depositIncome.status!=='known'||maternityIncome.status!=='known'||supplemental.status!=='known'||childEarnings.status!=='known'?null:incomeResult.total+pregnancyBenefits.total+alimony.amount+depositIncome.amount+maternityIncome.amount+supplemental.amount+childEarnings.amount;
         const result=pregnancyTier({income12:pregnancyIncome,familySize:members.unanswered.length?null:members.included.length,pmPerson,pmWorking:pm.status==='known'?pm.working:null});
-        pregnancyText=result.status==='estimate'?`По беременности: предварительная ступень ${result.tier}% от ПМ трудоспособных (${result.monthly.toLocaleString('ru-RU')} ₽ в месяц); сроки выплаты и остальные критерии ещё требуют проверки.`:result.status==='income-too-high'?'По беременности: доход выше указанного ПМ на человека.':'По беременности: для ступени нужны подтверждённые доходы и ПМ.';
+        pregnancyText=result.status==='estimate'?`Отдельное заявление по беременности: предварительная ступень ${result.tier}% от ПМ трудоспособных (${result.monthly.toLocaleString('ru-RU')} ₽ в месяц). Прежние выплаты на детей, остающихся в семье, учтены в доходе этого заявления: ${pregnancyBenefits.total.toLocaleString('ru-RU')} ₽ за расчётный период. Сроки выплаты и остальные критерии ещё требуют проверки.`:result.status==='income-too-high'?'По беременности: доход отдельного заявления выше указанного ПМ на человека.':'По беременности: для ступени нужны подтверждённые доходы и ПМ.';
       }
     }
     if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
