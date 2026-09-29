@@ -2,12 +2,22 @@ import { incomeWindow, minimumIncomeTest, monthIndex, monthString, RULES } from 
 import { includedFamily, childCanApply, checkCars, ageAt } from './family-assets.mjs';
 import {incomeForMonth,childTier} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest} from './property.mjs';
+import {childBenefitIncome} from './benefits.mjs';
 const $ = id => document.getElementById(id);
 const types = [
   ['unemployment','Официальная безработица'], ['pregnancy','Беременность'],
   ['careUnderThree','Уход за ребёнком до 3 лет']
 ];
 const incomePeople=[{label:'Заявитель',months:{},total:null}];
+let nextChildId=1;
+const benefitPayments=[];
+const applicationChoice=document.createElement('div');
+applicationChoice.innerHTML='<label>Как подаёте на детей?<select id="application-mode"><option value="together">Одним заявлением на всех отмеченных</option><option value="separate">Отдельное заявление на каждого отмеченного</option></select></label><p class="hint">Для каждого отдельного заявления выплаты на остальных детей могут войти в доход. Даты подачи пока одинаковы; при разных месяцах сравните соответствующие строки календаря.</p>';
+$('children').after(applicationChoice);
+applicationChoice.querySelector('select').addEventListener('input',render);
+const benefitsSection=document.createElement('section');
+benefitsSection.innerHTML='<div class="section-heading"><h3>Уже получаете единое пособие на ребёнка?</h3><button id="add-benefit" type="button">+ Указать выплату</button></div><p class="hint">Не добавляйте это пособие к зарплате или общей сумме дохода. Укажите ребёнка, сумму и месяцы поступления. Если размер менялся, добавьте отдельный период. При продлении на того же ребёнка прежние выплаты исключаются, при заявлении только на другого — учитываются. Одинаковые выплаты в разных строках не дублируйте.</p><div id="benefits"></div>';
+$('income-people').after(benefitsSection);
 function incomeMonths() {
   const start=monthIndex($('start').value||'2026-09');
   return Array.from({length:23},(_,i)=>monthString(start-13+i));
@@ -48,8 +58,40 @@ function addReason() {
 }
 function addChild() {
   const row=document.createElement('div'); row.className='form-row';
-  row.innerHTML='<label>Дата рождения<input class="birth" type="date"></label><label>Очное обучение<select class="student"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>В браке<select class="married"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>Гражданин РФ и проживает в России<select class="citizen"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><button class="remove" type="button">Убрать</button>';
-  bindRow(row); $('children').append(row); render();
+  row.dataset.childId=`child-${nextChildId++}`;
+  row.innerHTML='<label>Имя или обозначение ребёнка<input class="child-name" type="text" placeholder="Например, старший"></label><label>Дата рождения<input class="birth" type="date"></label><label class="check"><input class="applying" type="checkbox" checked> Подаю на этого ребёнка</label><label>Очное обучение<select class="student"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>В браке<select class="married"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label>Гражданин РФ и проживает в России<select class="citizen"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><button class="remove" type="button">Убрать</button>';
+  row.querySelector('.remove').onclick=()=>{row.remove();renderBenefitRows();render()};
+  row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{renderBenefitRows();render()}));
+  $('children').append(row); renderBenefitRows(); render();
+}
+function renderBenefitRows() {
+  const childOptions=[...document.querySelectorAll('#children .form-row')].map((row,i)=>({id:row.dataset.childId,label:row.querySelector('.child-name').value||`Ребёнок ${i+1}`}));
+  $('benefits').replaceChildren();
+  benefitPayments.forEach((payment,index)=>{
+    const row=document.createElement('div');row.className='form-row';
+    const select=document.createElement('select');
+    const placeholder=new Option('Выберите ребёнка','');select.add(placeholder);
+    childOptions.forEach(c=>select.add(new Option(c.label,c.id)));
+    select.value=payment.childId;
+    select.addEventListener('input',()=>{payment.childId=select.value;render()});
+    const childLabel=document.createElement('label');childLabel.textContent='Кому назначено пособие';childLabel.append(select);row.append(childLabel);
+    for(const [key,label,type] of [['amount','Сумма в месяц, ₽','number'],['from','С месяца получения','month'],['to','По месяц получения включительно','month']]) {
+      const wrapper=document.createElement('label');wrapper.textContent=label;
+      const input=document.createElement('input');input.type=type;if(type==='number')input.min='0';input.value=payment[key]??'';
+      input.addEventListener('input',()=>{payment[key]=input.value;render()});wrapper.append(input);row.append(wrapper);
+    }
+    const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='Убрать';remove.onclick=()=>{benefitPayments.splice(index,1);renderBenefitRows();render()};row.append(remove);
+    $('benefits').append(row);
+  });
+}
+function benefitRowsForWindow(applicationMonth) {
+  const window=incomeWindow(applicationMonth), payments=[],missing=[];
+  for(const p of benefitPayments) {
+    if(!p.from || !p.to || p.from>p.to) {missing.push('Укажите начало и конец выплаты пособия');continue}
+    for(const month of window) if(month>=p.from && month<=p.to)
+      payments.push({childId:p.childId,month,amount:p.amount===''?null:Number(p.amount)});
+  }
+  return {payments,missing};
 }
 function addCar() {
   const row=document.createElement('div'); row.className='form-row';
@@ -80,7 +122,8 @@ function bindRow(row) {
 const yn = value => value==='' ? undefined : value==='yes';
 function childData() {
   return [...document.querySelectorAll('#children .form-row')].map(row=>({
-    role:'child',birthDate:row.querySelector('.birth').value,
+    id:row.dataset.childId,role:'child',birthDate:row.querySelector('.birth').value,
+    applying:row.querySelector('.applying').checked,
     fullTimeStudent:yn(row.querySelector('.student').value),married:yn(row.querySelector('.married').value),
     russianCitizen:yn(row.querySelector('.citizen').value),livesInRussia:yn(row.querySelector('.citizen').value)
   }));
@@ -135,11 +178,21 @@ function render() {
     const depositCheck=allDepositsKnown&&Number($('pm-person').value)>0?checkDepositInterest(deposits,{applicationMonth:month,perCapitaMinimum:Number($('pm-person').value)}):{status:'unknown'};
     const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые дети)':''}. Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}. Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по базовым порогам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по базовым порогам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
     const incomeResult=incomeForMonth(incomePeople.map(p=>({...p,mode:$('income-mode').value,baseApplicationMonth:start})),month);
-    const eligibleChildren=applicable.filter(x=>x.status==='yes').length;
+    const selected=children.filter((c,j)=>c.applying && applicable[j].status==='yes');
+    const scenarios=$('application-mode').value==='separate'?selected.map(c=>[c]):[selected];
+    const benefitRows=benefitRowsForWindow(month);
     const pmPerson=Number($('pm-person').value),pmChild=Number($('pm-child').value);
-    const tier=year===2026 && incomeResult.total!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length && eligibleChildren && !children.some(c=>c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && c.fullTimeStudent)
-      ?childTier({income12:incomeResult.total,familySize:members.included.length,childrenApplying:eligibleChildren,pmPerson,pmChild}):null;
-    const incomeText=incomeResult.total===null?'Для прогноза дохода нужны данные по месяцам каждого члена семьи.':`Введённый доход за окно: ${incomeResult.total.toLocaleString('ru-RU')} ₽. ${tier?.status==='estimate'?`Ступень только по введённому доходу: ${tier.tier}% (без остальных критериев).`:tier?.status==='income-too-high'?'Введённый доход выше указанного ПМ.':'Ступень не вычислена без ПМ и всех данных семьи.'}`;
+    const incomeText=scenarios.length?scenarios.map((group,scenarioIndex)=>{
+      const benefitResult=childBenefitIncome(benefitRows.payments,children,group.map(c=>c.id),month,filingDate);
+      const benefitUnknown=[...benefitRows.missing,...benefitResult.missing];
+      const combinedIncome=incomeResult.total===null || benefitResult.total===null || benefitUnknown.length ? null : incomeResult.total+benefitResult.total;
+      const tier=year===2026 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length && !children.some(c=>c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && c.fullTimeStudent)
+        ?childTier({income12:combinedIncome,familySize:members.included.length,childrenApplying:group.length,pmPerson,pmChild}):null;
+      const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
+      const label=$('application-mode').value==='separate'?`Заявление на ребёнка ${childNumber} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
+      const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
+      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. ${benefitText} ${tier?.status==='estimate'?`Ступень по указанному доходу: ${tier.tier}%.`:tier?.status==='income-too-high'?'Выше указанного ПМ.':'Ступень пока неизвестна.'}`;
+    }).join(' '):'Отметьте хотя бы одного ребёнка для заявления.';
     if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
     // An entered 12-week condition is applicable only to the selected month.
     const adult={reasons,pregnancyWeeksAtApplication:i===0?Number($('weeks').value):0,income:Object.fromEntries(incomeWindow(month).map(m=>[m,[]]))};
@@ -150,6 +203,7 @@ function render() {
 }
 $('add').onclick=addReason;
 $('add-child').onclick=addChild; $('add-car').onclick=addCar;
+$('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:'',to:''});renderBenefitRows();render()};
  $('add-property').onclick=addProperty; $('add-vehicle').onclick=addOtherVehicle; $('add-deposit').onclick=addDeposit;
  $('add-adult').onclick=()=>{if(incomePeople.length===1)incomePeople.push({label:'Супруг(а)',months:{},total:null});renderIncomeForm();render()};
  $('income-mode').addEventListener('input',()=>{renderIncomeForm();render()});
