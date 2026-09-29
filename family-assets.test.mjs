@@ -12,6 +12,13 @@ test('full-time unmarried 22-year-old counts, married and 23-year-old do not',()
   assert.equal(includedFamily([{...child,married:true}],'2026-09-29').included.length,0);
   assert.equal(includedFamily([child],'2027-10-01').included.length,0);
 });
+test('imprisoned spouse is excluded from family size under paragraph 46',()=>{
+  const people=[{role:'applicant'},{role:'spouse',familyStatus:'imprisoned'}];
+  assert.equal(includedFamily(people,'2026-09-29').included.length,1);
+  assert.equal(includedFamily(people,'2026-09-29').excluded.length,1);
+  assert.equal(includedFamily([{...people[0]},{role:'spouse',familyStatus:'ordinary'}],'2026-09-29').included.length,2);
+  assert.equal(includedFamily([{...people[0]},{role:'spouse',familyStatus:'unknown'}],'2026-09-29').unanswered.length,1);
+});
 test('powerful car cutoff is 250 hp, and five-year cutoff is inclusive',()=>{
   const context={applicationYear:2026,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false,fourOrMoreChildren:false};
   assert.equal(checkCars([{manufactureYear:2021,horsepower:250}],context).status,'no');
