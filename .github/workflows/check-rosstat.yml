@@ -1,0 +1,49 @@
+name: Сверка годовой зарплаты Росстата
+
+on:
+  schedule:
+    - cron: '17 3 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install openpyxl==3.1.5
+      - name: Проверить годовую таблицу Росстата
+        run: |
+          python3 scripts/check_rosstat.py --update | tee rosstat-changes.txt
+          cat rosstat-changes.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Проверить защиту от предварительных и неполных данных
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      - name: Проверить расчёты калькулятора
+        run: node --test *.test.mjs
+      - name: Предложить изменения на проверку
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- data/rosstat-wages.json; then
+            echo 'Годовые данные Росстата не изменились.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B bot/rosstat-annual-review
+          git add data/rosstat-wages.json
+          git commit -m 'Review annual regional Rosstat wage data'
+          git push --force-with-lease origin HEAD:refs/heads/bot/rosstat-annual-review
+          if [ "$(gh pr list --head bot/rosstat-annual-review --json number --jq 'length')" = '0' ]; then
+            gh pr create --base main --head bot/rosstat-annual-review \
+              --title 'Проверить годовые зарплаты Росстата для алиментов' \
+              --body 'Еженедельная сверка официальной годовой таблицы обнаружила изменения. Проверьте регионы, предварительность, дату официальной публикации и окончательность года. До подтверждения не применять новые значения для расчёта алиментов.'
+          fi
