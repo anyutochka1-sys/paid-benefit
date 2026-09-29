@@ -24,6 +24,7 @@ export function includedFamily(people, applicationDate) {
       continue;
     }
     if (!['child', 'ward'].includes(person.role)) { unanswered.push({person, reason:'Неизвестная роль в семье'}); continue; }
+    if (person.deathDate && person.deathDate<=applicationDate) { excluded.push({person,reason:'Ребёнок умер до даты заявления'}); continue; }
     if (!person.birthDate || person.married === undefined) { unanswered.push({person, reason:'Нужны дата рождения и семейное положение'}); continue; }
     const age=ageAt(person.birthDate, applicationDate);
     if (person.married) { excluded.push({person, reason:'Ребёнок состоит в браке'}); continue; }
@@ -38,6 +39,7 @@ export function includedFamily(people, applicationDate) {
 }
 
 export function childCanApply(person, applicationDate) {
+  if(person.deathDate && person.deathDate<=applicationDate)return {status:'no',reason:'Ребёнок умер до даты обращения'};
   if (!person.birthDate || person.russianCitizen === undefined || person.livesInRussia === undefined)
     return {status:'unknown', reason:'Нужны дата рождения, гражданство и проживание ребёнка'};
   if (ageAt(person.birthDate, applicationDate) >= 17) return {status:'no', reason:'На дату обращения ребёнку исполнилось 17 лет'};
