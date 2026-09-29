@@ -6,7 +6,7 @@ const excluded = item => item.wardOwned || item.seized || item.registrationBan |
   (item.auxiliaryExcluded && item.type==='nonresidential') || item.familyShare <= 1/3;
 
 export function checkProperty(items, {familySize, rural, multipleChildren, disabledFamilyMember, supportVehicle}) {
-  if (!Array.isArray(items) || !familySize || rural===undefined) return {status:'unknown',reasons:['Нужны состав семьи и тип населённого пункта']};
+  if (!Array.isArray(items) || !familySize) return {status:'unknown',reasons:['Нужен состав семьи']};
   const relevant=items.filter(item=>!excluded(item));
   const reasons=[], review=[];
   const group=type=>relevant.filter(item=>item.type===type);
@@ -22,10 +22,11 @@ export function checkProperty(items, {familySize, rural, multipleChildren, disab
     if(group(type).length>limit) reasons.push(`Слишком много ${label}: ${group(type).length}`);
   }
   const land=group('land').filter(x=>!x.agriculturalExcluded && !x.farEastHectare);
+  if(land.length && rural===undefined) review.push('Уточните место жительства для порога земли: 0,25 га или 1 га');
   if(land.some(x=>!Number.isFinite(x.hectares))) review.push('Нужна площадь земельных участков');
-  else if(land.reduce((s,x)=>s+x.hectares,0)>(rural?1:.25)) reasons.push('Площадь земельных участков выше допустимой');
+  else if(rural!==undefined && land.reduce((s,x)=>s+x.hectares,0)>(rural?1:.25)) reasons.push('Площадь земельных участков выше допустимой');
   if(relevant.some(x=>!['apartment','house','garden','nonresidential','garage','land'].includes(x.type))) review.push('Есть объект недвижимости, для которого пока нет правила');
-  return {status:review.length?'review':reasons.length?'no':'yes',reasons,review};
+  return {status:reasons.length?'no':review.length?'review':'yes',reasons,review};
 }
 
 export function checkOtherVehicles(items, {applicationYear,multipleChildren,disabledFamilyMember,supportMotorcycle,supportMachine}) {
@@ -39,7 +40,7 @@ export function checkOtherVehicles(items, {applicationYear,multipleChildren,disa
     if(group(type).some(x=>!Number.isFinite(x.manufactureYear)))review.push(`Нужен год выпуска ${label}`);
     else if(group(type).filter(x=>applicationYear-x.manufactureYear<=5).length>limit)reasons.push(`Превышено допустимое число ${label} не старше пяти лет`);
   }
-  return {status:review.length?'review':reasons.length?'no':'yes',reasons,review};
+  return {status:reasons.length?'no':review.length?'review':'yes',reasons,review};
 }
 
 export function checkDepositInterest(accounts, {applicationMonth,perCapitaMinimum}) {
