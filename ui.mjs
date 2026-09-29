@@ -10,6 +10,7 @@ import {maternityIncomeForApplication} from './maternity.mjs';
 import {ADDITIONAL_TYPES,additionalIncomeForApplication} from './extra-income.mjs';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
+import {largeFamilyGrace} from './large-family-grace.mjs';
 const $ = id => document.getElementById(id);
 const types = [
   ['unemployment','Официальная безработица'], ['pregnancy','Беременность'],
@@ -387,15 +388,17 @@ function render() {
       const newborns=group.filter(c=>c.birthDate && c.birthDate<=filingDate).map(c=>({child:c,result:newbornShortcut({birthDate:c.birthDate,applicationDate:filingDate,olderAwards:olderAwards.filter(a=>a.childId!==c.id),sameRecipient:yn($('same-recipient').value),motherPregnancyBenefit:$('mother-pregnancy-benefit').checked})})).filter(x=>x.result.status==='simplified');
       const regularChildren=group.length-newborns.length;
       if(regularChildren)shortcutOnly=false;
-      const tier=year===2026 && regularChildren>0 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length && !children.some(c=>c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && c.fullTimeStudent)
+      let tier=year===2026 && regularChildren>0 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length && !children.some(c=>c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && c.fullTimeStudent)
         ?childTier({income12:combinedIncome,familySize:members.included.length,childrenApplying:regularChildren,pmPerson,pmChild}):null;
-      if(regularChildren && tier?.status==='income-too-high')scenarioBlocks=true;
+      const grace=tier?.status==='income-too-high'?largeFamilyGrace({applicationMonth:month,perCapita:tier.base,pmPerson,isLargeFamily:$('large-family').checked,usedBefore:yn($('grace-used').value),awardEndMonths:children.filter(c=>c.awardRecipient==='self'&&c.awardEnd).map(c=>c.awardEnd.slice(0,7))}):null;
+      if(grace?.status==='eligible')tier={...tier,status:'estimate',tier:50,grace:true};
+      if(regularChildren && tier?.status==='income-too-high'&&grace?.status!=='unknown')scenarioBlocks=true;
       if(regularChildren && (tier?.status!=='estimate'||members.unanswered.length))scenarioComplete=false;
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
       const label=$('application-mode').value==='separate'?`Заявление на ребёнка ${childNumber} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
       const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
       const newbornText=newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'';
-      const regularText=regularChildren?`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?'доход выше указанного ПМ.':'ступень пока неизвестна.'}`:'';
+      const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
       return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+alimony.reason+')'}. Доходы детей: ${childEarnings.status==='known'?`${childEarnings.amount.toLocaleString('ru-RU')} ₽`:'уточнить ('+childEarnings.issues.join('; ')+')'}. Дополнительные источники: ${supplemental.status==='known'?`${supplemental.amount.toLocaleString('ru-RU')} ₽`:'уточнить вид, сумму и период'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. БиР за вошедшие месяцы: ${maternityIncome.status==='known'?`${maternityIncome.amount.toLocaleString('ru-RU')} ₽`:'уточнить период начисления'}. ${newbornText} ${regularText}`;
     }).join(' '):'Отметьте хотя бы одного ребёнка для заявления.';
     if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
@@ -423,7 +426,7 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
  $('add-adult').onclick=()=>{if(incomePeople.length===1)incomePeople.push({label:'Супруг(а)',months:{},total:null,incomeType:'employment'});renderIncomeForm();render()};
  $('income-mode').addEventListener('input',()=>{renderIncomeForm();render()});
  $('start').addEventListener('input',()=>{renderIncomeForm();render()});
-['applicant-citizen','applicant-residence','day','weeks','large-family','disability','support-car','rural','pm-person','pm-child'].forEach(id=>$(id).addEventListener('input',render));
+['applicant-citizen','applicant-residence','day','weeks','large-family','grace-used','disability','support-car','rural','pm-person','pm-child'].forEach(id=>$(id).addEventListener('input',render));
 renderIncomeForm();
 render();
 
