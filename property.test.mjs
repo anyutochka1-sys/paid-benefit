@@ -19,6 +19,8 @@ test('housing and land exceptions are evaluated per object',()=>{
   assert.equal(checkProperty([{type:'apartment',area:90},{type:'apartment',area:90,familyShare:.3}],context).status,'yes');
 });
 test('rural land has a one-hectare limit and supported land is excluded',()=>{
+  assert.equal(checkProperty([{type:'land',hectares:.5}],{...context,rural:undefined}).status,'review');
+  assert.equal(checkProperty([{type:'apartment',area:90}],{...context,rural:undefined}).status,'yes');
   assert.equal(checkProperty([{type:'land',hectares:.5}],context).status,'no');
   assert.equal(checkProperty([{type:'land',hectares:.5}],{...context,rural:true}).status,'yes');
   assert.equal(checkProperty([{type:'land',hectares:.5,supported:true}],context).status,'yes');
