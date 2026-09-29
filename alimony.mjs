@@ -13,6 +13,8 @@ export function alimonyForApplication(entry, applicationMonth) {
   const fraction=entry.childrenForAlimony===1?1/4:entry.childrenForAlimony===2?1/3:1/2;
   const eligibleMonths=window.filter(m=>monthIndex(m)>=monthIndex(entry.divorceMonth));
   const minimum=entry.officialWage*fraction;
-  if(!Number.isFinite(entry.declaredMonthly))return {status:'unknown',reason:'Укажите ежемесячную сумму алиментов'};
-  return {status:'known',amount:Math.max(entry.declaredMonthly,minimum)*eligibleMonths.length,method:'floor-or-declared',minimumMonthly:minimum,eligibleMonths};
+  if(!Number.isFinite(entry.declaredMonthly) && !entry.declaredByMonth)return {status:'unknown',reason:'Укажите ежемесячную сумму алиментов'};
+  const monthly=eligibleMonths.map(m=>({month:m,declared:entry.declaredByMonth?.[m]??entry.declaredMonthly}));
+  if(monthly.some(v=>!Number.isFinite(v.declared) || v.declared<0))return {status:'unknown',reason:'Уточните алименты по месяцам'};
+  return {status:'known',amount:monthly.reduce((sum,v)=>sum+Math.max(v.declared,minimum),0),method:'floor-or-declared',minimumMonthly:minimum,eligibleMonths};
 }
