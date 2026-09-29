@@ -5,12 +5,13 @@ import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForAp
 import {childBenefitIncome} from './benefits.mjs';
 import {alimonyForApplication} from './alimony.mjs';
 import {newbornShortcut} from './newborn.mjs';
+import {maternityIncomeForApplication} from './maternity.mjs';
 const $ = id => document.getElementById(id);
 const types = [
   ['unemployment','Официальная безработица'], ['pregnancy','Беременность'],
   ['careUnderThree','Уход за ребёнком до 3 лет']
 ];
-const incomePeople=[{label:'Заявитель',months:{},total:null}];
+const incomePeople=[{label:'Заявитель',months:{},total:null,incomeType:'employment'}];
 let nextChildId=1;
 const benefitPayments=[];
 const applicationChoice=document.createElement('div');
@@ -26,6 +27,25 @@ $('income-people').after(benefitsSection);
 const alimonySection=document.createElement('section');
 alimonySection.innerHTML='<h3>Алименты</h3><label>Семейное положение заявителя<select id="marital-status"><option value="other">Не в разводе / нет алиментов</option><option value="divorced">В разводе</option><option value="single">Единственный родитель</option></select></label><div id="alimony-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>На каком основании алименты?<select id="alimony-kind"><option value="">Выберите</option><option value="court">Решение суда / судебный приказ / приставы</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label>Детей, на которых полагаются алименты<input id="alimony-child-count" type="number" min="1" value="1"></label><label>Сумма алиментов за месяц, ₽<input id="alimony-monthly" type="number" min="0" placeholder="0, если ничего не поступало"></label><label>С какого месяца поступает сумма<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div><p class="hint">При судебном решении учитываются фактически полученные суммы, даже ноль; укажите месяцы и изменения отдельными периодами в дальнейшем. При нотариальном соглашении или без оформления для разведённого заявителя действует минимум ¼, ⅓ или ½ региональной зарплаты на 1, 2 или 3+ детей; месяц развода входит. Без подтверждённых окончательных данных Росстата точного вывода нет. Не включайте алименты повторно в поле зарплаты.</p>';
 benefitsSection.after(alimonySection);
+const maternitySection=document.createElement('section');
+maternitySection.innerHTML='<div class="section-heading"><h3>Пособие по беременности и родам (БиР)</h3><button id="add-maternity" type="button">+ Указать выплату</button></div><p class="hint">Вводите всю сумму разовой выплаты отдельно от зарплаты. Она распределяется по месяцам начисления, а не учитывается целиком в месяце поступления. Для обычного периода выставлено 5 месяцев; при продлении уточните срок по документу.</p><div id="maternity-payments"></div>';
+benefitsSection.after(maternitySection);
+const maternityPayments=[];
+function renderMaternityRows() {
+  $('maternity-payments').replaceChildren();
+  maternityPayments.forEach((payment,index)=>{
+    const row=document.createElement('div');row.className='form-row';
+    row.innerHTML='<label>Кто получил<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><label>Вся сумма БиР, ₽<input class="amount" type="number" min="0"></label><label>С какого месяца начислено<input class="start" type="month"></label><label>За сколько месяцев начислено<input class="months" type="number" min="1" max="12"></label><button type="button" class="remove">Убрать</button>';
+    row.querySelector('.person').value=String(payment.personIndex);
+    row.querySelector('.amount').value=payment.amount??'';
+    row.querySelector('.start').value=payment.startMonth;
+    row.querySelector('.months').value=payment.chargedMonths;
+    for(const [selector,key] of [['.person','personIndex'],['.amount','amount'],['.start','startMonth'],['.months','chargedMonths']])row.querySelector(selector).oninput=e=>{payment[key]=selector==='.start'?e.target.value:e.target.value===''?null:Number(e.target.value);render()};
+    row.querySelector('.remove').onclick=()=>{maternityPayments.splice(index,1);renderMaternityRows();render()};
+    $('maternity-payments').append(row);
+  });
+}
+$('add-maternity').onclick=()=>{maternityPayments.push({personIndex:0,amount:null,startMonth:'',chargedMonths:5});renderMaternityRows();render()};
 alimonySection.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{ $('alimony-fields').hidden=$('marital-status').value!=='divorced';$('alimony-wage-fields').hidden=$('alimony-kind').value==='court';render()}));
 function incomeMonths() {
   const start=monthIndex($('start').value||'2026-09');
@@ -37,6 +57,10 @@ function renderIncomeForm() {
   incomePeople.forEach((person,index)=>{
     const section=document.createElement('section'); section.className='income-person';
     const title=document.createElement('h3'); title.textContent=person.label; section.append(title);
+    const typeLabel=document.createElement('label');typeLabel.textContent='Что за доход в строках ниже';
+    const incomeType=document.createElement('select');
+    [['employment','Зарплата / договор ГПХ'],['business','ИП'],['selfEmployed','Самозанятость'],['pension','Пенсия / больничный'],['scholarship','Стипендия'],['other','Другой доход — для 8 МРОТ требуется уточнение']].forEach(([value,label])=>incomeType.add(new Option(label,value)));
+    incomeType.value=person.incomeType||'employment';incomeType.oninput=()=>{person.incomeType=incomeType.value;render()};typeLabel.append(incomeType);section.append(typeLabel);
     if(mode==='total') {
       const label=document.createElement('label'); label.textContent='Начисленные доходы за первый расчётный период, ₽';
       const input=document.createElement('input'); input.type='number'; input.min='0'; input.value=person.total??'';
@@ -59,7 +83,7 @@ function renderIncomeForm() {
 }
 function addReason() {
   const row = document.createElement('div'); row.className='reason';
-  row.innerHTML=`<label>Причина<select class="type">${types.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="check"><input class="registered" type="checkbox">Стою на учёте в ЦЗН</label><button class="remove" type="button">Убрать</button>`;
+  row.innerHTML=`<label>У кого была причина<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><label>Причина<select class="type">${types.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="check"><input class="registered" type="checkbox">Стою на учёте в ЦЗН</label><button class="remove" type="button">Убрать</button>`;
   row.querySelector('.remove').onclick=()=>{row.remove();render()};
   row.querySelector('.type').onchange=()=>{row.querySelector('.check').hidden=row.querySelector('.type').value!=='unemployment';render()};
   row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
@@ -175,7 +199,7 @@ function depositData() {
 function render() {
   const start=$('start').value; if (!start) return;
   const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData(),deposits=depositData();
-  const reasons=[...document.querySelectorAll('.reason')].map(row=>({type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked}));
+  const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked}));
   const output=[];
   for(let i=0;i<12;i++) {
     const month=monthString(monthIndex(start)+i), year=Number(month.slice(0,4));
@@ -196,6 +220,7 @@ function render() {
     const benefitRows=benefitRowsForWindow(month);
     const pmPerson=Number($('pm-person').value),pmChild=Number($('pm-child').value);
     const depositIncome=depositIncomeForApplication(deposits,{applicationMonth:month,perCapitaMinimum:pmPerson});
+    const maternityIncome=maternityIncomeForApplication(maternityPayments,month);
     const maritalStatus=$('marital-status').value;
     const alimonyFrom=$('alimony-from').value, alimonyTo=$('alimony-to').value;
     const alimonyMonthly=$('alimony-monthly').value;
@@ -209,27 +234,39 @@ function render() {
       receivedByMonth:courtAmounts,officialWage:Number($('alimony-wage').value),wageFinal:$('alimony-final').checked
     },month);
     if(maritalStatus==='divorced' && $('alimony-kind').value==='court' && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните полученные алименты и период'}
+    let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
     const incomeText=scenarios.length?scenarios.map((group,scenarioIndex)=>{
       const benefitResult=childBenefitIncome(benefitRows.payments,children,group.map(c=>c.id),month,filingDate);
       const benefitUnknown=[...benefitRows.missing,...benefitResult.missing];
-      const combinedIncome=incomeResult.total===null || benefitResult.total===null || benefitUnknown.length || alimony.status!=='known' || depositIncome.status!=='known' ? null : incomeResult.total+benefitResult.total+alimony.amount+depositIncome.amount;
+      const combinedIncome=incomeResult.total===null || benefitResult.total===null || benefitUnknown.length || alimony.status!=='known' || depositIncome.status!=='known' || maternityIncome.status!=='known' ? null : incomeResult.total+benefitResult.total+alimony.amount+depositIncome.amount+maternityIncome.amount;
       const olderAwards=children.filter(c=>c.awardTier && c.awardEnd && c.awardDecision).map(c=>({childId:c.id,tier:c.awardTier,endsOn:c.awardEnd,decisionDate:c.awardDecision}));
       const newborns=group.filter(c=>c.birthDate && c.birthDate<=filingDate).map(c=>({child:c,result:newbornShortcut({birthDate:c.birthDate,applicationDate:filingDate,olderAwards:olderAwards.filter(a=>a.childId!==c.id),sameRecipient:yn($('same-recipient').value),motherPregnancyBenefit:$('mother-pregnancy-benefit').checked})})).filter(x=>x.result.status==='simplified');
       const regularChildren=group.length-newborns.length;
+      if(regularChildren)shortcutOnly=false;
       const tier=year===2026 && regularChildren>0 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length && !children.some(c=>c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && c.fullTimeStudent)
         ?childTier({income12:combinedIncome,familySize:members.included.length,childrenApplying:regularChildren,pmPerson,pmChild}):null;
+      if(regularChildren && tier?.status==='income-too-high')scenarioBlocks=true;
+      if(regularChildren && tier?.status!=='estimate')scenarioComplete=false;
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
       const label=$('application-mode').value==='separate'?`Заявление на ребёнка ${childNumber} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
       const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
       const newbornText=newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'';
       const regularText=regularChildren?`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?'доход выше указанного ПМ.':'ступень пока неизвестна.'}`:'';
-      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+alimony.reason+')'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. ${newbornText} ${regularText}`;
+      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+alimony.reason+')'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. БиР за вошедшие месяцы: ${maternityIncome.status==='known'?`${maternityIncome.amount.toLocaleString('ru-RU')} ₽`:'уточнить период начисления'}. ${newbornText} ${regularText}`;
     }).join(' '):'Отметьте хотя бы одного ребёнка для заявления.';
     if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
     // An entered 12-week condition is applicable only to the selected month.
-    const adult={reasons,pregnancyWeeksAtApplication:i===0?Number($('weeks').value):0,income:Object.fromEntries(incomeWindow(month).map(m=>[m,[]]))};
-    const result=minimumIncomeTest(adult,month,RULES[year].mrot);
-    output.push(`<div class="result"><strong>${filingDate}<small> · доходы ${incomeWindow(month)[0]} — ${incomeWindow(month).at(-1)}</small></strong><span class="${result.exempt?'ok':'bad'}">${result.exempt?'Порог дохода не применяется':`Необходимый доход: ${Math.ceil(result.minimum).toLocaleString('ru-RU')} ₽`}. Засчитано причин: ${result.creditedMonths} мес. ${incomeText} ${familyText}${result.warnings.length?' '+result.warnings.join(' '):''}</span></div>`);
+    const adults=incomePeople.map((person,j)=>{
+      const income=Object.fromEntries(incomeWindow(month).map(m=>[m,Number.isFinite(person.months[m])?[{type:person.incomeType,amount:person.months[m]}]:[]]));
+      const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),pregnancyWeeksAtApplication:j===0&&i===0?Number($('weeks').value):0,income},month,RULES[year].mrot);
+      const amountKnown=$('income-mode').value==='monthly'?incomeWindow(month).every(m=>Number.isFinite(person.months[m])):month===start&&Number.isFinite(person.total);
+      const earned=$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total:result.earned;
+      return {...result,earned,passed:earned>=result.minimum,known:amountKnown&&person.incomeType!=='other',label:person.label};
+    });
+    const adultText=adults.map(a=>`${a.label}: ${a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`).join('; ');
+    const explicitBlockers=[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
+    const headline=shortcutOnly&&selected.length?'Для новорождённого проверьте упрощённое назначение ниже':explicitBlockers?'Есть препятствие по введённым данным':scenarioComplete&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
+    output.push(`<div class="result"><strong>${filingDate}<small> · доходы ${incomeWindow(month)[0]} — ${incomeWindow(month).at(-1)}</small></strong><span class="${explicitBlockers?'bad':'unknown'}">${headline}. Минимальный доход: ${adultText}. ${incomeText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}</span></div>`);
   }
   $('results').innerHTML=output.join('');
 }
@@ -237,7 +274,7 @@ $('add').onclick=addReason;
 $('add-child').onclick=addChild; $('add-car').onclick=addCar;
 $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:'',to:''});renderBenefitRows();render()};
  $('add-property').onclick=addProperty; $('add-vehicle').onclick=addOtherVehicle; $('add-deposit').onclick=addDeposit;
- $('add-adult').onclick=()=>{if(incomePeople.length===1)incomePeople.push({label:'Супруг(а)',months:{},total:null});renderIncomeForm();render()};
+ $('add-adult').onclick=()=>{if(incomePeople.length===1)incomePeople.push({label:'Супруг(а)',months:{},total:null,incomeType:'employment'});renderIncomeForm();render()};
  $('income-mode').addEventListener('input',()=>{renderIncomeForm();render()});
  $('start').addEventListener('input',()=>{renderIncomeForm();render()});
 ['day','weeks','large-family','disability','support-car','rural','pm-person','pm-child'].forEach(id=>$(id).addEventListener('input',render));
