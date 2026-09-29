@@ -4,6 +4,10 @@ import {childBenefitIncome} from './benefits.mjs';
 
 const children=[{id:'a',birthDate:'2020-03-01'},{id:'b',birthDate:'2023-04-01'}];
 const payments=Array.from({length:12},(_,i)=>({childId:'a',month:`${i<5?'2025':'2026'}-${String(i<5?i+8:i-4).padStart(2,'0')}`,amount:19243}));
+test('previous payments on a child who has died are excluded even when filing for a sibling',()=>{
+  const family=[{...children[0],deathDate:'2026-02-01'},children[1]];
+  assert.equal(childBenefitIncome(payments,family,['b'],'2026-09').total,0);
+});
 test('19 243 each month is excluded when renewing the same child',()=>{
   const result=childBenefitIncome(payments,children,['a'],'2026-09');
   assert.equal(result.total,0);
