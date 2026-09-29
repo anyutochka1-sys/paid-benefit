@@ -1,6 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ageAt,includedFamily,childCanApply,checkCars} from './family-assets.mjs';
+import {ageAt,includedFamily,childCanApply,applicantParentalRights,checkCars} from './family-assets.mjs';
+
+test('parental-rights refusal concerns this applicant and this child, not the other parent',()=>{
+  const child={role:'child',applying:true,secondParentStatus:'deprived-rights'};
+  assert.equal(applicantParentalRights({...child,applicantRights:'intact'}).status,'clear');
+  assert.equal(applicantParentalRights({...child,applicantRights:'restricted'}).status,'block');
+  assert.equal(applicantParentalRights({...child,applicantRights:'lost'}).status,'block');
+  assert.equal(applicantParentalRights(child).status,'unknown');
+  assert.equal(applicantParentalRights({...child,role:'ward'}).status,'not-applicable');
+  assert.equal(applicantParentalRights({...child,applying:false}).status,'not-applicable');
+});
 
 test('age changes on birthday, including child application cut-off at 17',()=>{
   assert.equal(ageAt('2009-10-01','2026-09-30'),16);
