@@ -60,3 +60,19 @@ test('previous first child payment and historic 8–17 payment follow their sepa
   const historic=[{...first[0],kind:'oldEightToSeventeen'}];
   assert.equal(childBenefitIncome(historic,children,['b'],'2026-09').total,0);
 });
+test('ordinary child payment outside the family is excluded on filing date',()=>{
+  const paid=[{childId:'a',month:'2026-07',amount:20000,kind:'decree606',forPastPeriods:false}];
+  for(const familyStatus of ['stateCare','imprisoned','missing']) {
+    const family=[{...children[0],role:'child',familyStatus},children[1]];
+    assert.equal(childBenefitIncome(paid,family,['b'],'2026-09').total,0);
+  }
+});
+test('18–22-year-old payment needs a regional basis when the adult child remains in the household',()=>{
+  const student={id:'a',role:'child',birthDate:'2008-09-01',married:false,fullTimeStudent:true};
+  const paid={childId:'a',month:'2026-07',amount:20000,kind:'decree606',forPastPeriods:false};
+  assert.equal(childBenefitIncome([paid],[student,children[1]],['b'],'2026-09').total,null);
+  assert.equal(childBenefitIncome([{...paid,regionalPaymentThrough23:false}],[student,children[1]],['b'],'2026-09').total,0);
+  assert.equal(childBenefitIncome([{...paid,regionalPaymentThrough23:true}],[student,children[1]],['b'],'2026-09').total,20000);
+  assert.equal(childBenefitIncome([{...paid,regionalPaymentThrough23:true}],[{...student,fullTimeStudent:false},children[1]],['b'],'2026-09').total,0);
+  assert.equal(childBenefitIncome([{...paid,kind:'unified',forPastPeriods:undefined}],[student,children[1]],['b'],'2026-09').total,0);
+});
