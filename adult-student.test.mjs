@@ -34,4 +34,6 @@ test('post-eighteenth-birthday earnings alone can confirm the adult child minimu
   assert.equal(adultStudentChecks([child],{included:[child]},[birthdayOnly],'2026-09','2026-09-01',27093)[0].status,'unknown');
   const firstDay={...child,birthDate:'2008-03-01'};
   assert.equal(adultStudentChecks([firstDay],{included:[firstDay]},[birthdayOnly],'2026-09','2026-09-01',27093)[0].status,'yes');
+  assert.equal(adultStudentChecks([child],{included:[child]},[{...birthdayOnly,receiptDate:'2026-03-15'}],'2026-09','2026-09-01',27093)[0].status,'yes');
+  assert.equal(adultStudentChecks([child],{included:[child]},[{...birthdayOnly,receiptDate:'2026-03-14'}],'2026-09','2026-09-01',27093)[0].status,'unknown');
 });
