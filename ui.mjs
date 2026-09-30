@@ -15,6 +15,7 @@ import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs';
 import {pregnancyTier} from './pregnancy.mjs';
 import {confirmedRegionalWage} from './rosstat-wages.mjs';
 import {familyAssets} from './asset-owners.mjs';
+import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
 function updatePmSelection() {
   const year=Number($('start').value.slice(0,4));
@@ -102,14 +103,14 @@ extraSection.innerHTML='<div class="section-heading"><h3>Другие доход
 maternitySection.after(extraSection);
 const childIncomeEntries=[];
 const childIncomeSection=document.createElement('section');
-childIncomeSection.innerHTML='<div class="section-heading"><h3>Доходы детей</h3><button id="add-child-income" type="button">+ Период дохода</button></div><p class="hint">Зарплата несовершеннолетнего и компенсация за государственные/общественные обязанности могут исключаться, если ребёнок учился очно не меньше 6 месяцев расчётного периода (п. 52¹). Другие доходы оцениваются отдельно. Месяцы учёбы укажите в карточке ребёнка.</p><div id="child-income-entries"></div>';
+childIncomeSection.innerHTML='<div class="section-heading"><h3>Доходы детей</h3><button id="add-child-income" type="button">+ Период дохода</button></div><p class="hint">Зарплата несовершеннолетнего и компенсация за государственные/общественные обязанности могут исключаться, если ребёнок учился очно не меньше 6 месяцев расчётного периода (п. 52¹). Для ребёнка 18–22 лет, входящего в состав семьи, укажите месяцы очной учёбы в его карточке, а зарплату и стипендию — здесь: его минимальный доход проверяется отдельно. Пока не подтверждены учёба или достаточный доход, вывод остаётся открытым.</p><div id="child-income-entries"></div>';
 extraSection.after(childIncomeSection);
 function renderChildIncomeRows() {
   $('child-income-entries').replaceChildren();
   const childOptions=childData().map((child,index)=>({id:child.id,label:document.querySelector(`[data-child-id="${child.id}"] .child-name`)?.value||`Ребёнок ${index+1}`}));
   childIncomeEntries.forEach((entry,index)=>{
     const row=document.createElement('div');row.className='form-row';
-    row.innerHTML='<label>Кто получил<select class="child"><option value="">Выберите ребёнка</option></select></label><label>Вид<select class="type"><option value="employment">Зарплата / ГПХ</option><option value="publicDutyCompensation">Компенсация за государственные обязанности</option><option value="other">Другой учитываемый доход</option></select></label><label>За месяц, ₽<input class="amount" type="number" min="0"></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><button class="remove" type="button">Убрать</button>';
+    row.innerHTML='<label>Кто получил<select class="child"><option value="">Выберите ребёнка</option></select></label><label>Вид<select class="type"><option value="employment">Зарплата / ГПХ</option><option value="scholarship">Стипендия</option><option value="publicDutyCompensation">Компенсация за государственные обязанности</option><option value="other">Другой учитываемый доход</option></select></label><label>За месяц, ₽<input class="amount" type="number" min="0"></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><button class="remove" type="button">Убрать</button>';
     childOptions.forEach(child=>row.querySelector('.child').add(new Option(child.label,child.id)));
     for(const [selector,key] of [['.child','childId'],['.type','type'],['.amount','amount'],['.from','from'],['.to','to']]) {
       const input=row.querySelector(selector);input.value=entry[key]??'';
@@ -518,12 +519,13 @@ function render() {
       const earned=sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
       return {...result,earned,passed:earned>=result.minimum,known:sourceComplete&&amountKnown&&!guardianUnknown&&person.incomeType!=='other'&&supplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),label:person.label};
     });
-    const adultText=adults.map(a=>`${a.label}: ${a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`).join('; ');
+    const studentChecks=adultStudentChecks(children,members,sourceEnabled.has('childIncome')?childIncomeEntries:[],month,filingDate,RULES[year].mrot);
+    const adultText=[...adults.map(a=>`${a.label}: ${a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`),...studentChecks.map(check=>`Ребёнок ${children.findIndex(child=>child.id===check.childId)+1} (18–22 года): ${check.status==='yes'?check.reason:check.reason+'; индивидуальный порог 8 МРОТ пока не подтверждён'}`)].join('; ');
     const applicantCheck=$('applicant-citizen').value==='no'||$('applicant-residence').value==='no'?'no':$('applicant-citizen').value&&$('applicant-residence').value?'yes':'unknown';
     const addressBasis=$('residence-basis').value;
     const addressReview=!addressBasis||addressBasis!=='permanent'&&$('address-proof').value!=='yes';
     const priorMeasureReview=$('prior-measure').value!=='no';
-    const contextReview=addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview;
+    const contextReview=addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||studentChecks.some(check=>check.status!=='yes');
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'не указаны'}.`;
     const explicitBlockers=applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
     const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
