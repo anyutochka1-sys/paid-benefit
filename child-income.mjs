@@ -10,7 +10,7 @@ const monthsBetween=(from,to)=>{
 // Paragraphs 45–47, 52(1) of Decree 2330. Only employment and compensation
 // for public duties are excluded for a minor who studied at least six months
 // in the assessment window. A birth month with the 18th birthday needs an
-// exact receipt date, so monthly input remains unresolved there.
+// exact receipt date to decide whether the minor's exemption applies.
 export function childIncomeForApplication(entries,children,family,applicationMonth) {
   const window=new Set(incomeWindow(applicationMonth));
   const byId=new Map(children.map(child=>[child.id,child]));
@@ -28,8 +28,11 @@ export function childIncomeForApplication(entries,children,family,applicationMon
       if(!included.has(child.id)){excluded.push({childId:child.id,month,reason:'вне состава семьи'});continue}
       if(!child.birthDate){issues.push('Уточните дату рождения ребёнка с доходом');continue}
       const eighteenth=Number(child.birthDate.slice(0,4))+18+'-'+child.birthDate.slice(5,7);
-      if(exemptible.has(entry.type)&&month===eighteenth){issues.push('Укажите точную дату дохода в месяце 18-летия');continue}
-      const minor=ageAt(child.birthDate,`${month}-01`)<18;
+      const birthdayMonth=month===eighteenth;
+      if(exemptible.has(entry.type)&&birthdayMonth&&(!/^\d{4}-\d{2}-\d{2}$/.test(entry.receiptDate||'')||entry.receiptDate.slice(0,7)!==month)) {
+        issues.push('Укажите точную дату дохода в месяце 18-летия');continue;
+      }
+      const minor=ageAt(child.birthDate,birthdayMonth&&entry.receiptDate?entry.receiptDate:`${month}-01`)<18;
       if(exemptible.has(entry.type)&&minor) {
         if(['none','additional'].includes(child.educationStatus)){amount+=entry.amount;counted.push({childId:child.id,month,amount:entry.amount});continue}
         if(child.educationStatus!=='school'){issues.push('Уточните вид обучения несовершеннолетнего ребёнка');continue}
