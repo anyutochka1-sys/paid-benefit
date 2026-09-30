@@ -7,7 +7,7 @@ import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth,
 import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20260930-11';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20260930-15';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20260930-16';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
@@ -701,7 +701,8 @@ function render() {
       const priorSupportText=`Сравнение с прежними выплатами: ${priorSupport.reason}${Number.isFinite(priorSupport.oldMonthly)?`; прежние ${priorSupport.oldMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}${Number.isFinite(priorSupport.newMonthly)?`; новые ${priorSupport.newMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}.`;
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
       const label=$('application-mode').value==='separate'?`Заявление: ${childLabel(group[0],childNumber-1)} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
-      const benefitText=(benefitResult.included.some(payment=>payment.projected)?'Для будущих месяцев использовано ваше предположение о сумме пособия. ':'')+(benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`);
+      const excludedBenefitText=benefitResult.excluded.every(payment=>Number.isFinite(payment.amount))?benefitResult.excluded.reduce((sum,payment)=>sum+payment.amount,0).toLocaleString('ru-RU')+' ₽':'сумма не уточнена; эти выплаты не входят в доход заявления';
+      const benefitText=(benefitResult.included.some(payment=>payment.projected)?'Для будущих месяцев использовано ваше предположение о сумме пособия. ':'')+(benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${excludedBenefitText}.`);
       const newbornText=(newbornUnknowns.length?`Упрощённое назначение новорождённому требует уточнения: ${newbornUnknowns.map(x=>x.result.reason).join('; ')}. `:'')+(newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'');
       const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
       if(!regularChildren)return `${label}: Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${newbornText} ${priorSupportText}`;

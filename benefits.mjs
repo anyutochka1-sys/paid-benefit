@@ -32,7 +32,7 @@ export function childBenefitIncome(payments, children, applicationChildIds, appl
     if (!child || !child.birthDate) {
       missing.push(`Укажите ребёнка и дату рождения для пособия за ${payment.month}`); continue;
     }
-    if (!Number.isFinite(payment.amount) || payment.amount<0) {
+    if (Number.isFinite(payment.amount) && payment.amount<0) {
       missing.push(`Уточните сумму пособия за ${payment.month}`); continue;
     }
     const age=ageAt(child.birthDate,applicationDate);
@@ -61,6 +61,7 @@ export function childBenefitIncome(payments, children, applicationChildIds, appl
       : kind==='unified' && age>=17
         ? 'ребёнку исполнилось 17 лет'
         : null;
+    if(!excludedReason&&!Number.isFinite(payment.amount)) {missing.push(`Уточните сумму пособия за ${payment.month}`);continue;}
     if(!excludedReason&&payment.futureUnconfirmed) {missing.push(`Подтвердите предположение о выплате пособия за будущий месяц ${payment.month}`);continue;}
     const record={...payment,reason:excludedReason};
     if (excludedReason) excluded.push(record);

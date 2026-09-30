@@ -95,3 +95,21 @@ test('past receipts remain known and missing amount or period cannot be fabricat
   assert.equal(expandBenefitPayments([{...row,to:''}],'2026-09').missing.length,1);
   assert.equal(childBenefitIncome(expandBenefitPayments([{...row,amount:''}],'2026-09').payments,children,['b'],'2026-09').total,null);
 });
+
+test('unknown excluded amount does not block the same child but still blocks a sibling application',()=>{
+  const paid=[{childId:'a',kind:'unified',month:'2026-07',amount:null}];
+  const renewal=childBenefitIncome(paid,children,['a'],'2026-09');
+  assert.equal(renewal.total,0);
+  assert.equal(renewal.excluded.length,1);
+  assert.equal(renewal.excluded[0].amount,null);
+  assert.deepEqual(renewal.missing,[]);
+  assert.equal(childBenefitIncome(paid,children,['b'],'2026-09').total,null);
+});
+test('known sibling amount remains countable alongside an unknown excluded amount',()=>{
+  const paid=[{childId:'a',kind:'unified',month:'2026-07',amount:null},{childId:'b',kind:'unified',month:'2026-07',amount:10000}];
+  assert.equal(childBenefitIncome(paid,children,['a'],'2026-09').total,10000);
+});
+test('negative amounts remain invalid even on an excluded benefit',()=>{
+  const paid=[{childId:'a',kind:'unified',month:'2026-07',amount:-1}];
+  assert.equal(childBenefitIncome(paid,children,['a'],'2026-09').total,null);
+});
