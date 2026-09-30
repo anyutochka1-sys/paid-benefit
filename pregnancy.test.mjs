@@ -1,3 +1,4 @@
+import {applicationDateForMonth} from './engine.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
@@ -31,4 +32,12 @@ test('actual end overrides forecast and malformed dates stay unknown',()=>{
   assert.equal(pregnancyAtDate({...anchor,endedDate:'2026-10-01',applicationDate:'2026-09-30'}).status,'forecast');
   assert.equal(pregnancyAtDate({...anchor,endedDate:'2026-02-30',applicationDate:'2026-09-01'}).status,'unknown');
   assert.equal(pregnancyAtDate({...anchor,weeks:42,applicationDate:'2026-09-02'}).status,'unknown');
+});
+
+test('pregnancy forecast keeps the actual first filing date in a short month',()=>{
+  const referenceDate=applicationDateForMonth('2026-02',31);
+  const applicationDate=applicationDateForMonth('2026-03',31);
+  const result=pregnancyAtDate({weeks:11,referenceDate,applicationDate,forecastThrough:'2026-03-31'});
+  assert.equal(result.status,'forecast');
+  assert.equal(result.weeks,11+31/7);
 });

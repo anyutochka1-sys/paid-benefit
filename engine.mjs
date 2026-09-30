@@ -15,6 +15,16 @@ export function monthString(index) {
   return `${Math.floor(index / 12)}-${String(index % 12 + 1).padStart(2, '0')}`;
 }
 
+// Keep the requested day in each month, using its last day when necessary.
+export function applicationDateForMonth(month,day=1) {
+  if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(month))throw new Error('Неверный месяц подачи');
+  if(!Number.isInteger(day)||day<1||day>31)throw new Error('День подачи должен быть от 1 до 31');
+  const last=new Date(`${month}-01T00:00:00Z`);
+  last.setUTCMonth(last.getUTCMonth()+1);
+  last.setUTCDate(0);
+  return `${month}-${String(Math.min(day,last.getUTCDate())).padStart(2,'0')}`;
+}
+
 export function incomeWindow(applicationMonth) {
   const m = monthIndex(applicationMonth);
   return Array.from({ length: 12 }, (_, i) => monthString(m - 13 + i));

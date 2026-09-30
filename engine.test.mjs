@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { incomeWindow, minimumIncomeTest, assessMonth } from './engine.mjs';
+import { incomeWindow, minimumIncomeTest, assessMonth, applicationDateForMonth } from './engine.mjs';
 
 test('September application counts August to July, leaving August out', () => {
   const w = incomeWindow('2026-09');
@@ -51,4 +51,18 @@ test('unknown pregnancy prevents a definite minimum-income failure',()=>{
   assert.equal(minimumIncomeTest({pregnancyWeeksAtApplication:12},'2026-11',27093).exempt,true);
   assert.equal(minimumIncomeTest({pregnancyStatusUnknown:true,reasons:[{type:'pregnancy',start:'2026-01',end:'2026-06'}]},'2026-11',27093).exempt,true);
   assert.equal(minimumIncomeTest({},'2026-11',27093).uncertain,false);
+});
+
+test('filing days 29 through 31 use real month ends without drifting',()=>{
+  assert.equal(applicationDateForMonth('2026-01',31),'2026-01-31');
+  assert.equal(applicationDateForMonth('2026-02',31),'2026-02-28');
+  assert.equal(applicationDateForMonth('2026-03',31),'2026-03-31');
+  assert.equal(applicationDateForMonth('2026-04',31),'2026-04-30');
+  assert.equal(applicationDateForMonth('2024-02',29),'2024-02-29');
+  assert.equal(applicationDateForMonth('2100-02',29),'2100-02-28');
+});
+test('invalid filing days and months are rejected by the date helper',()=>{
+  for(const day of [0,32,1.5,NaN])assert.throws(()=>applicationDateForMonth('2026-09',day));
+  assert.throws(()=>applicationDateForMonth('2026-13',31));
+  assert.throws(()=>applicationDateForMonth('2026-09-01',31));
 });
