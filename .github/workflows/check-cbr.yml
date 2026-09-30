@@ -1,0 +1,41 @@
+name: Исторические курсы ЦБ
+
+on:
+  schedule:
+    - cron: '43 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cbr-month-end-rates
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Загрузить опубликованные курсы на конец месяца
+        run: python3 scripts/check_cbr.py
+      - name: Проверить загрузку и расчёты
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_*.py'
+          node --test *.test.mjs
+      - name: Сохранить официальные данные
+        run: |
+          if git diff --quiet -- data/cbr-rates.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/cbr-rates.json
+          git commit -m 'Update official month-end CBR rates'
+          git pull --rebase origin main
+          git push origin HEAD:main

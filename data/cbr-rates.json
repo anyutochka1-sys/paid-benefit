@@ -1,0 +1,7878 @@
+{
+  "source": "https://www.cbr.ru/scripts/XML_daily.asp",
+  "dates": {
+    "2024-01-31": {
+      "effectiveDate": "2024-01-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/01/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 59.0109,
+          "rublesPerUnit": 59.0109
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 52.5228,
+          "rublesPerUnit": 52.5228
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 113.2002,
+          "rublesPerUnit": 113.2002
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 22.1034,
+          "rublesPerUnit": 0.221034
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.1038,
+          "rublesPerUnit": 28.1038
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 49.4099,
+          "rublesPerUnit": 49.4099
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 18.14,
+          "rublesPerUnit": 18.14
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 24.8197,
+          "rublesPerUnit": 0.248197
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 37.168,
+          "rublesPerUnit": 0.0037168
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.4443,
+          "rublesPerUnit": 11.4443
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 33.3503,
+          "rublesPerUnit": 33.3503
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.9648,
+          "rublesPerUnit": 12.9648
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 24.3128,
+          "rublesPerUnit": 24.3128
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 89.2887,
+          "rublesPerUnit": 89.2887
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 96.7895,
+          "rublesPerUnit": 96.7895
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 28.9027,
+          "rublesPerUnit": 2.89027
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 10.7444,
+          "rublesPerUnit": 1.07444
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 56.4225,
+          "rublesPerUnit": 0.00564225
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 19.8428,
+          "rublesPerUnit": 0.198428
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 66.4252,
+          "rublesPerUnit": 66.4252
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 24.5299,
+          "rublesPerUnit": 24.5299
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 99.965,
+          "rublesPerUnit": 0.99965
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 12.4066,
+          "rublesPerUnit": 12.4066
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 50.3216,
+          "rublesPerUnit": 5.03216
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 54.8411,
+          "rublesPerUnit": 54.8411
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 85.4822,
+          "rublesPerUnit": 8.54822
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 22.1555,
+          "rublesPerUnit": 22.1555
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 19.4423,
+          "rublesPerUnit": 19.4423
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 118.6808,
+          "rublesPerUnit": 118.6808
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 66.6682,
+          "rublesPerUnit": 66.6682
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 81.5117,
+          "rublesPerUnit": 8.15117
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 25.2538,
+          "rublesPerUnit": 2.52538
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 29.4564,
+          "rublesPerUnit": 2.94564
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 25.5111,
+          "rublesPerUnit": 25.5111
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 71.8679,
+          "rublesPerUnit": 0.00718679
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 23.5676,
+          "rublesPerUnit": 2.35676
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 38.9329,
+          "rublesPerUnit": 3.89329
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 85.0968,
+          "rublesPerUnit": 8.50968
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 103.4512,
+          "rublesPerUnit": 103.4512
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 82.4968,
+          "rublesPerUnit": 0.824968
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.3336,
+          "rublesPerUnit": 4.73336
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 67.1647,
+          "rublesPerUnit": 0.0671647
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 60.6087,
+          "rublesPerUnit": 0.606087
+        }
+      }
+    },
+    "2024-02-29": {
+      "effectiveDate": "2024-02-29",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=29/02/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 59.8895,
+          "rublesPerUnit": 59.8895
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 54.0407,
+          "rublesPerUnit": 54.0407
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 116.5177,
+          "rublesPerUnit": 116.5177
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 22.7219,
+          "rublesPerUnit": 0.227219
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.3626,
+          "rublesPerUnit": 28.3626
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 50.9928,
+          "rublesPerUnit": 50.9928
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 18.5325,
+          "rublesPerUnit": 18.5325
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.3586,
+          "rublesPerUnit": 0.253586
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 38.274,
+          "rublesPerUnit": 0.0038274
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.7585,
+          "rublesPerUnit": 11.7585
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 34.5867,
+          "rublesPerUnit": 34.5867
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.3778,
+          "rublesPerUnit": 13.3778
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 25.0154,
+          "rublesPerUnit": 25.0154
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 91.8692,
+          "rublesPerUnit": 91.8692
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 99.45,
+          "rublesPerUnit": 99.45
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 29.7366,
+          "rublesPerUnit": 2.97366
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 11.0839,
+          "rublesPerUnit": 1.10839
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 58.6836,
+          "rublesPerUnit": 0.00586836
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 20.4659,
+          "rublesPerUnit": 0.204659
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 67.9456,
+          "rublesPerUnit": 67.9456
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 25.2388,
+          "rublesPerUnit": 25.2388
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 10.2727,
+          "rublesPerUnit": 1.02727
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 12.7085,
+          "rublesPerUnit": 12.7085
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 51.4518,
+          "rublesPerUnit": 5.14518
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 56.449,
+          "rublesPerUnit": 56.449
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 87.2477,
+          "rublesPerUnit": 8.72477
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 23.0122,
+          "rublesPerUnit": 23.0122
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 19.9911,
+          "rublesPerUnit": 19.9911
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 122.0501,
+          "rublesPerUnit": 122.0501
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 68.2839,
+          "rublesPerUnit": 68.2839
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 83.8391,
+          "rublesPerUnit": 8.38391
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 25.5722,
+          "rublesPerUnit": 2.55722
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 29.5383,
+          "rublesPerUnit": 2.95383
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 26.2483,
+          "rublesPerUnit": 26.2483
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 73.4953,
+          "rublesPerUnit": 0.00734953
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 23.9088,
+          "rublesPerUnit": 2.39088
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 39.3663,
+          "rublesPerUnit": 3.93663
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 89.2029,
+          "rublesPerUnit": 8.92029
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 104.231,
+          "rublesPerUnit": 104.231
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 84.9041,
+          "rublesPerUnit": 0.849041
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.8645,
+          "rublesPerUnit": 4.78645
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 68.8881,
+          "rublesPerUnit": 0.0688881
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 61.0629,
+          "rublesPerUnit": 0.610629
+        }
+      }
+    },
+    "2024-03-31": {
+      "effectiveDate": "2024-03-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/03/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 60.3335,
+          "rublesPerUnit": 60.3335
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 54.3329,
+          "rublesPerUnit": 54.3329
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 116.649,
+          "rublesPerUnit": 116.649
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 23.4861,
+          "rublesPerUnit": 0.234861
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.4002,
+          "rublesPerUnit": 28.4002
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 51.056,
+          "rublesPerUnit": 51.056
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 18.4884,
+          "rublesPerUnit": 18.4884
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.1452,
+          "rublesPerUnit": 0.251452
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 38.481,
+          "rublesPerUnit": 0.0038481
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.8236,
+          "rublesPerUnit": 11.8236
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 34.2375,
+          "rublesPerUnit": 34.2375
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.3951,
+          "rublesPerUnit": 13.3951
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 25.1507,
+          "rublesPerUnit": 25.1507
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 92.366,
+          "rublesPerUnit": 92.366
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 99.5299,
+          "rublesPerUnit": 99.5299
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 19.4877,
+          "rublesPerUnit": 1.94877
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 11.0785,
+          "rublesPerUnit": 1.10785
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 58.2641,
+          "rublesPerUnit": 0.00582641
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 20.6105,
+          "rublesPerUnit": 0.206105
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 68.1668,
+          "rublesPerUnit": 68.1668
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 25.3753,
+          "rublesPerUnit": 25.3753
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 10.3236,
+          "rublesPerUnit": 1.03236
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 12.671,
+          "rublesPerUnit": 12.671
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 52.3471,
+          "rublesPerUnit": 5.23471
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 55.3365,
+          "rublesPerUnit": 55.3365
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 85.5154,
+          "rublesPerUnit": 8.55154
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 23.1575,
+          "rublesPerUnit": 23.1575
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 20.0456,
+          "rublesPerUnit": 20.0456
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 122.2399,
+          "rublesPerUnit": 122.2399
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 68.5411,
+          "rublesPerUnit": 68.5411
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 84.344,
+          "rublesPerUnit": 8.4344
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 25.3405,
+          "rublesPerUnit": 2.53405
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 28.6063,
+          "rublesPerUnit": 2.86063
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 26.3903,
+          "rublesPerUnit": 26.3903
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 73.1897,
+          "rublesPerUnit": 0.00731897
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 23.5499,
+          "rublesPerUnit": 2.35499
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 39.4507,
+          "rublesPerUnit": 3.94507
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 86.6437,
+          "rublesPerUnit": 8.66437
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 101.9267,
+          "rublesPerUnit": 101.9267
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 84.9845,
+          "rublesPerUnit": 0.849845
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 48.6326,
+          "rublesPerUnit": 4.86326
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 68.5615,
+          "rublesPerUnit": 0.0685615
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 61.0684,
+          "rublesPerUnit": 0.610684
+        }
+      }
+    },
+    "2024-04-30": {
+      "effectiveDate": "2024-04-28",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/04/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 60.0144,
+          "rublesPerUnit": 60.0144
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 53.9877,
+          "rublesPerUnit": 53.9877
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 114.6229,
+          "rublesPerUnit": 114.6229
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 23.6495,
+          "rublesPerUnit": 0.236495
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.3803,
+          "rublesPerUnit": 28.3803
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 50.2764,
+          "rublesPerUnit": 50.2764
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 17.9323,
+          "rublesPerUnit": 17.9323
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.09,
+          "rublesPerUnit": 0.2509
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 37.8533,
+          "rublesPerUnit": 0.00378533
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.744,
+          "rublesPerUnit": 11.744
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 34.2971,
+          "rublesPerUnit": 34.2971
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.1861,
+          "rublesPerUnit": 13.1861
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 24.9909,
+          "rublesPerUnit": 24.9909
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 91.7791,
+          "rublesPerUnit": 91.7791
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 98.027,
+          "rublesPerUnit": 98.027
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 19.1605,
+          "rublesPerUnit": 1.91605
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 11.0127,
+          "rublesPerUnit": 1.10127
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 56.6258,
+          "rublesPerUnit": 0.00566258
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 20.7013,
+          "rublesPerUnit": 0.207013
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 67.1489,
+          "rublesPerUnit": 67.1489
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 25.214,
+          "rublesPerUnit": 25.214
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 10.3347,
+          "rublesPerUnit": 1.03347
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 12.5657,
+          "rublesPerUnit": 12.5657
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 51.4131,
+          "rublesPerUnit": 5.14131
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 54.76,
+          "rublesPerUnit": 54.76
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 83.3355,
+          "rublesPerUnit": 8.33355
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 22.8051,
+          "rublesPerUnit": 22.8051
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 19.7915,
+          "rublesPerUnit": 19.7915
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 120.9217,
+          "rublesPerUnit": 120.9217
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 67.4598,
+          "rublesPerUnit": 67.4598
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 83.9753,
+          "rublesPerUnit": 8.39753
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.8058,
+          "rublesPerUnit": 2.48058
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 28.2555,
+          "rublesPerUnit": 2.82555
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 26.2226,
+          "rublesPerUnit": 26.2226
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 72.6088,
+          "rublesPerUnit": 0.00726088
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 23.1355,
+          "rublesPerUnit": 2.31355
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 39.0865,
+          "rublesPerUnit": 3.90865
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 84.0073,
+          "rublesPerUnit": 8.40073
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 100.7012,
+          "rublesPerUnit": 100.7012
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 84.0055,
+          "rublesPerUnit": 0.840055
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 48.3315,
+          "rublesPerUnit": 4.83315
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 66.7339,
+          "rublesPerUnit": 0.0667339
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 58.9726,
+          "rublesPerUnit": 0.589726
+        }
+      }
+    },
+    "2024-05-31": {
+      "effectiveDate": "2024-05-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/05/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 59.2324,
+          "rublesPerUnit": 59.2324
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 52.8158,
+          "rublesPerUnit": 52.8158
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 114.164,
+          "rublesPerUnit": 114.164
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 23.1219,
+          "rublesPerUnit": 0.231219
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.0068,
+          "rublesPerUnit": 28.0068
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 49.8415,
+          "rublesPerUnit": 49.8415
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 17.277,
+          "rublesPerUnit": 17.277
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 24.9991,
+          "rublesPerUnit": 0.249991
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 37.0133,
+          "rublesPerUnit": 0.00370133
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.5052,
+          "rublesPerUnit": 11.5052
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 32.2117,
+          "rublesPerUnit": 32.2117
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.066,
+          "rublesPerUnit": 13.066
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 24.4484,
+          "rublesPerUnit": 24.4484
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 89.7869,
+          "rublesPerUnit": 89.7869
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 97.1347,
+          "rublesPerUnit": 97.1347
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 18.9899,
+          "rublesPerUnit": 1.89899
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 10.7628,
+          "rublesPerUnit": 1.07628
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 55.5612,
+          "rublesPerUnit": 0.00555612
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 20.2748,
+          "rublesPerUnit": 0.202748
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 65.5379,
+          "rublesPerUnit": 65.5379
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 24.6667,
+          "rublesPerUnit": 24.6667
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 10.238,
+          "rublesPerUnit": 1.0238
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 12.365,
+          "rublesPerUnit": 12.365
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 50.7311,
+          "rublesPerUnit": 5.07311
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 54.8329,
+          "rublesPerUnit": 54.8329
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 85.3829,
+          "rublesPerUnit": 8.53829
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 22.8791,
+          "rublesPerUnit": 22.8791
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 19.507,
+          "rublesPerUnit": 19.507
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 118.824,
+          "rublesPerUnit": 118.824
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 66.3712,
+          "rublesPerUnit": 66.3712
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 83.3459,
+          "rublesPerUnit": 8.33459
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.3312,
+          "rublesPerUnit": 2.43312
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 27.8699,
+          "rublesPerUnit": 2.78699
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 25.6534,
+          "rublesPerUnit": 25.6534
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 71.0291,
+          "rublesPerUnit": 0.00710291
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 22.1788,
+          "rublesPerUnit": 2.21788
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 39.1997,
+          "rublesPerUnit": 3.91997
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 84.6084,
+          "rublesPerUnit": 8.46084
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 98.9715,
+          "rublesPerUnit": 98.9715
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 82.7864,
+          "rublesPerUnit": 0.827864
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 48.019,
+          "rublesPerUnit": 4.8019
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 65.0913,
+          "rublesPerUnit": 0.0650913
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 57.2949,
+          "rublesPerUnit": 0.572949
+        }
+      }
+    },
+    "2024-06-30": {
+      "effectiveDate": "2024-06-29",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/06/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 56.7995,
+          "rublesPerUnit": 56.7995
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 50.44,
+          "rublesPerUnit": 50.44
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 108.4798,
+          "rublesPerUnit": 108.4798
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 22.0909,
+          "rublesPerUnit": 0.220909
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.0823,
+          "rublesPerUnit": 27.0823
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 46.8937,
+          "rublesPerUnit": 46.8937
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.5267,
+          "rublesPerUnit": 15.5267
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.2128,
+          "rublesPerUnit": 0.232128
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 35.3454,
+          "rublesPerUnit": 0.00353454
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.0004,
+          "rublesPerUnit": 11.0004
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 30.2708,
+          "rublesPerUnit": 30.2708
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.2971,
+          "rublesPerUnit": 12.2971
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 23.3487,
+          "rublesPerUnit": 23.3487
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 85.748,
+          "rublesPerUnit": 85.748
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 92.4184,
+          "rublesPerUnit": 92.4184
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 17.8529,
+          "rublesPerUnit": 1.78529
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 10.275,
+          "rublesPerUnit": 1.0275
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 52.2185,
+          "rublesPerUnit": 0.00522185
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 18.4198,
+          "rublesPerUnit": 0.184198
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 62.6355,
+          "rublesPerUnit": 62.6355
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 23.5571,
+          "rublesPerUnit": 23.5571
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 99.1932,
+          "rublesPerUnit": 0.991932
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.5756,
+          "rublesPerUnit": 11.5756
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 47.8272,
+          "rublesPerUnit": 4.78272
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 52.1305,
+          "rublesPerUnit": 52.1305
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 80.467,
+          "rublesPerUnit": 8.0467
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.2669,
+          "rublesPerUnit": 21.2669
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.4448,
+          "rublesPerUnit": 18.4448
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 112.7595,
+          "rublesPerUnit": 112.7595
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 63.1196,
+          "rublesPerUnit": 63.1196
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 80.4104,
+          "rublesPerUnit": 8.04104
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 23.2707,
+          "rublesPerUnit": 2.32707
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 26.086,
+          "rublesPerUnit": 2.6086
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 24.4994,
+          "rublesPerUnit": 24.4994
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 68.297,
+          "rublesPerUnit": 0.0068297
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 21.1528,
+          "rublesPerUnit": 2.11528
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 36.6664,
+          "rublesPerUnit": 3.66664
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 80.8927,
+          "rublesPerUnit": 8.08927
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 95.3073,
+          "rublesPerUnit": 95.3073
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 78.291,
+          "rublesPerUnit": 0.78291
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.0786,
+          "rublesPerUnit": 4.70786
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 62.2852,
+          "rublesPerUnit": 0.0622852
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 53.2762,
+          "rublesPerUnit": 0.532762
+        }
+      }
+    },
+    "2024-07-31": {
+      "effectiveDate": "2024-07-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/07/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 56.5979,
+          "rublesPerUnit": 56.5979
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 50.7824,
+          "rublesPerUnit": 50.7824
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 110.9082,
+          "rublesPerUnit": 110.9082
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 22.2282,
+          "rublesPerUnit": 0.222282
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.5384,
+          "rublesPerUnit": 27.5384
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 47.746,
+          "rublesPerUnit": 47.746
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.2861,
+          "rublesPerUnit": 15.2861
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.7138,
+          "rublesPerUnit": 0.237138
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 35.5897,
+          "rublesPerUnit": 0.00355897
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.0708,
+          "rublesPerUnit": 11.0708
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 31.8056,
+          "rublesPerUnit": 31.8056
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.5136,
+          "rublesPerUnit": 12.5136
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 23.5071,
+          "rublesPerUnit": 23.5071
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 86.33,
+          "rublesPerUnit": 86.33
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 93.2947,
+          "rublesPerUnit": 93.2947
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 17.8357,
+          "rublesPerUnit": 1.78357
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 10.3102,
+          "rublesPerUnit": 1.03102
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 53.0087,
+          "rublesPerUnit": 0.00530087
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 18.2404,
+          "rublesPerUnit": 0.182404
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 62.3231,
+          "rublesPerUnit": 62.3231
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 23.717,
+          "rublesPerUnit": 23.717
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 10.2737,
+          "rublesPerUnit": 1.02737
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.8368,
+          "rublesPerUnit": 11.8368
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 48.6613,
+          "rublesPerUnit": 4.86613
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 50.6714,
+          "rublesPerUnit": 50.6714
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 78.3714,
+          "rublesPerUnit": 7.83714
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.8187,
+          "rublesPerUnit": 21.8187
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.798,
+          "rublesPerUnit": 18.798
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 114.4589,
+          "rublesPerUnit": 114.4589
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 64.2528,
+          "rublesPerUnit": 64.2528
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 81.2602,
+          "rublesPerUnit": 8.12602
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 23.9926,
+          "rublesPerUnit": 2.39926
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 26.176,
+          "rublesPerUnit": 2.6176
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 24.6657,
+          "rublesPerUnit": 24.6657
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 68.6555,
+          "rublesPerUnit": 0.00686555
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 21.0316,
+          "rublesPerUnit": 2.10316
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 36.7565,
+          "rublesPerUnit": 3.67565
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 79.6343,
+          "rublesPerUnit": 7.96343
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 97.4599,
+          "rublesPerUnit": 97.4599
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 79.837,
+          "rublesPerUnit": 0.79837
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.1365,
+          "rublesPerUnit": 4.71365
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 62.4674,
+          "rublesPerUnit": 0.0624674
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 56.0439,
+          "rublesPerUnit": 0.560439
+        }
+      }
+    },
+    "2024-08-31": {
+      "effectiveDate": "2024-08-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/08/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 62.0617,
+          "rublesPerUnit": 62.0617
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 53.6393,
+          "rublesPerUnit": 53.6393
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 119.9562,
+          "rublesPerUnit": 119.9562
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 23.5303,
+          "rublesPerUnit": 0.235303
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.761,
+          "rublesPerUnit": 28.761
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 51.6955,
+          "rublesPerUnit": 51.6955
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 16.1808,
+          "rublesPerUnit": 16.1808
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.7248,
+          "rublesPerUnit": 0.257248
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 37.6432,
+          "rublesPerUnit": 0.00376432
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.7146,
+          "rublesPerUnit": 11.7146
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 33.8733,
+          "rublesPerUnit": 33.8733
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.5555,
+          "rublesPerUnit": 13.5555
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 24.8296,
+          "rublesPerUnit": 24.8296
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 91.1868,
+          "rublesPerUnit": 91.1868
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 100.7622,
+          "rublesPerUnit": 100.7622
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 18.7546,
+          "rublesPerUnit": 1.87546
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 10.8723,
+          "rublesPerUnit": 1.08723
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 59.1776,
+          "rublesPerUnit": 0.00591776
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 18.933,
+          "rublesPerUnit": 0.18933
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 67.6761,
+          "rublesPerUnit": 67.6761
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 25.0513,
+          "rublesPerUnit": 25.0513
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 10.7386,
+          "rublesPerUnit": 1.07386
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 12.0151,
+          "rublesPerUnit": 12.0151
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 52.4077,
+          "rublesPerUnit": 5.24077
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 57.1559,
+          "rublesPerUnit": 57.1559
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 86.8553,
+          "rublesPerUnit": 8.68553
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 23.5966,
+          "rublesPerUnit": 23.5966
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 20.3062,
+          "rublesPerUnit": 20.3062
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 122.9052,
+          "rublesPerUnit": 122.9052
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 69.9715,
+          "rublesPerUnit": 69.9715
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 85.5307,
+          "rublesPerUnit": 8.55307
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 26.8386,
+          "rublesPerUnit": 2.68386
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 26.8561,
+          "rublesPerUnit": 2.68561
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 26.0534,
+          "rublesPerUnit": 26.0534
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 72.2271,
+          "rublesPerUnit": 0.00722271
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 22.138,
+          "rublesPerUnit": 2.2138
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 40.3892,
+          "rublesPerUnit": 4.03892
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 89.1172,
+          "rublesPerUnit": 8.91172
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 107.4682,
+          "rublesPerUnit": 107.4682
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 86.3149,
+          "rublesPerUnit": 0.863149
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 51.7774,
+          "rublesPerUnit": 5.17774
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 68.2894,
+          "rublesPerUnit": 0.0682894
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 62.9917,
+          "rublesPerUnit": 0.629917
+        }
+      }
+    },
+    "2024-09-30": {
+      "effectiveDate": "2024-09-28",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/09/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 63.7677,
+          "rublesPerUnit": 63.7677
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 54.5368,
+          "rublesPerUnit": 54.5368
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 124.1978,
+          "rublesPerUnit": 124.1978
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 23.937,
+          "rublesPerUnit": 0.23937
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.8707,
+          "rublesPerUnit": 28.8707
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 52.8783,
+          "rublesPerUnit": 52.8783
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 17.0399,
+          "rublesPerUnit": 17.0399
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 26.037,
+          "rublesPerUnit": 0.26037
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 38.4412,
+          "rublesPerUnit": 0.00384412
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.9475,
+          "rublesPerUnit": 11.9475
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 33.9793,
+          "rublesPerUnit": 33.9793
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.8685,
+          "rublesPerUnit": 13.8685
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 25.2451,
+          "rublesPerUnit": 25.2451
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 92.7126,
+          "rublesPerUnit": 92.7126
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 103.4694,
+          "rublesPerUnit": 103.4694
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 19.173,
+          "rublesPerUnit": 1.9173
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 11.0809,
+          "rublesPerUnit": 1.10809
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 61.1117,
+          "rublesPerUnit": 0.00611117
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 19.3741,
+          "rublesPerUnit": 0.193741
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 68.8085,
+          "rublesPerUnit": 68.8085
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 25.4705,
+          "rublesPerUnit": 25.4705
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 11.011,
+          "rublesPerUnit": 1.1011
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 13.2163,
+          "rublesPerUnit": 13.2163
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 53.2501,
+          "rublesPerUnit": 5.32501
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 58.5017,
+          "rublesPerUnit": 58.5017
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 87.7453,
+          "rublesPerUnit": 8.77453
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 24.164,
+          "rublesPerUnit": 24.164
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 20.782,
+          "rublesPerUnit": 20.782
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 125.4967,
+          "rublesPerUnit": 125.4967
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 72.1611,
+          "rublesPerUnit": 72.1611
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 87.0492,
+          "rublesPerUnit": 8.70492
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 28.5841,
+          "rublesPerUnit": 2.85841
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 27.1654,
+          "rublesPerUnit": 2.71654
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 26.4893,
+          "rublesPerUnit": 26.4893
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 72.793,
+          "rublesPerUnit": 0.0072793
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 22.4984,
+          "rublesPerUnit": 2.24984
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 41.1197,
+          "rublesPerUnit": 4.11197
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 91.5229,
+          "rublesPerUnit": 9.15229
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 109.7061,
+          "rublesPerUnit": 109.7061
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 88.4327,
+          "rublesPerUnit": 0.884327
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 54.0397,
+          "rublesPerUnit": 5.40397
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 69.7244,
+          "rublesPerUnit": 0.0697244
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 63.7463,
+          "rublesPerUnit": 0.637463
+        }
+      }
+    },
+    "2024-10-31": {
+      "effectiveDate": "2024-10-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/10/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 63.5018,
+          "rublesPerUnit": 63.5018
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 57.09,
+          "rublesPerUnit": 57.09
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 126.1301,
+          "rublesPerUnit": 126.1301
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 25.0751,
+          "rublesPerUnit": 0.250751
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 29.246,
+          "rublesPerUnit": 29.246
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 53.4633,
+          "rublesPerUnit": 53.4633
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 16.986,
+          "rublesPerUnit": 16.986
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.887,
+          "rublesPerUnit": 0.25887
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 40.0285,
+          "rublesPerUnit": 0.00400285
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 12.5101,
+          "rublesPerUnit": 12.5101
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 35.4105,
+          "rublesPerUnit": 35.4105
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 14.0189,
+          "rublesPerUnit": 14.0189
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 26.427,
+          "rublesPerUnit": 26.427
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 97.053,
+          "rublesPerUnit": 97.053
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 105.2211,
+          "rublesPerUnit": 105.2211
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 19.899,
+          "rublesPerUnit": 1.9899
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 11.5423,
+          "rublesPerUnit": 1.15423
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 61.5819,
+          "rublesPerUnit": 0.00615819
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 19.7383,
+          "rublesPerUnit": 0.197383
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 69.7671,
+          "rublesPerUnit": 69.7671
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 26.6629,
+          "rublesPerUnit": 26.6629
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 11.3115,
+          "rublesPerUnit": 1.13115
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 13.5876,
+          "rublesPerUnit": 13.5876
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 54.0984,
+          "rublesPerUnit": 5.40984
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 57.9552,
+          "rublesPerUnit": 57.9552
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 88.3039,
+          "rublesPerUnit": 8.83039
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 24.2699,
+          "rublesPerUnit": 24.2699
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 21.138,
+          "rublesPerUnit": 21.138
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 128.8796,
+          "rublesPerUnit": 128.8796
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 73.231,
+          "rublesPerUnit": 73.231
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 91.0877,
+          "rublesPerUnit": 9.10877
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 28.7633,
+          "rublesPerUnit": 2.87633
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 28.3617,
+          "rublesPerUnit": 2.83617
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 27.7294,
+          "rublesPerUnit": 27.7294
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 75.9118,
+          "rublesPerUnit": 0.00759118
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 23.4542,
+          "rublesPerUnit": 2.34542
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 41.2097,
+          "rublesPerUnit": 4.12097
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 90.7918,
+          "rublesPerUnit": 9.07918
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 111.9541,
+          "rublesPerUnit": 111.9541
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 89.7322,
+          "rublesPerUnit": 0.897322
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 55.3084,
+          "rublesPerUnit": 5.53084
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 70.1706,
+          "rublesPerUnit": 0.0701706
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 63.3216,
+          "rublesPerUnit": 0.633216
+        }
+      }
+    },
+    "2024-11-30": {
+      "effectiveDate": "2024-11-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/11/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 70.2147,
+          "rublesPerUnit": 70.2147
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 63.377,
+          "rublesPerUnit": 63.377
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 136.637,
+          "rublesPerUnit": 136.637
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 27.3011,
+          "rublesPerUnit": 0.273011
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 30.1787,
+          "rublesPerUnit": 30.1787
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 58.0729,
+          "rublesPerUnit": 58.0729
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 17.9964,
+          "rublesPerUnit": 17.9964
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 27.5341,
+          "rublesPerUnit": 0.275341
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 44.4274,
+          "rublesPerUnit": 0.00444274
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 13.8663,
+          "rublesPerUnit": 13.8663
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 39.2957,
+          "rublesPerUnit": 39.2957
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 15.2299,
+          "rublesPerUnit": 15.2299
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 29.3372,
+          "rublesPerUnit": 29.3372
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 107.7409,
+          "rublesPerUnit": 107.7409
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 114.3149,
+          "rublesPerUnit": 114.3149
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 21.7233,
+          "rublesPerUnit": 2.17233
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 12.7508,
+          "rublesPerUnit": 1.27508
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 67.9153,
+          "rublesPerUnit": 0.00679153
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 21.0021,
+          "rublesPerUnit": 0.210021
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 76.9029,
+          "rublesPerUnit": 76.9029
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 29.5991,
+          "rublesPerUnit": 29.5991
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 12.4125,
+          "rublesPerUnit": 1.24125
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 14.7233,
+          "rublesPerUnit": 14.7233
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 58.9189,
+          "rublesPerUnit": 5.89189
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 63.5671,
+          "rublesPerUnit": 63.5671
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 97.3771,
+          "rublesPerUnit": 9.73771
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 26.4265,
+          "rublesPerUnit": 26.4265
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 22.8609,
+          "rublesPerUnit": 22.8609
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 141.5618,
+          "rublesPerUnit": 141.5618
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 80.4457,
+          "rublesPerUnit": 80.4457
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 99.1697,
+          "rublesPerUnit": 9.91697
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 31.4333,
+          "rublesPerUnit": 3.14333
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 31.1382,
+          "rublesPerUnit": 3.11382
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 30.7831,
+          "rublesPerUnit": 30.7831
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 83.747,
+          "rublesPerUnit": 0.0083747
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 25.902,
+          "rublesPerUnit": 2.5902
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 44.967,
+          "rublesPerUnit": 4.4967
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 98.4446,
+          "rublesPerUnit": 9.84446
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 122.28,
+          "rublesPerUnit": 122.28
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 97.355,
+          "rublesPerUnit": 0.97355
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 59.717,
+          "rublesPerUnit": 5.9717
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 77.2502,
+          "rublesPerUnit": 0.0772502
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 71.8273,
+          "rublesPerUnit": 0.718273
+        }
+      }
+    },
+    "2024-12-31": {
+      "effectiveDate": "2024-12-29",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/12/2024",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 63.1533,
+          "rublesPerUnit": 63.1533
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 59.8116,
+          "rublesPerUnit": 59.8116
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 127.4962,
+          "rublesPerUnit": 127.4962
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 25.6456,
+          "rublesPerUnit": 0.256456
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 29.6434,
+          "rublesPerUnit": 29.6434
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 54.2494,
+          "rublesPerUnit": 54.2494
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 16.4031,
+          "rublesPerUnit": 16.4031
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.5214,
+          "rublesPerUnit": 0.255214
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 41.8056,
+          "rublesPerUnit": 0.00418056
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 13.1225,
+          "rublesPerUnit": 13.1225
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 36.3883,
+          "rublesPerUnit": 36.3883
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 14.2225,
+          "rublesPerUnit": 14.2225
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 27.6868,
+          "rublesPerUnit": 27.6868
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 101.6797,
+          "rublesPerUnit": 101.6797
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 106.1028,
+          "rublesPerUnit": 106.1028
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 19.9827,
+          "rublesPerUnit": 1.99827
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 11.8797,
+          "rublesPerUnit": 1.18797
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 62.7343,
+          "rublesPerUnit": 0.00627343
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 19.486,
+          "rublesPerUnit": 0.19486
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 70.5325,
+          "rublesPerUnit": 70.5325
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 27.934,
+          "rublesPerUnit": 27.934
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 11.6874,
+          "rublesPerUnit": 1.16874
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 13.4272,
+          "rublesPerUnit": 13.4272
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 55.0778,
+          "rublesPerUnit": 5.50778
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 57.1643,
+          "rublesPerUnit": 57.1643
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 89.5872,
+          "rublesPerUnit": 8.95872
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 24.7782,
+          "rublesPerUnit": 24.7782
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 21.2862,
+          "rublesPerUnit": 21.2862
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 132.6035,
+          "rublesPerUnit": 132.6035
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 74.77,
+          "rublesPerUnit": 74.77
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 93.0026,
+          "rublesPerUnit": 9.30026
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 29.7989,
+          "rublesPerUnit": 2.97989
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 28.9122,
+          "rublesPerUnit": 2.89122
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 29.0513,
+          "rublesPerUnit": 29.0513
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 78.6965,
+          "rublesPerUnit": 0.00786965
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 24.2993,
+          "rublesPerUnit": 2.42993
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 42.0912,
+          "rublesPerUnit": 4.20912
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 92.428,
+          "rublesPerUnit": 9.2428
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 112.9774,
+          "rublesPerUnit": 112.9774
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 90.5031,
+          "rublesPerUnit": 0.905031
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 54.1077,
+          "rublesPerUnit": 5.41077
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 69.5056,
+          "rublesPerUnit": 0.0695056
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 64.3746,
+          "rublesPerUnit": 0.643746
+        }
+      }
+    },
+    "2025-01-31": {
+      "effectiveDate": "2025-01-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/01/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 61.0089,
+          "rublesPerUnit": 61.0089
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 57.6507,
+          "rublesPerUnit": 57.6507
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 121.8609,
+          "rublesPerUnit": 121.8609
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 24.6296,
+          "rublesPerUnit": 0.246296
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.7122,
+          "rublesPerUnit": 28.7122
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 52.0941,
+          "rublesPerUnit": 52.0941
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 16.7266,
+          "rublesPerUnit": 16.7266
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.0373,
+          "rublesPerUnit": 0.250373
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 40.2903,
+          "rublesPerUnit": 0.00402903
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 12.6021,
+          "rublesPerUnit": 12.6021
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 34.0488,
+          "rublesPerUnit": 34.0488
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.6529,
+          "rublesPerUnit": 13.6529
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 26.6865,
+          "rublesPerUnit": 26.6865
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 98.0062,
+          "rublesPerUnit": 98.0062
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 102.7782,
+          "rublesPerUnit": 102.7782
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 19.5093,
+          "rublesPerUnit": 1.95093
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 11.3192,
+          "rublesPerUnit": 1.13192
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 60.4977,
+          "rublesPerUnit": 0.00604977
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 18.9622,
+          "rublesPerUnit": 0.189622
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 67.8948,
+          "rublesPerUnit": 67.8948
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 26.9248,
+          "rublesPerUnit": 26.9248
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 11.2071,
+          "rublesPerUnit": 1.12071
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 13.3729,
+          "rublesPerUnit": 13.3729
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 52.5807,
+          "rublesPerUnit": 5.25807
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 55.496,
+          "rublesPerUnit": 55.496
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 86.503,
+          "rublesPerUnit": 8.6503
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 24.2632,
+          "rublesPerUnit": 24.2632
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 20.4824,
+          "rublesPerUnit": 20.4824
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 127.9157,
+          "rublesPerUnit": 127.9157
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 72.4576,
+          "rublesPerUnit": 72.4576
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 89.8678,
+          "rublesPerUnit": 8.98678
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 29.0268,
+          "rublesPerUnit": 2.90268
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 27.4229,
+          "rublesPerUnit": 2.74229
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 28.0018,
+          "rublesPerUnit": 28.0018
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 75.5734,
+          "rublesPerUnit": 0.00755734
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 23.3741,
+          "rublesPerUnit": 2.33741
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 40.5403,
+          "rublesPerUnit": 4.05403
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 88.9418,
+          "rublesPerUnit": 8.89418
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 107.972,
+          "rublesPerUnit": 107.972
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 87.1849,
+          "rublesPerUnit": 0.871849
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 52.9663,
+          "rublesPerUnit": 5.29663
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 68.1972,
+          "rublesPerUnit": 0.0681972
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 63.332,
+          "rublesPerUnit": 0.63332
+        }
+      }
+    },
+    "2025-02-28": {
+      "effectiveDate": "2025-02-28",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=28/02/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 55.1437,
+          "rublesPerUnit": 55.1437
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 51.5863,
+          "rublesPerUnit": 51.5863
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 111.331,
+          "rublesPerUnit": 111.331
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 22.2999,
+          "rublesPerUnit": 0.222999
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.6036,
+          "rublesPerUnit": 27.6036
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 47.0224,
+          "rublesPerUnit": 47.0224
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.1845,
+          "rublesPerUnit": 15.1845
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.0091,
+          "rublesPerUnit": 0.230091
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 35.5105,
+          "rublesPerUnit": 0.00355105
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 11.3011,
+          "rublesPerUnit": 11.3011
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 31.1633,
+          "rublesPerUnit": 31.1633
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.3308,
+          "rublesPerUnit": 12.3308
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 23.8793,
+          "rublesPerUnit": 23.8793
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 87.6967,
+          "rublesPerUnit": 87.6967
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 92.0362,
+          "rublesPerUnit": 92.0362
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 17.3103,
+          "rublesPerUnit": 1.73103
+        },
+        "INR": {
+          "nominal": 10,
+          "value": 10.0556,
+          "rublesPerUnit": 1.00556
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 53.516,
+          "rublesPerUnit": 0.0053516
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 17.4946,
+          "rublesPerUnit": 0.174946
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 61.1596,
+          "rublesPerUnit": 61.1596
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 24.0925,
+          "rublesPerUnit": 24.0925
+        },
+        "KGS": {
+          "nominal": 10,
+          "value": 10.0282,
+          "rublesPerUnit": 1.00282
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.9563,
+          "rublesPerUnit": 11.9563
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 47.0898,
+          "rublesPerUnit": 4.70898
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 49.9345,
+          "rublesPerUnit": 49.9345
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 78.675,
+          "rublesPerUnit": 7.8675
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 22.2248,
+          "rublesPerUnit": 22.2248
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.4625,
+          "rublesPerUnit": 18.4625
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 115.2194,
+          "rublesPerUnit": 115.2194
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 65.377,
+          "rublesPerUnit": 65.377
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 80.1505,
+          "rublesPerUnit": 8.01505
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 25.8952,
+          "rublesPerUnit": 2.58952
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 24.0896,
+          "rublesPerUnit": 2.40896
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 25.0562,
+          "rublesPerUnit": 25.0562
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 68.0878,
+          "rublesPerUnit": 0.00680878
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 21.0612,
+          "rublesPerUnit": 2.10612
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 36.8721,
+          "rublesPerUnit": 3.68721
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 82.5339,
+          "rublesPerUnit": 8.25339
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 97.7013,
+          "rublesPerUnit": 97.7013
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 78.3111,
+          "rublesPerUnit": 0.783111
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.4652,
+          "rublesPerUnit": 4.74652
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 61.2493,
+          "rublesPerUnit": 0.0612493
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 58.7937,
+          "rublesPerUnit": 0.587937
+        }
+      }
+    },
+    "2025-03-31": {
+      "effectiveDate": "2025-03-29",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/03/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 52.5853,
+          "rublesPerUnit": 52.5853
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 49.2243,
+          "rublesPerUnit": 49.2243
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 108.4761,
+          "rublesPerUnit": 108.4761
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.3696,
+          "rublesPerUnit": 0.213696
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.8416,
+          "rublesPerUnit": 26.8416
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 46.1443,
+          "rublesPerUnit": 46.1443
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.5606,
+          "rublesPerUnit": 14.5606
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 22.3914,
+          "rublesPerUnit": 0.223914
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 33.6841,
+          "rublesPerUnit": 0.00336841
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.7767,
+          "rublesPerUnit": 10.7767
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 30.1968,
+          "rublesPerUnit": 30.1968
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.097,
+          "rublesPerUnit": 12.097
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 22.7859,
+          "rublesPerUnit": 22.7859
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 83.6813,
+          "rublesPerUnit": 83.6813
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 89.6553,
+          "rublesPerUnit": 89.6553
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.5429,
+          "rublesPerUnit": 1.65429
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 97.7798,
+          "rublesPerUnit": 0.977798
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 50.4469,
+          "rublesPerUnit": 0.00504469
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 16.795,
+          "rublesPerUnit": 0.16795
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 58.4816,
+          "rublesPerUnit": 58.4816
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 22.9894,
+          "rublesPerUnit": 22.9894
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 96.8534,
+          "rublesPerUnit": 0.968534
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.4575,
+          "rublesPerUnit": 11.4575
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 46.3064,
+          "rublesPerUnit": 4.63064
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 47.941,
+          "rublesPerUnit": 47.941
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 79.5616,
+          "rublesPerUnit": 7.95616
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.5579,
+          "rublesPerUnit": 21.5579
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.1179,
+          "rublesPerUnit": 18.1179
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 110.9706,
+          "rublesPerUnit": 110.9706
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 62.4022,
+          "rublesPerUnit": 62.4022
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 76.7423,
+          "rublesPerUnit": 7.67423
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.668,
+          "rublesPerUnit": 2.4668
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 22.0408,
+          "rublesPerUnit": 2.20408
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 23.9089,
+          "rublesPerUnit": 23.9089
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 64.803,
+          "rublesPerUnit": 0.0064803
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 20.1708,
+          "rublesPerUnit": 2.01708
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 36.1162,
+          "rublesPerUnit": 3.61162
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 83.3836,
+          "rublesPerUnit": 8.33836
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 94.8123,
+          "rublesPerUnit": 94.8123
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 77.018,
+          "rublesPerUnit": 0.77018
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 46.0083,
+          "rublesPerUnit": 4.60083
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 57.0502,
+          "rublesPerUnit": 0.0570502
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 55.4732,
+          "rublesPerUnit": 0.554732
+        }
+      }
+    },
+    "2025-04-30": {
+      "effectiveDate": "2025-04-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/04/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 52.3055,
+          "rublesPerUnit": 52.3055
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 47.9774,
+          "rublesPerUnit": 47.9774
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 109.2355,
+          "rublesPerUnit": 109.2355
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.9428,
+          "rublesPerUnit": 0.209428
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.731,
+          "rublesPerUnit": 26.731
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 47.365,
+          "rublesPerUnit": 47.365
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.3903,
+          "rublesPerUnit": 14.3903
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 22.9751,
+          "rublesPerUnit": 0.229751
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 32.6822,
+          "rublesPerUnit": 0.00326822
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.5309,
+          "rublesPerUnit": 10.5309
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 29.6631,
+          "rublesPerUnit": 29.6631
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.4107,
+          "rublesPerUnit": 12.4107
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 22.2087,
+          "rublesPerUnit": 22.2087
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 81.5616,
+          "rublesPerUnit": 81.5616
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 93.173,
+          "rublesPerUnit": 93.173
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.053,
+          "rublesPerUnit": 1.6053
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 95.729,
+          "rublesPerUnit": 0.95729
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 48.3701,
+          "rublesPerUnit": 0.00483701
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.8779,
+          "rublesPerUnit": 0.158779
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 58.8892,
+          "rublesPerUnit": 58.8892
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 22.407,
+          "rublesPerUnit": 22.407
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 93.2666,
+          "rublesPerUnit": 0.932666
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.2016,
+          "rublesPerUnit": 11.2016
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 47.2903,
+          "rublesPerUnit": 4.72903
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 48.6556,
+          "rublesPerUnit": 48.6556
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 78.0995,
+          "rublesPerUnit": 7.80995
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.7741,
+          "rublesPerUnit": 21.7741
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.6593,
+          "rublesPerUnit": 18.6593
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 110.4825,
+          "rublesPerUnit": 110.4825
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 62.3178,
+          "rublesPerUnit": 62.3178
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 76.95,
+          "rublesPerUnit": 7.695
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.4717,
+          "rublesPerUnit": 2.44717
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 21.2394,
+          "rublesPerUnit": 2.12394
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 23.3033,
+          "rublesPerUnit": 23.3033
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 62.9912,
+          "rublesPerUnit": 0.00629912
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 19.6228,
+          "rublesPerUnit": 1.96228
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.2274,
+          "rublesPerUnit": 3.72274
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 84.2391,
+          "rublesPerUnit": 8.42391
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 98.8506,
+          "rublesPerUnit": 98.8506
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 79.1818,
+          "rublesPerUnit": 0.791818
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 43.9842,
+          "rublesPerUnit": 4.39842
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 56.6675,
+          "rublesPerUnit": 0.0566675
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 56.8849,
+          "rublesPerUnit": 0.568849
+        }
+      }
+    },
+    "2025-05-31": {
+      "effectiveDate": "2025-05-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/05/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 50.598,
+          "rublesPerUnit": 50.598
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 46.2454,
+          "rublesPerUnit": 46.2454
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 105.9994,
+          "rublesPerUnit": 105.9994
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.4764,
+          "rublesPerUnit": 0.204764
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.2424,
+          "rublesPerUnit": 26.2424
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 45.3454,
+          "rublesPerUnit": 45.3454
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 13.9008,
+          "rublesPerUnit": 13.9008
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 22.0333,
+          "rublesPerUnit": 0.220333
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 31.4745,
+          "rublesPerUnit": 0.00314745
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.0418,
+          "rublesPerUnit": 10.0418
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 28.7532,
+          "rublesPerUnit": 28.7532
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 11.9283,
+          "rublesPerUnit": 11.9283
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.407,
+          "rublesPerUnit": 21.407
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 78.6171,
+          "rublesPerUnit": 78.6171
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 89.2512,
+          "rublesPerUnit": 89.2512
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 15.8041,
+          "rublesPerUnit": 1.58041
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 91.9737,
+          "rublesPerUnit": 0.919737
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 48.3649,
+          "rublesPerUnit": 0.00483649
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.4375,
+          "rublesPerUnit": 0.154375
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 56.9442,
+          "rublesPerUnit": 56.9442
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 21.5981,
+          "rublesPerUnit": 21.5981
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 89.8995,
+          "rublesPerUnit": 0.898995
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 10.8897,
+          "rublesPerUnit": 10.8897
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 45.3778,
+          "rublesPerUnit": 4.53778
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 46.899,
+          "rublesPerUnit": 46.899
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 77.4034,
+          "rublesPerUnit": 7.74034
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 20.9439,
+          "rublesPerUnit": 20.9439
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 17.5881,
+          "rublesPerUnit": 17.5881
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 106.5034,
+          "rublesPerUnit": 106.5034
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 61.0144,
+          "rublesPerUnit": 61.0144
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 78.736,
+          "rublesPerUnit": 7.8736
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.0743,
+          "rublesPerUnit": 2.40743
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 20.1291,
+          "rublesPerUnit": 2.01291
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.462,
+          "rublesPerUnit": 22.462
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 61.5723,
+          "rublesPerUnit": 0.00615723
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 18.932,
+          "rublesPerUnit": 1.8932
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 35.7887,
+          "rublesPerUnit": 3.57887
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 81.8237,
+          "rublesPerUnit": 8.18237
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 95.4091,
+          "rublesPerUnit": 95.4091
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 76.1149,
+          "rublesPerUnit": 0.761149
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 44.0523,
+          "rublesPerUnit": 4.40523
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 56.9112,
+          "rublesPerUnit": 0.0569112
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 54.6407,
+          "rublesPerUnit": 0.546407
+        }
+      }
+    },
+    "2025-06-30": {
+      "effectiveDate": "2025-06-28",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/06/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 51.3419,
+          "rublesPerUnit": 51.3419
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 46.1579,
+          "rublesPerUnit": 46.1579
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 107.7608,
+          "rublesPerUnit": 107.7608
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.4175,
+          "rublesPerUnit": 0.204175
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.4533,
+          "rublesPerUnit": 26.4533
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 46.9208,
+          "rublesPerUnit": 46.9208
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.2303,
+          "rublesPerUnit": 14.2303
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.0059,
+          "rublesPerUnit": 0.230059
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 31.3273,
+          "rublesPerUnit": 0.00313273
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.0138,
+          "rublesPerUnit": 10.0138
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 28.8042,
+          "rublesPerUnit": 28.8042
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.3009,
+          "rublesPerUnit": 12.3009
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.3665,
+          "rublesPerUnit": 21.3665
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 78.4685,
+          "rublesPerUnit": 78.4685
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 92.2785,
+          "rublesPerUnit": 92.2785
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 15.7232,
+          "rublesPerUnit": 1.57232
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 91.7123,
+          "rublesPerUnit": 0.917123
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 48.1638,
+          "rublesPerUnit": 0.00481638
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.1384,
+          "rublesPerUnit": 0.151384
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 57.5282,
+          "rublesPerUnit": 57.5282
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 21.5573,
+          "rublesPerUnit": 21.5573
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 89.7871,
+          "rublesPerUnit": 0.897871
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 10.9433,
+          "rublesPerUnit": 10.9433
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 46.6015,
+          "rublesPerUnit": 4.66015
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 47.6304,
+          "rublesPerUnit": 47.6304
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 77.6877,
+          "rublesPerUnit": 7.76877
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.6902,
+          "rublesPerUnit": 21.6902
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.0928,
+          "rublesPerUnit": 18.0928
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 107.793,
+          "rublesPerUnit": 107.793
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 61.5053,
+          "rublesPerUnit": 61.5053
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 79.2595,
+          "rublesPerUnit": 7.92595
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.1137,
+          "rublesPerUnit": 2.41137
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 19.7481,
+          "rublesPerUnit": 1.97481
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.4196,
+          "rublesPerUnit": 22.4196
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 62.3438,
+          "rublesPerUnit": 0.00623438
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 18.8441,
+          "rublesPerUnit": 1.88441
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.1501,
+          "rublesPerUnit": 3.71501
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 82.7418,
+          "rublesPerUnit": 8.27418
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 98.2822,
+          "rublesPerUnit": 98.2822
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 78.2376,
+          "rublesPerUnit": 0.782376
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 43.9289,
+          "rublesPerUnit": 4.39289
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 57.7994,
+          "rublesPerUnit": 0.0577994
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 54.2847,
+          "rublesPerUnit": 0.542847
+        }
+      }
+    },
+    "2025-07-31": {
+      "effectiveDate": "2025-07-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/07/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 53.2826,
+          "rublesPerUnit": 53.2826
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 48.1381,
+          "rublesPerUnit": 48.1381
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 62.8254,
+          "rublesPerUnit": 0.628254
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 109.0693,
+          "rublesPerUnit": 109.0693
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.32,
+          "rublesPerUnit": 0.2132
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 217.5985,
+          "rublesPerUnit": 217.5985
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.0707,
+          "rublesPerUnit": 27.0707
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 48.2556,
+          "rublesPerUnit": 48.2556
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.8429,
+          "rublesPerUnit": 11.8429
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.676,
+          "rublesPerUnit": 14.676
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.7078,
+          "rublesPerUnit": 0.237078
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 32.438,
+          "rublesPerUnit": 0.0032438
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.4434,
+          "rublesPerUnit": 10.4434
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 30.2308,
+          "rublesPerUnit": 30.2308
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.6491,
+          "rublesPerUnit": 12.6491
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 22.2831,
+          "rublesPerUnit": 22.2831
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 81.8347,
+          "rublesPerUnit": 81.8347
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 94.9514,
+          "rublesPerUnit": 94.9514
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.8,
+          "rublesPerUnit": 1.68
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 93.7705,
+          "rublesPerUnit": 0.937705
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 49.9023,
+          "rublesPerUnit": 0.00499023
+        },
+        "IRR": {
+          "nominal": 100000,
+          "value": 14.5762,
+          "rublesPerUnit": 0.000145762
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.0978,
+          "rublesPerUnit": 0.150978
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 59.4254,
+          "rublesPerUnit": 59.4254
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 22.4821,
+          "rublesPerUnit": 22.4821
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 93.5788,
+          "rublesPerUnit": 0.935788
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.3683,
+          "rublesPerUnit": 11.3683
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 34.0978,
+          "rublesPerUnit": 3.40978
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 47.9865,
+          "rublesPerUnit": 4.79865
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 22.8158,
+          "rublesPerUnit": 0.0228158
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 53.3757,
+          "rublesPerUnit": 0.0533757
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 48.8226,
+          "rublesPerUnit": 48.8226
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 79.8715,
+          "rublesPerUnit": 7.98715
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 212.8341,
+          "rublesPerUnit": 212.8341
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 22.1288,
+          "rublesPerUnit": 22.1288
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 21.8226,
+          "rublesPerUnit": 21.8226
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.6098,
+          "rublesPerUnit": 18.6098
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 111.4924,
+          "rublesPerUnit": 111.4924
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 63.6252,
+          "rublesPerUnit": 63.6252
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 85.8959,
+          "rublesPerUnit": 8.58959
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 25.2374,
+          "rublesPerUnit": 2.52374
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 66.6553,
+          "rublesPerUnit": 0.666553
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 20.1914,
+          "rublesPerUnit": 2.01914
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 23.3813,
+          "rublesPerUnit": 23.3813
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 65.4677,
+          "rublesPerUnit": 0.00654677
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 19.5935,
+          "rublesPerUnit": 1.95935
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 38.3696,
+          "rublesPerUnit": 3.83696
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 84.6002,
+          "rublesPerUnit": 8.46002
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 101.7465,
+          "rublesPerUnit": 101.7465
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 59.2119,
+          "rublesPerUnit": 0.592119
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 80.6712,
+          "rublesPerUnit": 0.806712
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 45.8204,
+          "rublesPerUnit": 4.58204
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 58.8146,
+          "rublesPerUnit": 0.0588146
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 55.2154,
+          "rublesPerUnit": 0.552154
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 38.9689,
+          "rublesPerUnit": 0.0389689
+        }
+      }
+    },
+    "2025-08-31": {
+      "effectiveDate": "2025-08-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/08/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 52.5208,
+          "rublesPerUnit": 52.5208
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 47.2539,
+          "rublesPerUnit": 47.2539
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 61.7759,
+          "rublesPerUnit": 0.617759
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 108.536,
+          "rublesPerUnit": 108.536
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.0006,
+          "rublesPerUnit": 0.210006
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 213.6017,
+          "rublesPerUnit": 213.6017
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.0195,
+          "rublesPerUnit": 27.0195
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 47.9566,
+          "rublesPerUnit": 47.9566
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.6254,
+          "rublesPerUnit": 11.6254
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.8454,
+          "rublesPerUnit": 14.8454
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.6318,
+          "rublesPerUnit": 0.236318
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 31.8271,
+          "rublesPerUnit": 0.00318271
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.3241,
+          "rublesPerUnit": 10.3241
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 29.7877,
+          "rublesPerUnit": 29.7877
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.565,
+          "rublesPerUnit": 12.565
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.8738,
+          "rublesPerUnit": 21.8738
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 80.3316,
+          "rublesPerUnit": 80.3316
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 94.0479,
+          "rublesPerUnit": 94.0479
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.5304,
+          "rublesPerUnit": 1.65304
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 91.4403,
+          "rublesPerUnit": 0.914403
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 49.1145,
+          "rublesPerUnit": 0.00491145
+        },
+        "IRR": {
+          "nominal": 100000,
+          "value": 14.2873,
+          "rublesPerUnit": 0.000142873
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 14.9382,
+          "rublesPerUnit": 0.149382
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 58.3975,
+          "rublesPerUnit": 58.3975
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 22.0691,
+          "rublesPerUnit": 22.0691
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 91.9217,
+          "rublesPerUnit": 0.919217
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.2713,
+          "rublesPerUnit": 11.2713
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 33.4715,
+          "rublesPerUnit": 3.34715
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 48.282,
+          "rublesPerUnit": 4.8282
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 22.3591,
+          "rublesPerUnit": 0.0223591
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 52.3171,
+          "rublesPerUnit": 0.0523171
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 47.3193,
+          "rublesPerUnit": 47.3193
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 79.839,
+          "rublesPerUnit": 7.9839
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 208.9248,
+          "rublesPerUnit": 208.9248
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.9731,
+          "rublesPerUnit": 21.9731
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 21.4218,
+          "rublesPerUnit": 21.4218
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.4913,
+          "rublesPerUnit": 18.4913
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 110.0197,
+          "rublesPerUnit": 110.0197
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 62.5879,
+          "rublesPerUnit": 62.5879
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 84.0465,
+          "rublesPerUnit": 8.40465
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.8466,
+          "rublesPerUnit": 2.48466
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 66.0162,
+          "rublesPerUnit": 0.660162
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 19.5881,
+          "rublesPerUnit": 1.95881
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.9519,
+          "rublesPerUnit": 22.9519
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 64.356,
+          "rublesPerUnit": 0.0064356
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 19.4412,
+          "rublesPerUnit": 1.94412
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 38.3133,
+          "rublesPerUnit": 3.83133
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 84.7024,
+          "rublesPerUnit": 8.47024
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 100.3267,
+          "rublesPerUnit": 100.3267
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 56.6914,
+          "rublesPerUnit": 0.566914
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 79.9854,
+          "rublesPerUnit": 0.799854
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 45.259,
+          "rublesPerUnit": 4.5259
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 57.8508,
+          "rublesPerUnit": 0.0578508
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 54.7032,
+          "rublesPerUnit": 0.547032
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 38.2531,
+          "rublesPerUnit": 0.0382531
+        }
+      }
+    },
+    "2025-09-30": {
+      "effectiveDate": "2025-09-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/09/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 54.4523,
+          "rublesPerUnit": 54.4523
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 48.7456,
+          "rublesPerUnit": 48.7456
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 63.9655,
+          "rublesPerUnit": 0.639655
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 111.0592,
+          "rublesPerUnit": 111.0592
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.6506,
+          "rublesPerUnit": 0.216506
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 220.3449,
+          "rublesPerUnit": 220.3449
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.397,
+          "rublesPerUnit": 27.397
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 49.4537,
+          "rublesPerUnit": 49.4537
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.9924,
+          "rublesPerUnit": 11.9924
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.5061,
+          "rublesPerUnit": 15.5061
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 24.8777,
+          "rublesPerUnit": 0.248777
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 32.8944,
+          "rublesPerUnit": 0.00328944
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.6692,
+          "rublesPerUnit": 10.6692
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 30.6044,
+          "rublesPerUnit": 30.6044
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.959,
+          "rublesPerUnit": 12.959
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 22.5644,
+          "rublesPerUnit": 22.5644
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 82.8676,
+          "rublesPerUnit": 82.8676
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 97.141,
+          "rublesPerUnit": 97.141
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 17.2471,
+          "rublesPerUnit": 1.72471
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 93.3658,
+          "rublesPerUnit": 0.933658
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 49.3994,
+          "rublesPerUnit": 0.00493994
+        },
+        "IRR": {
+          "nominal": 100000,
+          "value": 14.1097,
+          "rublesPerUnit": 0.000141097
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.2257,
+          "rublesPerUnit": 0.152257
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 59.4416,
+          "rublesPerUnit": 59.4416
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 22.7658,
+          "rublesPerUnit": 22.7658
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 94.8121,
+          "rublesPerUnit": 0.948121
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.5978,
+          "rublesPerUnit": 11.5978
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 34.5282,
+          "rublesPerUnit": 3.45282
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 49.2465,
+          "rublesPerUnit": 4.92465
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 23.0531,
+          "rublesPerUnit": 0.0230531
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 55.9668,
+          "rublesPerUnit": 0.0559668
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 47.885,
+          "rublesPerUnit": 47.885
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 82.595,
+          "rublesPerUnit": 8.2595
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 215.5204,
+          "rublesPerUnit": 215.5204
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 22.7589,
+          "rublesPerUnit": 22.7589
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 22.098,
+          "rublesPerUnit": 22.098
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 19.1212,
+          "rublesPerUnit": 19.1212
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 113.1632,
+          "rublesPerUnit": 113.1632
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 64.2136,
+          "rublesPerUnit": 64.2136
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 88.173,
+          "rublesPerUnit": 8.8173
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 25.7026,
+          "rublesPerUnit": 2.57026
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 68.0329,
+          "rublesPerUnit": 0.680329
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 19.9897,
+          "rublesPerUnit": 1.99897
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 23.6765,
+          "rublesPerUnit": 23.6765
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 68.2674,
+          "rublesPerUnit": 0.00682674
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 20.0562,
+          "rublesPerUnit": 2.00562
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 39.9824,
+          "rublesPerUnit": 3.99824
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 87.6353,
+          "rublesPerUnit": 8.76353
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 104.0919,
+          "rublesPerUnit": 104.0919
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 57.2538,
+          "rublesPerUnit": 0.572538
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 82.9535,
+          "rublesPerUnit": 0.829535
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.9741,
+          "rublesPerUnit": 4.79741
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 58.7047,
+          "rublesPerUnit": 0.0587047
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 55.5711,
+          "rublesPerUnit": 0.555711
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 39.4608,
+          "rublesPerUnit": 0.0394608
+        }
+      }
+    },
+    "2025-10-31": {
+      "effectiveDate": "2025-10-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/10/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 53.0922,
+          "rublesPerUnit": 53.0922
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 47.3551,
+          "rublesPerUnit": 47.3551
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 61.8696,
+          "rublesPerUnit": 0.618696
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 106.5949,
+          "rublesPerUnit": 106.5949
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.0346,
+          "rublesPerUnit": 0.210346
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 214.0593,
+          "rublesPerUnit": 214.0593
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.0401,
+          "rublesPerUnit": 27.0401
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 47.8949,
+          "rublesPerUnit": 47.8949
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.6503,
+          "rublesPerUnit": 11.6503
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.0719,
+          "rublesPerUnit": 15.0719
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 24.0748,
+          "rublesPerUnit": 0.240748
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 32.0847,
+          "rublesPerUnit": 0.00320847
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.3822,
+          "rublesPerUnit": 10.3822
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 29.6471,
+          "rublesPerUnit": 29.6471
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.5426,
+          "rublesPerUnit": 12.5426
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.9207,
+          "rublesPerUnit": 21.9207
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 80.5037,
+          "rublesPerUnit": 80.5037
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 93.3894,
+          "rublesPerUnit": 93.3894
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 17.049,
+          "rublesPerUnit": 1.7049
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 90.857,
+          "rublesPerUnit": 0.90857
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 48.4058,
+          "rublesPerUnit": 0.00484058
+        },
+        "IRR": {
+          "nominal": 100000,
+          "value": 14.1239,
+          "rublesPerUnit": 0.000141239
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.1851,
+          "rublesPerUnit": 0.151851
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 57.8497,
+          "rublesPerUnit": 57.8497
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 22.1164,
+          "rublesPerUnit": 22.1164
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 92.0568,
+          "rublesPerUnit": 0.920568
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.2952,
+          "rublesPerUnit": 11.2952
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 33.5432,
+          "rublesPerUnit": 3.35432
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 47.3548,
+          "rublesPerUnit": 4.73548
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 22.4489,
+          "rublesPerUnit": 0.0224489
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 55.7342,
+          "rublesPerUnit": 0.0557342
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 46.4949,
+          "rublesPerUnit": 46.4949
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 80.4868,
+          "rublesPerUnit": 8.04868
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 209.3724,
+          "rublesPerUnit": 209.3724
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 22.0437,
+          "rublesPerUnit": 22.0437
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 21.4677,
+          "rublesPerUnit": 21.4677
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.3798,
+          "rublesPerUnit": 18.3798
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 109.7547,
+          "rublesPerUnit": 109.7547
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 62.0883,
+          "rublesPerUnit": 62.0883
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 86.6983,
+          "rublesPerUnit": 8.66983
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.8215,
+          "rublesPerUnit": 2.48215
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 65.8469,
+          "rublesPerUnit": 0.658469
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 19.2098,
+          "rublesPerUnit": 1.92098
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 23.0011,
+          "rublesPerUnit": 23.0011
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 67.1394,
+          "rublesPerUnit": 0.00671394
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 19.1623,
+          "rublesPerUnit": 1.91623
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 38.5038,
+          "rublesPerUnit": 3.85038
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 85.9711,
+          "rublesPerUnit": 8.59711
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 100.7808,
+          "rublesPerUnit": 100.7808
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 52.4229,
+          "rublesPerUnit": 0.524229
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 79.8427,
+          "rublesPerUnit": 0.798427
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 46.7979,
+          "rublesPerUnit": 4.67979
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 56.1784,
+          "rublesPerUnit": 0.0561784
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 52.7236,
+          "rublesPerUnit": 0.527236
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 38.3351,
+          "rublesPerUnit": 0.0383351
+        }
+      }
+    },
+    "2025-11-30": {
+      "effectiveDate": "2025-11-29",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/11/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 51.1066,
+          "rublesPerUnit": 51.1066
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 46.0167,
+          "rublesPerUnit": 46.0167
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 60.0328,
+          "rublesPerUnit": 0.600328
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 103.6683,
+          "rublesPerUnit": 103.6683
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.5092,
+          "rublesPerUnit": 0.205092
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 208.0093,
+          "rublesPerUnit": 208.0093
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.8928,
+          "rublesPerUnit": 26.8928
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 46.3411,
+          "rublesPerUnit": 46.3411
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.321,
+          "rublesPerUnit": 11.321
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.6257,
+          "rublesPerUnit": 14.6257
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.7322,
+          "rublesPerUnit": 0.237322
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 31.0985,
+          "rublesPerUnit": 0.00310985
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.0667,
+          "rublesPerUnit": 10.0667
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 28.9317,
+          "rublesPerUnit": 28.9317
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.1352,
+          "rublesPerUnit": 12.1352
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.3011,
+          "rublesPerUnit": 21.3011
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 78.2284,
+          "rublesPerUnit": 78.2284
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 90.819,
+          "rublesPerUnit": 90.819
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.4177,
+          "rublesPerUnit": 1.64177
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 87.4493,
+          "rublesPerUnit": 0.874493
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 47.001,
+          "rublesPerUnit": 0.0047001
+        },
+        "IRR": {
+          "nominal": 100000,
+          "value": 12.6494,
+          "rublesPerUnit": 0.000126494
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.1353,
+          "rublesPerUnit": 0.151353
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 55.7421,
+          "rublesPerUnit": 55.7421
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 21.4913,
+          "rublesPerUnit": 21.4913
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 89.455,
+          "rublesPerUnit": 0.89455
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.0211,
+          "rublesPerUnit": 11.0211
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 32.5952,
+          "rublesPerUnit": 3.25952
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 46.0281,
+          "rublesPerUnit": 4.60281
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 22.014,
+          "rublesPerUnit": 0.022014
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 54.1784,
+          "rublesPerUnit": 0.0541784
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 44.8053,
+          "rublesPerUnit": 44.8053
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 76.7901,
+          "rublesPerUnit": 7.67901
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 203.4549,
+          "rublesPerUnit": 203.4549
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.3599,
+          "rublesPerUnit": 21.3599
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 20.8609,
+          "rublesPerUnit": 20.8609
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 17.7646,
+          "rublesPerUnit": 17.7646
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 106.2788,
+          "rublesPerUnit": 106.2788
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 60.3381,
+          "rublesPerUnit": 60.3381
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 84.2425,
+          "rublesPerUnit": 8.42425
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.3028,
+          "rublesPerUnit": 2.43028
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 63.9267,
+          "rublesPerUnit": 0.639267
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 18.4498,
+          "rublesPerUnit": 1.84498
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.351,
+          "rublesPerUnit": 22.351
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 65.7254,
+          "rublesPerUnit": 0.00657254
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 18.5407,
+          "rublesPerUnit": 1.85407
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.4926,
+          "rublesPerUnit": 3.74926
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 82.4371,
+          "rublesPerUnit": 8.24371
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 97.0094,
+          "rublesPerUnit": 97.0094
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 51.1201,
+          "rublesPerUnit": 0.511201
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 77.2238,
+          "rublesPerUnit": 0.772238
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 45.5783,
+          "rublesPerUnit": 4.55783
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 53.4055,
+          "rublesPerUnit": 0.0534055
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 50.0662,
+          "rublesPerUnit": 0.500662
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 37.2516,
+          "rublesPerUnit": 0.0372516
+        }
+      }
+    },
+    "2025-12-31": {
+      "effectiveDate": "2025-12-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/12/2025",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 52.4979,
+          "rublesPerUnit": 52.4979
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 46.0157,
+          "rublesPerUnit": 46.0157
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 60.4454,
+          "rublesPerUnit": 0.604454
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 105.606,
+          "rublesPerUnit": 105.606
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.5126,
+          "rublesPerUnit": 0.205126
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 208.0048,
+          "rublesPerUnit": 208.0048
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.9496,
+          "rublesPerUnit": 26.9496
+        },
+        "BGN": {
+          "nominal": 1,
+          "value": 47.0602,
+          "rublesPerUnit": 47.0602
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.3208,
+          "rublesPerUnit": 11.3208
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.0352,
+          "rublesPerUnit": 14.0352
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.8285,
+          "rublesPerUnit": 0.238285
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 31.1362,
+          "rublesPerUnit": 0.00311362
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.0678,
+          "rublesPerUnit": 10.0678
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 29.0212,
+          "rublesPerUnit": 29.0212
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.3229,
+          "rublesPerUnit": 12.3229
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.3007,
+          "rublesPerUnit": 21.3007
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 78.2267,
+          "rublesPerUnit": 78.2267
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 92.0938,
+          "rublesPerUnit": 92.0938
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.4068,
+          "rublesPerUnit": 1.64068
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 86.9737,
+          "rublesPerUnit": 0.869737
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 46.5968,
+          "rublesPerUnit": 0.00465968
+        },
+        "IRR": {
+          "nominal": 100000,
+          "value": 10.579,
+          "rublesPerUnit": 0.00010579
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.4978,
+          "rublesPerUnit": 0.154978
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 57.1582,
+          "rublesPerUnit": 57.1582
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 21.4909,
+          "rublesPerUnit": 21.4909
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 89.4861,
+          "rublesPerUnit": 0.894861
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.1592,
+          "rublesPerUnit": 11.1592
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 32.5945,
+          "rublesPerUnit": 3.25945
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 46.6212,
+          "rublesPerUnit": 4.66212
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 21.9944,
+          "rublesPerUnit": 0.0219944
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 54.2295,
+          "rublesPerUnit": 0.0542295
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 45.6805,
+          "rublesPerUnit": 45.6805
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 77.8236,
+          "rublesPerUnit": 7.78236
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 203.4505,
+          "rublesPerUnit": 203.4505
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.7683,
+          "rublesPerUnit": 21.7683
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 20.8605,
+          "rublesPerUnit": 20.8605
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.0721,
+          "rublesPerUnit": 18.0721
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 107.1729,
+          "rublesPerUnit": 107.1729
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 60.8437,
+          "rublesPerUnit": 60.8437
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 84.5593,
+          "rublesPerUnit": 8.45593
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.8095,
+          "rublesPerUnit": 2.48095
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 63.9605,
+          "rublesPerUnit": 0.639605
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 18.2377,
+          "rublesPerUnit": 1.82377
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.3505,
+          "rublesPerUnit": 22.3505
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 65.165,
+          "rublesPerUnit": 0.0065165
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 18.5293,
+          "rublesPerUnit": 1.85293
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.9134,
+          "rublesPerUnit": 3.79134
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 85.0976,
+          "rublesPerUnit": 8.50976
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 99.1969,
+          "rublesPerUnit": 99.1969
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 50.5786,
+          "rublesPerUnit": 0.505786
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 78.5461,
+          "rublesPerUnit": 0.785461
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 46.9571,
+          "rublesPerUnit": 4.69571
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 54.5552,
+          "rublesPerUnit": 0.0545552
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 50.0491,
+          "rublesPerUnit": 0.500491
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 37.2508,
+          "rublesPerUnit": 0.0372508
+        }
+      }
+    },
+    "2026-01-31": {
+      "effectiveDate": "2026-01-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/01/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 53.0432,
+          "rublesPerUnit": 53.0432
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 44.5486,
+          "rublesPerUnit": 44.5486
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 58.6162,
+          "rublesPerUnit": 0.586162
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 104.2385,
+          "rublesPerUnit": 104.2385
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.0012,
+          "rublesPerUnit": 0.200012
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 201.3732,
+          "rublesPerUnit": 201.3732
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.7314,
+          "rublesPerUnit": 26.7314
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 10.9599,
+          "rublesPerUnit": 10.9599
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.5772,
+          "rublesPerUnit": 14.5772
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.6207,
+          "rublesPerUnit": 0.236207
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 30.2037,
+          "rublesPerUnit": 0.00302037
+        },
+        "HKD": {
+          "nominal": 10,
+          "value": 97.1617,
+          "rublesPerUnit": 9.71617
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 28.1304,
+          "rublesPerUnit": 28.1304
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.1386,
+          "rublesPerUnit": 12.1386
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 20.6216,
+          "rublesPerUnit": 20.6216
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 75.7327,
+          "rublesPerUnit": 75.7327
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 90.468,
+          "rublesPerUnit": 90.468
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.1424,
+          "rublesPerUnit": 1.61424
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 82.4093,
+          "rublesPerUnit": 0.824093
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 45.1166,
+          "rublesPerUnit": 0.00451166
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 68.0237,
+          "rublesPerUnit": 6.80237e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.0511,
+          "rublesPerUnit": 0.150511
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 56.036,
+          "rublesPerUnit": 56.036
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 20.8057,
+          "rublesPerUnit": 20.8057
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 86.6011,
+          "rublesPerUnit": 0.866011
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 10.8689,
+          "rublesPerUnit": 10.8689
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 31.5553,
+          "rublesPerUnit": 3.15553
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 44.9564,
+          "rublesPerUnit": 4.49564
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 21.2489,
+          "rublesPerUnit": 0.0212489
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 54.2113,
+          "rublesPerUnit": 0.0542113
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 45.8827,
+          "rublesPerUnit": 45.8827
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 79.3811,
+          "rublesPerUnit": 7.93811
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 196.9641,
+          "rublesPerUnit": 196.9641
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.4061,
+          "rublesPerUnit": 21.4061
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 20.1954,
+          "rublesPerUnit": 20.1954
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 17.7186,
+          "rublesPerUnit": 17.7186
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 104.6793,
+          "rublesPerUnit": 104.6793
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 59.778,
+          "rublesPerUnit": 59.778
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 80.8152,
+          "rublesPerUnit": 8.08152
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.1233,
+          "rublesPerUnit": 2.41233
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 61.9034,
+          "rublesPerUnit": 0.619034
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 17.4566,
+          "rublesPerUnit": 1.74566
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 21.6379,
+          "rublesPerUnit": 21.6379
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 61.9482,
+          "rublesPerUnit": 0.00619482
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 17.6746,
+          "rublesPerUnit": 1.76746
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.2242,
+          "rublesPerUnit": 3.72242
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 85.7938,
+          "rublesPerUnit": 8.57938
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 98.3797,
+          "rublesPerUnit": 98.3797
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 48.7395,
+          "rublesPerUnit": 0.487395
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 76.9203,
+          "rublesPerUnit": 0.769203
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.5594,
+          "rublesPerUnit": 4.75594
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 53.0713,
+          "rublesPerUnit": 0.0530713
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 49.3051,
+          "rublesPerUnit": 0.493051
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 36.0632,
+          "rublesPerUnit": 0.0360632
+        }
+      }
+    },
+    "2026-02-28": {
+      "effectiveDate": "2026-02-28",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=28/02/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 55.0652,
+          "rublesPerUnit": 55.0652
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 45.4551,
+          "rublesPerUnit": 45.4551
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 59.5434,
+          "rublesPerUnit": 0.595434
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 104.4353,
+          "rublesPerUnit": 104.4353
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.497,
+          "rublesPerUnit": 0.20497
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 205.4705,
+          "rublesPerUnit": 205.4705
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.0793,
+          "rublesPerUnit": 27.0793
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.1829,
+          "rublesPerUnit": 11.1829
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.0399,
+          "rublesPerUnit": 15.0399
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 24.2572,
+          "rublesPerUnit": 0.242572
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 30.8551,
+          "rublesPerUnit": 0.00308551
+        },
+        "HKD": {
+          "nominal": 10,
+          "value": 98.9355,
+          "rublesPerUnit": 9.89355
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 28.897,
+          "rublesPerUnit": 28.897
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.2179,
+          "rublesPerUnit": 12.2179
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.0411,
+          "rublesPerUnit": 21.0411
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 77.2736,
+          "rublesPerUnit": 77.2736
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 91.2965,
+          "rublesPerUnit": 91.2965
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 16.1236,
+          "rublesPerUnit": 1.61236
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 84.9588,
+          "rublesPerUnit": 0.849588
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 46.1115,
+          "rublesPerUnit": 0.00461115
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 58.8139,
+          "rublesPerUnit": 5.88139e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.4008,
+          "rublesPerUnit": 0.154008
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 56.4535,
+          "rublesPerUnit": 56.4535
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 21.229,
+          "rublesPerUnit": 21.229
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 88.3632,
+          "rublesPerUnit": 0.883632
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.2394,
+          "rublesPerUnit": 11.2394
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 32.1973,
+          "rublesPerUnit": 3.21973
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 45.1362,
+          "rublesPerUnit": 4.51362
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 21.6699,
+          "rublesPerUnit": 0.0216699
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 56.8264,
+          "rublesPerUnit": 0.0568264
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 46.1903,
+          "rublesPerUnit": 46.1903
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 80.8386,
+          "rublesPerUnit": 8.08386
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 200.9717,
+          "rublesPerUnit": 200.9717
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.5824,
+          "rublesPerUnit": 21.5824
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 20.6063,
+          "rublesPerUnit": 20.6063
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 17.8961,
+          "rublesPerUnit": 17.8961
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 106.2999,
+          "rublesPerUnit": 106.2999
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 61.1535,
+          "rublesPerUnit": 61.1535
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 81.2474,
+          "rublesPerUnit": 8.12474
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.8804,
+          "rublesPerUnit": 2.48804
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 63.1852,
+          "rublesPerUnit": 0.631852
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 17.6254,
+          "rublesPerUnit": 1.76254
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.0782,
+          "rublesPerUnit": 22.0782
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 63.4838,
+          "rublesPerUnit": 0.00634838
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 17.8841,
+          "rublesPerUnit": 1.78841
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.654,
+          "rublesPerUnit": 3.7654
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 85.5345,
+          "rublesPerUnit": 8.55345
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 99.9788,
+          "rublesPerUnit": 99.9788
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 49.5244,
+          "rublesPerUnit": 0.495244
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 77.7335,
+          "rublesPerUnit": 0.777335
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 48.6218,
+          "rublesPerUnit": 4.86218
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 54.2461,
+          "rublesPerUnit": 0.0542461
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 49.6107,
+          "rublesPerUnit": 0.496107
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 36.797,
+          "rublesPerUnit": 0.036797
+        }
+      }
+    },
+    "2026-03-31": {
+      "effectiveDate": "2026-03-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/03/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 55.8419,
+          "rublesPerUnit": 55.8419
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 47.8209,
+          "rublesPerUnit": 47.8209
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 61.0816,
+          "rublesPerUnit": 0.610816
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 108.0498,
+          "rublesPerUnit": 108.0498
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.533,
+          "rublesPerUnit": 0.21533
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 216.1647,
+          "rublesPerUnit": 216.1647
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.5503,
+          "rublesPerUnit": 27.5503
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 11.7649,
+          "rublesPerUnit": 11.7649
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.5224,
+          "rublesPerUnit": 15.5224
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.9973,
+          "rublesPerUnit": 0.239973
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 32.3886,
+          "rublesPerUnit": 0.00323886
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.3945,
+          "rublesPerUnit": 10.3945
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 30.0816,
+          "rublesPerUnit": 30.0816
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.5303,
+          "rublesPerUnit": 12.5303
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 22.1363,
+          "rublesPerUnit": 22.1363
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 81.2955,
+          "rublesPerUnit": 81.2955
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 93.4369,
+          "rublesPerUnit": 93.4369
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 15.1686,
+          "rublesPerUnit": 1.51686
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 85.8867,
+          "rublesPerUnit": 0.858867
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 47.9421,
+          "rublesPerUnit": 0.00479421
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 58.8139,
+          "rublesPerUnit": 5.88139e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 16.8478,
+          "rublesPerUnit": 0.168478
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 58.5914,
+          "rublesPerUnit": 58.5914
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 22.3339,
+          "rublesPerUnit": 22.3339
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 92.9623,
+          "rublesPerUnit": 0.929623
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.7439,
+          "rublesPerUnit": 11.7439
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 33.8731,
+          "rublesPerUnit": 3.38731
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 46.1479,
+          "rublesPerUnit": 4.61479
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 22.7847,
+          "rublesPerUnit": 0.0227847
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 58.8852,
+          "rublesPerUnit": 0.0588852
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 46.6026,
+          "rublesPerUnit": 46.6026
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 83.6821,
+          "rublesPerUnit": 8.36821
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 210.7977,
+          "rublesPerUnit": 210.7977
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.8202,
+          "rublesPerUnit": 21.8202
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 21.6788,
+          "rublesPerUnit": 21.6788
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.3288,
+          "rublesPerUnit": 18.3288
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 110.4546,
+          "rublesPerUnit": 110.4546
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 63.1372,
+          "rublesPerUnit": 63.1372
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 84.6996,
+          "rublesPerUnit": 8.46996
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 24.7618,
+          "rublesPerUnit": 2.47618
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 66.161,
+          "rublesPerUnit": 0.66161
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 18.3393,
+          "rublesPerUnit": 1.83393
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 23.2273,
+          "rublesPerUnit": 23.2273
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 66.5772,
+          "rublesPerUnit": 0.00665772
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 18.5625,
+          "rublesPerUnit": 1.85625
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.9921,
+          "rublesPerUnit": 3.79921
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 86.071,
+          "rublesPerUnit": 8.6071
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 101.6067,
+          "rublesPerUnit": 101.6067
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 51.8305,
+          "rublesPerUnit": 0.518305
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 79.7186,
+          "rublesPerUnit": 0.797186
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.3623,
+          "rublesPerUnit": 4.73623
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 53.9059,
+          "rublesPerUnit": 0.0539059
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 50.8129,
+          "rublesPerUnit": 0.508129
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 38.7121,
+          "rublesPerUnit": 0.0387121
+        }
+      }
+    },
+    "2026-04-30": {
+      "effectiveDate": "2026-04-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/04/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 53.6295,
+          "rublesPerUnit": 53.6295
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 44.0474,
+          "rublesPerUnit": 44.0474
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 56.5408,
+          "rublesPerUnit": 0.565408
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 101.0738,
+          "rublesPerUnit": 101.0738
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 20.1731,
+          "rublesPerUnit": 0.201731
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 199.1075,
+          "rublesPerUnit": 199.1075
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.5252,
+          "rublesPerUnit": 26.5252
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 10.8366,
+          "rublesPerUnit": 10.8366
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.0137,
+          "rublesPerUnit": 15.0137
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 24.0418,
+          "rublesPerUnit": 0.240418
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 29.8175,
+          "rublesPerUnit": 0.00298175
+        },
+        "HKD": {
+          "nominal": 10,
+          "value": 95.7185,
+          "rublesPerUnit": 9.57185
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 27.8108,
+          "rublesPerUnit": 27.8108
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 11.7047,
+          "rublesPerUnit": 11.7047
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 20.3895,
+          "rublesPerUnit": 20.3895
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 74.8806,
+          "rublesPerUnit": 74.8806
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 87.7771,
+          "rublesPerUnit": 87.7771
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 14.1173,
+          "rublesPerUnit": 1.41173
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 78.9988,
+          "rublesPerUnit": 0.789988
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 43.4216,
+          "rublesPerUnit": 0.00434216
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 53.2979,
+          "rublesPerUnit": 5.32979e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 16.3777,
+          "rublesPerUnit": 0.163777
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 54.7453,
+          "rublesPerUnit": 54.7453
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 20.5716,
+          "rublesPerUnit": 20.5716
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 85.647,
+          "rublesPerUnit": 0.85647
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 10.9535,
+          "rublesPerUnit": 10.9535
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 31.2003,
+          "rublesPerUnit": 3.12003
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 43.2077,
+          "rublesPerUnit": 4.32077
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 20.9389,
+          "rublesPerUnit": 0.0209389
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 54.2335,
+          "rublesPerUnit": 0.0542335
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 44.0111,
+          "rublesPerUnit": 44.0111
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 80.3311,
+          "rublesPerUnit": 8.03311
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 194.748,
+          "rublesPerUnit": 194.748
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 20.5965,
+          "rublesPerUnit": 20.5965
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 19.9682,
+          "rublesPerUnit": 19.9682
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 17.1764,
+          "rublesPerUnit": 17.1764
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 102.537,
+          "rublesPerUnit": 102.537
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 58.6425,
+          "rublesPerUnit": 58.6425
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 79.5384,
+          "rublesPerUnit": 7.95384
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 22.9674,
+          "rublesPerUnit": 2.29674
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 60.9778,
+          "rublesPerUnit": 0.609778
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 16.6361,
+          "rublesPerUnit": 1.66361
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 21.3945,
+          "rublesPerUnit": 21.3945
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 62.5319,
+          "rublesPerUnit": 0.00625319
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 16.9867,
+          "rublesPerUnit": 1.69867
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 35.895,
+          "rublesPerUnit": 3.5895
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 80.6199,
+          "rublesPerUnit": 8.06199
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 94.8456,
+          "rublesPerUnit": 94.8456
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 47.8574,
+          "rublesPerUnit": 0.478574
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 74.6683,
+          "rublesPerUnit": 0.746683
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 45.1572,
+          "rublesPerUnit": 4.51572
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 50.8251,
+          "rublesPerUnit": 0.0508251
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 46.95,
+          "rublesPerUnit": 0.4695
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 35.6574,
+          "rublesPerUnit": 0.0356574
+        }
+      }
+    },
+    "2026-05-31": {
+      "effectiveDate": "2026-05-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/05/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 50.8804,
+          "rublesPerUnit": 50.8804
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 41.7779,
+          "rublesPerUnit": 41.7779
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 53.358,
+          "rublesPerUnit": 0.53358
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 95.3973,
+          "rublesPerUnit": 95.3973
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 19.2901,
+          "rublesPerUnit": 0.192901
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 188.8486,
+          "rublesPerUnit": 188.8486
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 25.7328,
+          "rublesPerUnit": 25.7328
+        },
+        "BOB": {
+          "nominal": 1,
+          "value": 10.2782,
+          "rublesPerUnit": 10.2782
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 14.0599,
+          "rublesPerUnit": 14.0599
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 23.2967,
+          "rublesPerUnit": 0.232967
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 28.2519,
+          "rublesPerUnit": 0.00282519
+        },
+        "HKD": {
+          "nominal": 10,
+          "value": 90.6245,
+          "rublesPerUnit": 9.06245
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 26.5922,
+          "rublesPerUnit": 26.5922
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 11.0408,
+          "rublesPerUnit": 11.0408
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 19.339,
+          "rublesPerUnit": 19.339
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 71.0224,
+          "rublesPerUnit": 71.0224
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 82.6369,
+          "rublesPerUnit": 82.6369
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 13.5826,
+          "rublesPerUnit": 1.35826
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 74.4591,
+          "rublesPerUnit": 0.744591
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 39.9249,
+          "rublesPerUnit": 0.00399249
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 48.4374,
+          "rublesPerUnit": 4.84374e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 14.6272,
+          "rublesPerUnit": 0.146272
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 51.432,
+          "rublesPerUnit": 51.432
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 19.5116,
+          "rublesPerUnit": 19.5116
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 81.2149,
+          "rublesPerUnit": 0.812149
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 10.4865,
+          "rublesPerUnit": 10.4865
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 29.5927,
+          "rublesPerUnit": 2.95927
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 40.9783,
+          "rublesPerUnit": 4.09783
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 19.8612,
+          "rublesPerUnit": 0.0198612
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 51.6374,
+          "rublesPerUnit": 0.0516374
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 42.269,
+          "rublesPerUnit": 42.269
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 76.4372,
+          "rublesPerUnit": 7.64372
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 184.7137,
+          "rublesPerUnit": 184.7137
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 19.5143,
+          "rublesPerUnit": 19.5143
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 18.9393,
+          "rublesPerUnit": 18.9393
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 15.7481,
+          "rublesPerUnit": 15.7481
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 97.0649,
+          "rublesPerUnit": 97.0649
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 55.6079,
+          "rublesPerUnit": 55.6079
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 76.7536,
+          "rublesPerUnit": 7.67536
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 21.796,
+          "rublesPerUnit": 2.1796
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 57.8227,
+          "rublesPerUnit": 0.578227
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 15.5504,
+          "rublesPerUnit": 1.55504
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 20.2921,
+          "rublesPerUnit": 20.2921
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 59.1758,
+          "rublesPerUnit": 0.00591758
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 16.0437,
+          "rublesPerUnit": 1.60437
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 34.0619,
+          "rublesPerUnit": 3.40619
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 76.2433,
+          "rublesPerUnit": 7.62433
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 90.5321,
+          "rublesPerUnit": 90.5321
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 44.9572,
+          "rublesPerUnit": 0.449572
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 70.4251,
+          "rublesPerUnit": 0.704251
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 43.665,
+          "rublesPerUnit": 4.3665
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 47.1659,
+          "rublesPerUnit": 0.0471659
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 44.5841,
+          "rublesPerUnit": 0.445841
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 33.8202,
+          "rublesPerUnit": 0.0338202
+        }
+      }
+    },
+    "2026-06-30": {
+      "effectiveDate": "2026-06-30",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=30/06/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 53.6191,
+          "rublesPerUnit": 53.6191
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 45.7376,
+          "rublesPerUnit": 45.7376
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 58.3955,
+          "rublesPerUnit": 0.583955
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 102.6118,
+          "rublesPerUnit": 102.6118
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.1253,
+          "rublesPerUnit": 0.211253
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 206.7476,
+          "rublesPerUnit": 206.7476
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 26.7508,
+          "rublesPerUnit": 26.7508
+        },
+        "BOB": {
+          "nominal": 10,
+          "value": 79.9115,
+          "rublesPerUnit": 7.99115
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.0418,
+          "rublesPerUnit": 15.0418
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.0093,
+          "rublesPerUnit": 0.250093
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 30.8535,
+          "rublesPerUnit": 0.00308535
+        },
+        "HKD": {
+          "nominal": 10,
+          "value": 99.138,
+          "rublesPerUnit": 9.9138
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 29.3832,
+          "rublesPerUnit": 29.3832
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 11.8598,
+          "rublesPerUnit": 11.8598
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.1719,
+          "rublesPerUnit": 21.1719
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 77.7539,
+          "rublesPerUnit": 77.7539
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 88.6472,
+          "rublesPerUnit": 88.6472
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 15.7736,
+          "rublesPerUnit": 1.57736
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 82.4084,
+          "rublesPerUnit": 0.824084
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 43.288,
+          "rublesPerUnit": 0.0043288
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 53.1485,
+          "rublesPerUnit": 5.31485e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 15.9833,
+          "rublesPerUnit": 0.159833
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 54.8103,
+          "rublesPerUnit": 54.8103
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 21.361,
+          "rublesPerUnit": 21.361
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 88.9124,
+          "rublesPerUnit": 0.889124
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.4624,
+          "rublesPerUnit": 11.4624
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 32.3975,
+          "rublesPerUnit": 3.23975
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 43.9849,
+          "rublesPerUnit": 4.39849
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 21.7262,
+          "rublesPerUnit": 0.0217262
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 56.3053,
+          "rublesPerUnit": 0.0563053
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 43.8571,
+          "rublesPerUnit": 43.8571
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 78.4244,
+          "rublesPerUnit": 7.84244
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 202.2208,
+          "rublesPerUnit": 202.2208
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 20.6594,
+          "rublesPerUnit": 20.6594
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 20.7344,
+          "rublesPerUnit": 20.7344
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 16.9041,
+          "rublesPerUnit": 16.9041
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 105.446,
+          "rublesPerUnit": 105.446
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 60.0741,
+          "rublesPerUnit": 60.0741
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 83.9004,
+          "rublesPerUnit": 8.39004
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 23.3299,
+          "rublesPerUnit": 2.33299
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 63.1216,
+          "rublesPerUnit": 0.631216
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 16.7248,
+          "rublesPerUnit": 1.67248
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.2154,
+          "rublesPerUnit": 22.2154
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 64.4681,
+          "rublesPerUnit": 0.00644681
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 17.3373,
+          "rublesPerUnit": 1.73373
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 36.5574,
+          "rublesPerUnit": 3.65574
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 80.0246,
+          "rublesPerUnit": 8.00246
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 96.0992,
+          "rublesPerUnit": 96.0992
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 48.9329,
+          "rublesPerUnit": 0.489329
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 75.4312,
+          "rublesPerUnit": 0.754312
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.295,
+          "rublesPerUnit": 4.7295
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 50.3522,
+          "rublesPerUnit": 0.0503522
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 48.0556,
+          "rublesPerUnit": 0.480556
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 37.0257,
+          "rublesPerUnit": 0.0370257
+        }
+      }
+    },
+    "2026-07-31": {
+      "effectiveDate": "2026-07-31",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/07/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 55.5088,
+          "rublesPerUnit": 55.5088
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 46.9749,
+          "rublesPerUnit": 46.9749
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 59.9249,
+          "rublesPerUnit": 0.599249
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 106.1064,
+          "rublesPerUnit": 106.1064
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 21.7814,
+          "rublesPerUnit": 0.217814
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 212.3406,
+          "rublesPerUnit": 212.3406
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 27.4113,
+          "rublesPerUnit": 27.4113
+        },
+        "BOB": {
+          "nominal": 10,
+          "value": 67.1634,
+          "rublesPerUnit": 6.71634
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 15.5929,
+          "rublesPerUnit": 15.5929
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 25.2481,
+          "rublesPerUnit": 0.252481
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 31.5392,
+          "rublesPerUnit": 0.00315392
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.1794,
+          "rublesPerUnit": 10.1794
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 30.3964,
+          "rublesPerUnit": 30.3964
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 12.1578,
+          "rublesPerUnit": 12.1578
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 21.7447,
+          "rublesPerUnit": 21.7447
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 79.8573,
+          "rublesPerUnit": 79.8573
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 90.8776,
+          "rublesPerUnit": 90.8776
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 15.6131,
+          "rublesPerUnit": 1.56131
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 83.417,
+          "rublesPerUnit": 0.83417
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 44.1518,
+          "rublesPerUnit": 0.00441518
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 52.5039,
+          "rublesPerUnit": 5.25039e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 16.7356,
+          "rublesPerUnit": 0.167356
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 56.7048,
+          "rublesPerUnit": 56.7048
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 21.9388,
+          "rublesPerUnit": 21.9388
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 91.3177,
+          "rublesPerUnit": 0.913177
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 11.8194,
+          "rublesPerUnit": 11.8194
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 33.2739,
+          "rublesPerUnit": 3.32739
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 45.2408,
+          "rublesPerUnit": 4.52408
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 22.22,
+          "rublesPerUnit": 0.02222
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 58.4301,
+          "rublesPerUnit": 0.0584301
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 46.3532,
+          "rublesPerUnit": 46.3532
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 82.6312,
+          "rublesPerUnit": 8.26312
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 207.6913,
+          "rublesPerUnit": 207.6913
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 21.2138,
+          "rublesPerUnit": 21.2138
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 21.2953,
+          "rublesPerUnit": 21.2953
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 17.462,
+          "rublesPerUnit": 17.462
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 108.2697,
+          "rublesPerUnit": 108.2697
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 61.8953,
+          "rublesPerUnit": 61.8953
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 86.3089,
+          "rublesPerUnit": 8.63089
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 23.7833,
+          "rublesPerUnit": 2.37833
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 64.4625,
+          "rublesPerUnit": 0.644625
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 16.8653,
+          "rublesPerUnit": 1.68653
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 22.8164,
+          "rublesPerUnit": 22.8164
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 66.5123,
+          "rublesPerUnit": 0.00665123
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 17.8685,
+          "rublesPerUnit": 1.78685
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 37.9352,
+          "rublesPerUnit": 3.79352
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 82.2199,
+          "rublesPerUnit": 8.22199
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 97.8523,
+          "rublesPerUnit": 97.8523
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 49.9491,
+          "rublesPerUnit": 0.499491
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 77.9121,
+          "rublesPerUnit": 0.779121
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 47.9831,
+          "rublesPerUnit": 4.79831
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 55.0702,
+          "rublesPerUnit": 0.0550702
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 48.8633,
+          "rublesPerUnit": 0.488633
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 38.0273,
+          "rublesPerUnit": 0.0380273
+        }
+      }
+    },
+    "2026-08-31": {
+      "effectiveDate": "2026-08-29",
+      "source": "https://www.cbr.ru/scripts/XML_daily.asp?date_req=31/08/2026",
+      "rates": {
+        "AUD": {
+          "nominal": 1,
+          "value": 61.5983,
+          "rublesPerUnit": 61.5983
+        },
+        "AZN": {
+          "nominal": 1,
+          "value": 50.3534,
+          "rublesPerUnit": 50.3534
+        },
+        "DZD": {
+          "nominal": 100,
+          "value": 64.3673,
+          "rublesPerUnit": 0.643673
+        },
+        "GBP": {
+          "nominal": 1,
+          "value": 116.2629,
+          "rublesPerUnit": 116.2629
+        },
+        "AMD": {
+          "nominal": 100,
+          "value": 23.496,
+          "rublesPerUnit": 0.23496
+        },
+        "BHD": {
+          "nominal": 1,
+          "value": 227.6123,
+          "rublesPerUnit": 227.6123
+        },
+        "BYN": {
+          "nominal": 1,
+          "value": 28.1618,
+          "rublesPerUnit": 28.1618
+        },
+        "BOB": {
+          "nominal": 10,
+          "value": 72.359,
+          "rublesPerUnit": 7.2359
+        },
+        "BRL": {
+          "nominal": 1,
+          "value": 16.5766,
+          "rublesPerUnit": 16.5766
+        },
+        "HUF": {
+          "nominal": 100,
+          "value": 27.3441,
+          "rublesPerUnit": 0.273441
+        },
+        "VND": {
+          "nominal": 10000,
+          "value": 33.4247,
+          "rublesPerUnit": 0.00334247
+        },
+        "HKD": {
+          "nominal": 1,
+          "value": 10.9171,
+          "rublesPerUnit": 10.9171
+        },
+        "GEL": {
+          "nominal": 1,
+          "value": 32.7658,
+          "rublesPerUnit": 32.7658
+        },
+        "DKK": {
+          "nominal": 1,
+          "value": 13.3359,
+          "rublesPerUnit": 13.3359
+        },
+        "AED": {
+          "nominal": 1,
+          "value": 23.3086,
+          "rublesPerUnit": 23.3086
+        },
+        "USD": {
+          "nominal": 1,
+          "value": 85.6007,
+          "rublesPerUnit": 85.6007
+        },
+        "EUR": {
+          "nominal": 1,
+          "value": 99.682,
+          "rublesPerUnit": 99.682
+        },
+        "EGP": {
+          "nominal": 10,
+          "value": 17.0458,
+          "rublesPerUnit": 1.70458
+        },
+        "INR": {
+          "nominal": 100,
+          "value": 89.5766,
+          "rublesPerUnit": 0.895766
+        },
+        "IDR": {
+          "nominal": 10000,
+          "value": 48.1932,
+          "rublesPerUnit": 0.00481932
+        },
+        "IRR": {
+          "nominal": 1000000,
+          "value": 54.4093,
+          "rublesPerUnit": 5.44093e-05
+        },
+        "KZT": {
+          "nominal": 100,
+          "value": 18.5163,
+          "rublesPerUnit": 0.185163
+        },
+        "CAD": {
+          "nominal": 1,
+          "value": 61.7565,
+          "rublesPerUnit": 61.7565
+        },
+        "QAR": {
+          "nominal": 1,
+          "value": 23.5167,
+          "rublesPerUnit": 23.5167
+        },
+        "KGS": {
+          "nominal": 100,
+          "value": 97.8853,
+          "rublesPerUnit": 0.978853
+        },
+        "CNY": {
+          "nominal": 1,
+          "value": 12.7335,
+          "rublesPerUnit": 12.7335
+        },
+        "CUP": {
+          "nominal": 10,
+          "value": 35.667,
+          "rublesPerUnit": 3.5667
+        },
+        "MDL": {
+          "nominal": 10,
+          "value": 49.5243,
+          "rublesPerUnit": 4.95243
+        },
+        "MNT": {
+          "nominal": 1000,
+          "value": 23.8085,
+          "rublesPerUnit": 0.0238085
+        },
+        "NGN": {
+          "nominal": 1000,
+          "value": 63.9486,
+          "rublesPerUnit": 0.0639486
+        },
+        "NZD": {
+          "nominal": 1,
+          "value": 51.0095,
+          "rublesPerUnit": 51.0095
+        },
+        "NOK": {
+          "nominal": 10,
+          "value": 91.6447,
+          "rublesPerUnit": 9.16447
+        },
+        "OMR": {
+          "nominal": 1,
+          "value": 222.6286,
+          "rublesPerUnit": 222.6286
+        },
+        "PLN": {
+          "nominal": 1,
+          "value": 23.0054,
+          "rublesPerUnit": 23.0054
+        },
+        "SAR": {
+          "nominal": 1,
+          "value": 22.8269,
+          "rublesPerUnit": 22.8269
+        },
+        "RON": {
+          "nominal": 1,
+          "value": 18.9504,
+          "rublesPerUnit": 18.9504
+        },
+        "XDR": {
+          "nominal": 1,
+          "value": 117.3526,
+          "rublesPerUnit": 117.3526
+        },
+        "SGD": {
+          "nominal": 1,
+          "value": 67.3703,
+          "rublesPerUnit": 67.3703
+        },
+        "TJS": {
+          "nominal": 10,
+          "value": 92.5493,
+          "rublesPerUnit": 9.25493
+        },
+        "THB": {
+          "nominal": 10,
+          "value": 25.9813,
+          "rublesPerUnit": 2.59813
+        },
+        "BDT": {
+          "nominal": 100,
+          "value": 69.5541,
+          "rublesPerUnit": 0.695541
+        },
+        "TRY": {
+          "nominal": 10,
+          "value": 17.8002,
+          "rublesPerUnit": 1.78002
+        },
+        "TMT": {
+          "nominal": 1,
+          "value": 24.4573,
+          "rublesPerUnit": 24.4573
+        },
+        "UZS": {
+          "nominal": 10000,
+          "value": 72.5354,
+          "rublesPerUnit": 0.00725354
+        },
+        "UAH": {
+          "nominal": 10,
+          "value": 19.2143,
+          "rublesPerUnit": 1.92143
+        },
+        "CZK": {
+          "nominal": 10,
+          "value": 41.2713,
+          "rublesPerUnit": 4.12713
+        },
+        "SEK": {
+          "nominal": 10,
+          "value": 89.9373,
+          "rublesPerUnit": 8.99373
+        },
+        "CHF": {
+          "nominal": 1,
+          "value": 106.4421,
+          "rublesPerUnit": 106.4421
+        },
+        "ETB": {
+          "nominal": 100,
+          "value": 53.4309,
+          "rublesPerUnit": 0.534309
+        },
+        "RSD": {
+          "nominal": 100,
+          "value": 84.9292,
+          "rublesPerUnit": 0.849292
+        },
+        "ZAR": {
+          "nominal": 10,
+          "value": 53.5701,
+          "rublesPerUnit": 5.35701
+        },
+        "KRW": {
+          "nominal": 1000,
+          "value": 62.016,
+          "rublesPerUnit": 0.062016
+        },
+        "JPY": {
+          "nominal": 100,
+          "value": 53.7153,
+          "rublesPerUnit": 0.537153
+        },
+        "MMK": {
+          "nominal": 1000,
+          "value": 40.7622,
+          "rublesPerUnit": 0.0407622
+        }
+      }
+    }
+  },
+  "retrieved": "2026-09-30"
+}
