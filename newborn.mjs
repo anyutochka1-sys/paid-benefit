@@ -15,10 +15,19 @@ export function newbornShortcut({birthDate,applicationDate,olderAwards=[],sameRe
   if(applicationDate>addSixCalendarMonths(birthDate))return {status:'ordinary',reason:'Позже 6 месяцев со дня рождения'};
   if(sameRecipient===undefined)return {status:'unknown',reason:'Уточните, тот же ли получатель пособия на старшего'};
   if(!sameRecipient)return {status:'ordinary',reason:'Выплату на старшего получает другое лицо'};
-  const active=olderAwards.filter(a=>a.endsOn && a.endsOn>=applicationDate && Number.isFinite(a.tier) && [50,75,100].includes(a.tier));
+  const active=[];
+  for(const award of olderAwards) {
+    if(award.decisionDate&&award.decisionDate>applicationDate)continue;
+    if(award.endsOn&&award.endsOn<applicationDate)continue;
+    if(!award.endsOn)return {status:'unknown',reason:'Укажите срок всех назначений на старших детей: одно из них может ещё действовать'};
+    if(!award.decisionDate)return {status:'unknown',reason:'Укажите даты решений по всем действующим назначениям на старших детей'};
+    if(![50,75,100].includes(award.tier))return {status:'unknown',reason:'Укажите размер всех действующих назначений на старших детей'};
+    active.push(award);
+  }
   if(!active.length)return {status:'ordinary',reason:'Нет действующего назначения на старшего ребёнка этому получателю'};
-  const latest=active.sort((a,b)=>(b.decisionDate||'').localeCompare(a.decisionDate||''))[0];
-  if(!latest.decisionDate)return {status:'unknown',reason:'Нужна дата последнего решения о назначении на старших детей'};
+  const latest=active.sort((a,b)=>b.decisionDate.localeCompare(a.decisionDate))[0];
+  const sameDate=active.filter(a=>a.decisionDate===latest.decisionDate);
+  if(sameDate.some(a=>a.tier!==latest.tier||a.endsOn!==latest.endsOn))return {status:'unknown',reason:'Решения в одну дату содержат разные размеры или сроки: уточните последнее решение СФР'};
   const month=birthDate.slice(0,7);
   const startMonth=motherPregnancyBenefit?addMonths(month,1):month;
   return {status:'simplified',tier:latest.tier,startMonth,endsOn:latest.endsOn,sourceChildId:latest.childId,

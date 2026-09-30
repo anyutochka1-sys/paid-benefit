@@ -9,7 +9,7 @@ import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForAp
 import {CHILD_BENEFIT_KINDS,childBenefitIncome} from './benefits.mjs';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
-import {newbornShortcut} from './newborn.mjs';
+import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
 import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs';
 import {childIncomeForApplication} from './child-income.mjs';
@@ -670,7 +670,7 @@ function render() {
       if(issue) {alimony.status='unknown';alimony.reason=issue}
       else if(alimony.status==='known') {alimony.amount+=amounts.reduce((sum,value)=>sum+value,0);alimony.method='multiple-obligations'}
     }
-    let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
+    let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true,newbornReview=false;
     const scenarioTiers=[],priorSupportChecks=[];
     const incomeText=selected.length?scenarios.map((group,scenarioIndex)=>{
       const awardChecks=group.map(child=>awardConflict(child,month,{jointRenewal}));
@@ -679,9 +679,12 @@ function render() {
       const benefitResult=childBenefitIncome(benefitRows.payments,children,group.map(c=>c.id),month,filingDate);
       const benefitUnknown=[...benefitRows.missing,...benefitResult.missing];
       const combinedIncome=!sourceComplete || incomeResult.total===null || benefitResult.total===null || benefitUnknown.length || alimony.status!=='known' || depositIncome.status!=='known' || maternityIncome.status!=='known' || supplemental.status!=='known' || childEarnings.status!=='known' ? null : incomeResult.total+benefitResult.total+alimony.amount+depositIncome.amount+maternityIncome.amount+supplemental.amount+childEarnings.amount;
-      const olderAwards=children.filter(c=>c.awardRecipient==='self'&&c.awardTier && c.awardEnd && c.awardDecision).map(c=>({childId:c.id,tier:c.awardTier,endsOn:c.awardEnd,decisionDate:c.awardDecision}));
-      const newborns=group.filter(c=>c.birthDate && c.birthDate<=filingDate).map(c=>({child:c,result:newbornShortcut({birthDate:c.birthDate,applicationDate:filingDate,olderAwards:olderAwards.filter(a=>a.childId!==c.id),sameRecipient:yn($('same-recipient').value),motherPregnancyBenefit:$('mother-pregnancy-benefit').checked})})).filter(x=>x.result.status==='simplified');
-      const regularChildren=group.length-newborns.length;
+      const olderAwards=children.filter(c=>c.awardRecipient==='self').map(c=>({childId:c.id,tier:c.awardTier,endsOn:c.awardEnd,decisionDate:c.awardDecision}));
+      const newbornChecks=group.filter(c=>c.birthDate && c.birthDate<=filingDate).map(c=>({child:c,result:newbornShortcut({birthDate:c.birthDate,applicationDate:filingDate,olderAwards:olderAwards.filter(a=>a.childId!==c.id),sameRecipient:yn($('same-recipient').value),motherPregnancyBenefit:$('mother-pregnancy-benefit').checked})}));
+      const newborns=newbornChecks.filter(x=>x.result.status==='simplified');
+      const newbornUnknowns=newbornChecks.filter(x=>x.result.status==='unknown');
+      if(newbornUnknowns.length){newbornReview=true;scenarioComplete=false;}
+      const regularChildren=group.length-newborns.length-newbornUnknowns.length;
       if(regularChildren)shortcutOnly=false;
       let tier=year===2026 && regularChildren>0 && combinedIncome!==null && pmPerson>0 && pmChild>0 && !members.unanswered.length
         ?childTier({income12:combinedIncome,familySize:members.included.length,childrenApplying:regularChildren,pmPerson,pmChild}):null;
@@ -690,7 +693,7 @@ function render() {
       if(regularChildren && tier?.status==='estimate')scenarioTiers.push(tier.tier);
       if(regularChildren && tier?.status==='income-too-high'&&grace?.status!=='unknown')scenarioBlocks=true;
       if(regularChildren && (tier?.status!=='estimate'||members.unanswered.length))scenarioComplete=false;
-      const newMonthly=pmChild>0&&(!regularChildren||tier?.status==='estimate')?pmChild*((regularChildren?(tier.tier/100)*regularChildren:0)+newborns.reduce((sum,item)=>sum+item.result.tier/100,0)):null;
+      const newMonthly=!newbornUnknowns.length&&pmChild>0&&(!regularChildren||tier?.status==='estimate')?pmChild*((regularChildren?(tier.tier/100)*regularChildren:0)+newborns.reduce((sum,item)=>sum+item.result.tier/100,0)):null;
       const priorSupport=priorSupportFor(group.map(child=>`child:${child.id}`),month,newMonthly,$('pregnancy-applying').checked);
       priorSupportChecks.push(priorSupport);
       if(priorSupport.status==='block')scenarioBlocks=true;
@@ -699,7 +702,7 @@ function render() {
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
       const label=$('application-mode').value==='separate'?`Заявление на ребёнка ${childNumber} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
       const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
-      const newbornText=newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'';
+      const newbornText=(newbornUnknowns.length?`Упрощённое назначение новорождённому требует уточнения: ${newbornUnknowns.map(x=>x.result.reason).join('; ')}. `:'')+(newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'');
       const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
       return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽${alimony.wageYear?' (минимум по окончательным данным Росстата за '+alimony.wageYear+' год)':''}`:'нужны данные ('+alimony.reason+')'}. Доходы детей: ${childEarnings.status==='known'?`${childEarnings.amount.toLocaleString('ru-RU')} ₽`:'уточнить ('+childEarnings.issues.join('; ')+')'}. Дополнительные источники: ${supplemental.status==='known'?`${supplemental.amount.toLocaleString('ru-RU')} ₽; исключено по п. 53: ${supplemental.excluded.reduce((sum,item)=>sum+item.amount,0).toLocaleString('ru-RU')} ₽`:'нужны данные ('+supplemental.issues.join('; ')+')'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. БиР за вошедшие месяцы: ${maternityIncome.status==='known'?`${maternityIncome.amount.toLocaleString('ru-RU')} ₽`:'уточнить период начисления'}. ${newbornText} ${regularText} ${priorSupportText}`;
     }).join(' '):$('pregnancy-applying').checked?'Заявление на ребёнка не выбрано.':'Отметьте ребёнка или заявление по беременности.';
@@ -750,8 +753,9 @@ function render() {
     const priorMeasureReview=priorSupportChecks.length?priorSupportChecks.some(check=>check.status==='unknown'):$('prior-measure').value!=='no';
     const contextReview=pregnancyState.status==='forecast'||capacity.status==='unknown'||addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'сравнение для выбранных заявлений выполнено ниже'}. ${mobilizedIndices.length?'Зарплата, дополнительные поступления, БиР и проценты по счетам отмеченных мобилизованных взрослых исключены; получателей детских выплат и алиментов, статус по Указу № 647 и правило минимального дохода нужно проверить по документам.':''}`;
-    const explicitBlockers=capacity.status==='block'||applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
-    const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&capacity.status!=='unknown'&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
+    const needsMeansAssessment=!shortcutOnly||$('pregnancy-applying').checked;
+    const explicitBlockers=capacity.status==='block'||applicantCheck==='no'||rightsBlocked||needsMeansAssessment&&([carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed))||scenarioBlocks;
+    const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&!newbornReview&&selected.length&&capacity.status!=='unknown'&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
     const clear=!explicitBlockers&&headline.startsWith('По проверенным критериям');
     overview[explicitBlockers?'blocked':clear?'clear':'needs']++;
     const comparableTier=clear&&scenarios.length===1&&scenarioTiers.length===1?scenarioTiers[0]:null;
