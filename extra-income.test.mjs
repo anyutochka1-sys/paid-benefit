@@ -30,6 +30,15 @@ test('social contract and monthly maternity-capital payment are excluded under p
   assert.equal(result.excluded.reduce((sum,item)=>sum+item.amount,0),135000);
 });
 
+test('specific care and targeted compensation categories stay out of household income',()=>{
+  const kinds=['disabledChildCare','parentAward','rehabilitationEquipment','homeEducationMeals','fallenProviderHomeRepair'];
+  const entries=kinds.map(benefitKind=>({personIndex:0,type:'otherBenefit',benefitKind,from:'2026-01',to:'2026-01',amount:1000}));
+  const result=additionalIncomeForApplication(entries,'2026-09');
+  assert.equal(result.status,'known');
+  assert.equal(result.amount,0);
+  assert.equal(result.excluded.length,kinds.length);
+});
+
 test('an unspecified other benefit cannot silently enter or leave household income',()=>{
   const entry={personIndex:0,type:'otherBenefit',from:'2026-01',to:'2026-01',amount:50000};
   const result=additionalIncomeForApplication([entry],'2026-09');
