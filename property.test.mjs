@@ -36,6 +36,17 @@ test('old motorboat ignored; two recent boats fail',()=>{
   assert.equal(checkOtherVehicles([{type:'boat',manufactureYear:2020},{type:'boat',manufactureYear:2025}],c).status,'yes');
   assert.equal(checkOtherVehicles([{type:'boat',manufactureYear:2021},{type:'boat',manufactureYear:2025}],c).status,'no');
 });
+test('partly owned flats or houses cannot cause a definite refusal from gross area alone',()=>{
+  const context={familySize:3,rural:false,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false};
+  for(const type of ['apartment','house']) {
+    const area=type==='apartment'?90:140;
+    const shared=[{type,area,familyShare:.5},{type,area,familyShare:.5}];
+    const review=checkProperty(shared,context);
+    assert.equal(review.status,'review');
+    assert.match(review.review.join(' '),/долей/);
+    assert.equal(checkProperty(shared.map(item=>({...item,familyShare:1})),context).status,'no');
+  }
+});
 test('deposit interest is compared in full, except accounts closed six months before filing',()=>{
   const account={interestForRelevantTaxYear:30000};
   assert.equal(checkDepositInterest([account],{applicationMonth:'2026-09',perCapitaMinimum:20000}).status,'no');
