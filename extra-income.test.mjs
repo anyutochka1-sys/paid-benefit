@@ -140,3 +140,14 @@ test('targeted business grant is excluded only once and cannot also fund deducte
   assert.equal(additionalIncomeForApplication([{...base,targetedBusinessSupportDocumented:false}],'2026-09').status,'unknown');
   assert.equal(additionalIncomeForApplication([{...base,expenses:250000}],'2026-09').status,'unknown');
 });
+test('maternity capital exclusions depend on federal purpose or documented regional source',()=>{
+  const base={personIndex:0,type:'otherBenefit',benefitKind:'maternityCapitalUse',from:'2026-02',to:'2026-02',amount:100000,matcapConfirmed:true};
+  for(const matcapPurpose of ['disabledGoods','individualHousing','blockHousing']) {
+    const r=additionalIncomeForApplication([{...base,matcapSource:'federal',matcapPurpose}],'2026-09');
+    assert.equal(r.amount,0);
+    assert.equal(r.excluded[0].amount,100000);
+  }
+  assert.equal(additionalIncomeForApplication([{...base,matcapSource:'regional'}],'2026-09').amount,0);
+  assert.equal(additionalIncomeForApplication([{...base,matcapSource:'federal',matcapPurpose:'other'}],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,matcapSource:'regional',matcapConfirmed:false}],'2026-09').status,'unknown');
+});
