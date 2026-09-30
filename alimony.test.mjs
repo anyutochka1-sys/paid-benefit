@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {alimonyForApplication,applicableRosstatWage} from './alimony.mjs';
+import {alimonyForApplication,allocatedAlimonyIncome,applicableRosstatWage} from './alimony.mjs';
 
 test('new final Rosstat year applies only from month after official publication',()=>{
   const wageRecords=[
@@ -47,4 +47,12 @@ test('no final Rosstat wage is unknown, not silently estimated from preliminary'
 test('higher actual informal payments count only in months received',()=>{
   const r=alimonyForApplication({maritalStatus:'divorced',arrangement:'informal',childrenForAlimony:1,officialWage:80000,wageFinal:true,declaredMonthly:0,declaredByMonth:{'2026-07':35000},divorceMonth:'2026-06'},'2026-09');
   assert.equal(r.amount,20000+35000);
+});
+test('documented court receipts split between included and excluded children without inventing shares',()=>{
+  const received={'2026-06':30000,'2026-07':30000};
+  const rows={young:20000,adult:10000};
+  assert.equal(allocatedAlimonyIncome(received,rows,['young','adult'],['young'],'2026-09').amount,40000);
+  assert.equal(allocatedAlimonyIncome(received,rows,['young','adult'],[],'2026-09').amount,0);
+  assert.equal(allocatedAlimonyIncome(received,{young:20000},['young','adult'],['young'],'2026-09').status,'unknown');
+  assert.equal(allocatedAlimonyIncome(received,{young:20000,adult:5000},['young','adult'],['young'],'2026-09').status,'unknown');
 });
