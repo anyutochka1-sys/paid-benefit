@@ -120,3 +120,14 @@ test('securities use proceeds less expenses, missing expenses keeps result unkno
   assert.equal(additionalIncomeForApplication([entry],'2026-09').amount,30000);
   assert.equal(additionalIncomeForApplication([{...entry,expenses:null}],'2026-09').status,'unknown');
 });
+test('USN income can deduct documented expenses and is spread by tax-year overlap',()=>{
+  const base={personIndex:0,type:'business',taxYear:2025,amount:240000};
+  const documented=additionalIncomeForApplication([{...base,businessBasis:'usnDocumented',expenses:120000,expensesDocumented:true}],'2026-09');
+  const gross=additionalIncomeForApplication([{...base,businessBasis:'usnGross'}],'2026-09');
+  assert.equal(documented.amount,50000);
+  assert.equal(documented.byPerson.get(0)['2025-08'].qualifying,10000);
+  assert.equal(gross.amount,100000);
+  assert.equal(additionalIncomeForApplication([base],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,businessBasis:'usnDocumented',expenses:120000}],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,businessBasis:'usnDocumented',expenses:260000,expensesDocumented:true}],'2026-09').status,'unknown');
+});
