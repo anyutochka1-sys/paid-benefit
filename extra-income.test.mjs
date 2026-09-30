@@ -39,6 +39,16 @@ test('specific care and targeted compensation categories stay out of household i
   assert.equal(result.excluded.length,kinds.length);
 });
 
+test('pregnancy unified-benefit arrears are excluded but its regular payment is counted',()=>{
+  const common={personIndex:0,type:'otherBenefit',from:'2026-03',to:'2026-03',amount:30000};
+  const result=additionalIncomeForApplication([
+    {...common,benefitKind:'pregnancyBenefitArrears'},
+    {...common,benefitKind:'counted'}
+  ],'2026-09');
+  assert.equal(result.amount,30000);
+  assert.equal(result.excluded[0].amount,30000);
+});
+
 test('an unspecified other benefit cannot silently enter or leave household income',()=>{
   const entry={personIndex:0,type:'otherBenefit',from:'2026-01',to:'2026-01',amount:50000};
   const result=additionalIncomeForApplication([entry],'2026-09');
