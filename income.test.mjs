@@ -10,6 +10,13 @@ test('one steady salary fills specified months and zeros outside its period',()=
   assert.equal(incomeForMonth([{label:'Мать',mode:'monthly',months}],'2026-09').total,150000);
   assert.deepEqual(regularIncomeMonths({regularAmount:null,regularFrom:'2026-01',regularTo:'2026-06'},'2026-09'),{});
 });
+test('future steady salary needs an explicit projection assumption',()=>{
+  const person={regularAmount:25000,regularFrom:'2025-08',regularTo:'2027-06'};
+  const cautious=regularIncomeMonths(person,'2026-12',{knownThrough:'2026-09'});
+  assert.equal(cautious['2026-09'],25000);
+  assert.equal(cautious['2026-10'],undefined);
+  assert.equal(regularIncomeMonths(person,'2026-12',{knownThrough:'2026-09',projectFuture:true})['2026-10'],25000);
+});
 
 test('a bonus leaving the lookback window changes a three-month forecast',()=>{
   const months=Object.fromEntries(new Set([...incomeWindow('2026-09'),...incomeWindow('2026-12')]).values().map(m=>[m,0]));
