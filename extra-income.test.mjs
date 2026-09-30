@@ -131,3 +131,12 @@ test('USN income can deduct documented expenses and is spread by tax-year overla
   assert.equal(additionalIncomeForApplication([{...base,businessBasis:'usnDocumented',expenses:120000}],'2026-09').status,'unknown');
   assert.equal(additionalIncomeForApplication([{...base,businessBasis:'usnDocumented',expenses:260000,expensesDocumented:true}],'2026-09').status,'unknown');
 });
+test('targeted business grant is excluded only once and cannot also fund deducted expenses',()=>{
+  const base={personIndex:0,type:'business',businessBasis:'usnDocumented',taxYear:2025,amount:300000,expenses:50000,expensesDocumented:true,targetedBusinessSupportAmount:100000,targetedBusinessSupportDocumented:true,expensesExcludeGrantCosts:true};
+  const result=additionalIncomeForApplication([base],'2026-09');
+  assert.equal(result.amount,62500);
+  assert.equal(result.excluded[0].amount,100000*5/12);
+  assert.equal(additionalIncomeForApplication([{...base,expensesExcludeGrantCosts:false}],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,targetedBusinessSupportDocumented:false}],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,expenses:250000}],'2026-09').status,'unknown');
+});
