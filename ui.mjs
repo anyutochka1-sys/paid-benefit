@@ -302,6 +302,12 @@ function renderBenefitRows() {
     kindSelect.addEventListener('input',()=>{payment.kind=kindSelect.value;togglePast();render()});
     pastSelect.addEventListener('input',()=>{payment.forPastPeriods=pastSelect.value===''?undefined:pastSelect.value==='yes';render()});
     togglePast();
+    const regionalDetails=document.createElement('details');
+    regionalDetails.innerHTML='<summary>Если ребёнку 18–22 года к дате заявления</summary><label>На эту выплату распространяется региональная норма до 23 лет?<select><option value="">Уточните</option><option value="no">Нет</option><option value="yes">Да, подтвержу основание</option></select></label><p class="hint">Уточните условия именно этой выплаты в вашем регионе. Если не знаете, оставьте вопрос открытым: сумма не попадёт в точный вывод.</p>';
+    const regionalSelect=regionalDetails.querySelector('select');
+    regionalSelect.value=payment.regionalPaymentThrough23===undefined?'':payment.regionalPaymentThrough23?'yes':'no';
+    regionalSelect.addEventListener('input',()=>{payment.regionalPaymentThrough23=regionalSelect.value===''?undefined:regionalSelect.value==='yes';render()});
+    row.append(regionalDetails);
     const select=document.createElement('select');
     const placeholder=new Option('Выберите ребёнка','');select.add(placeholder);
     childOptions.forEach(c=>select.add(new Option(c.label,c.id)));
@@ -322,7 +328,7 @@ function benefitRowsForWindow(applicationMonth) {
   for(const p of benefitPayments) {
     if(!p.from || !p.to || p.from>p.to) {missing.push('Укажите начало и конец выплаты пособия');continue}
     for(const month of window) if(month>=p.from && month<=p.to)
-      payments.push({childId:p.childId,kind:p.kind||'unified',forPastPeriods:p.forPastPeriods,month,amount:p.amount===''?null:Number(p.amount)});
+      payments.push({childId:p.childId,kind:p.kind||'unified',forPastPeriods:p.forPastPeriods,regionalPaymentThrough23:p.regionalPaymentThrough23,month,amount:p.amount===''?null:Number(p.amount)});
   }
   return {payments,missing};
 }
