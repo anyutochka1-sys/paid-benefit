@@ -2,7 +2,7 @@ import { incomeWindow, minimumIncomeTest, monthIndex, monthString, RULES } from 
 import { includedFamily, childCanApply, applicantParentalRights, checkCars, ageAt } from './family-assets.mjs';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {childBenefitIncome} from './benefits.mjs';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome} from './benefits.mjs';
 import {alimonyForApplication} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs';
@@ -57,7 +57,7 @@ applicationChoice.querySelector('#same-recipient').addEventListener('input',rend
 const pregnancyChoice=document.createElement('label');pregnancyChoice.className='check';pregnancyChoice.innerHTML='<input id="mother-pregnancy-benefit" type="checkbox"> Мать получала единое пособие по беременности перед рождением младшего';
 applicationChoice.after(pregnancyChoice);pregnancyChoice.querySelector('input').addEventListener('input',render);
 const benefitsSection=document.createElement('section');
-benefitsSection.innerHTML='<div class="section-heading"><h3>Уже получаете единое пособие на ребёнка?</h3><button id="add-benefit" type="button">+ Указать выплату</button></div><p class="hint">Не добавляйте это пособие к зарплате или общей сумме дохода. Укажите ребёнка, сумму и месяцы поступления. Если размер менялся, добавьте отдельный период. При продлении на того же ребёнка прежние выплаты исключаются, при заявлении только на другого — учитываются. Одинаковые выплаты в разных строках не дублируйте.</p><div id="benefits"></div>';
+benefitsSection.innerHTML='<div class="section-heading"><h3>Пособия на детей, которые уже получали</h3><button id="add-benefit" type="button">+ Указать выплату</button></div><p class="hint">Укажите вид, ребёнка и фактически полученную сумму по месяцам. Разовую доплату за прошлые периоды укажите одной строкой в месяце поступления. Прежнее единое пособие на ребёнка в новом заявлении исключается, на другого ребёнка обычно учитывается. Не добавляйте эти суммы также к зарплате или другим пособиям.</p><div id="benefits"></div>';
 $('income-people').after(benefitsSection);
 const alimonySection=document.createElement('section');
 alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><label id="spouse-status-field" hidden>Статус нынешнего супруга на дату заявления<select id="spouse-status"><option value="unknown">Уточните</option><option value="ordinary">Входит в состав семьи</option><option value="parentalRightsLost">Лишён / ограничен в правах на ребёнка из заявления</option><option value="stateCare">На полном государственном обеспечении</option><option value="conscript">Служба по призыву / военный курсант без контракта</option><option value="imprisoned">Отбывает лишение свободы</option><option value="forcedTreatment">На принудительном лечении по решению суда</option><option value="custody">Заключён под стражу</option><option value="missing">Признан безвестно отсутствующим / объявлен умершим</option><option value="wanted">Находится в розыске</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><p class="hint">Отметьте детей одного алиментного обязательства в их карточках. Если дети от разных вторых родителей, потребуется отдельный расчёт по каждому обязательству. Статус второго родителя укажите в карточке ребёнка. Лишение свободы и лишение родительских прав сами по себе не означают статус единственного родителя.</p><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
@@ -95,7 +95,7 @@ const sourceEnabled=new Set();
 const sourceSection=document.createElement('section');
 sourceSection.className='source-picker';
 const sourceGroups=[
-  ['Чаще всего',[['employment','Зарплата / ГПХ'],['pension','Пенсия / больничный'],['unemploymentBenefit','Пособие по безработице'],['otherBenefit','Другие пособия — уточним вид'],['childBenefit','Единое пособие на детей'],['alimony','Алименты'],['deposit','Проценты по вкладам'],['lottery','Выигрыш в лотерею']]],
+  ['Чаще всего',[['employment','Зарплата / ГПХ'],['pension','Пенсия / больничный'],['unemploymentBenefit','Пособие по безработице'],['otherBenefit','Другие пособия — уточним вид'],['childBenefit','Пособия на детей, в том числе единое'],['alimony','Алименты'],['deposit','Проценты по вкладам'],['lottery','Выигрыш в лотерею']]],
   ['Другие поступления',[['childIncome','Доходы детей'],['maternity','Пособие по беременности и родам'],['selfEmployed','Самозанятость'],['business','ИП'],['scholarship','Стипендия'],['academicMedical','Выплата в медакадемическом отпуске'],['guardianReward','Вознаграждение приёмного родителя'],['successorPayment','Выплата правопреемнику'],['publicDuty','Компенсация за общественные обязанности'],['military','Денежное довольствие'],['rationCompensation','Компенсация вместо пайка'],['judgeAllowance','Содержание судьи в отставке'],['serviceSeverance','Выплата при увольнении со службы'],['rent','Аренда'],['propertySale','Продажа имущества'],['securities','Ценные бумаги / дивиденды'],['copyright','Авторские выплаты'],['foreignEarned','Заработок в иностранной валюте']]]
 ];
 sourceSection.innerHTML='<h3>Какие поступления были в семье?</h3><p class="hint">Отметьте все виды. Дальше откроются только нужные поля. Если ничего не было, отметьте это отдельно.</p>'+sourceGroups.map(([title,items],index)=>`${index?'<details><summary>Другие виды дохода</summary>':''}<fieldset><legend>${title}</legend><div class="source-grid">${items.map(([key,label])=>`<label class="check"><input type="checkbox" value="${key}"> ${label}</label>`).join('')}</div></fieldset>${index?'</details>':''}`).join('')+'<label class="check"><input id="no-income" type="checkbox"> Никаких поступлений из перечисленных не было</label>';
@@ -289,13 +289,26 @@ function renderBenefitRows() {
   $('benefits').replaceChildren();
   benefitPayments.forEach((payment,index)=>{
     const row=document.createElement('div');row.className='form-row';
+    const kindSelect=document.createElement('select');
+    Object.entries(CHILD_BENEFIT_KINDS).forEach(([key,definition])=>kindSelect.add(new Option(definition.label,key)));
+    kindSelect.value=payment.kind||'unified';
+    const kindLabel=document.createElement('label');kindLabel.textContent='Вид пособия';kindLabel.append(kindSelect);row.append(kindLabel);
+    const pastLabel=document.createElement('label');pastLabel.textContent='Выплата за прошлые периоды?';
+    const pastSelect=document.createElement('select');
+    [['','Выберите'],['yes','Да'],['no','Нет']].forEach(([key,label])=>pastSelect.add(new Option(label,key)));
+    pastSelect.value=payment.forPastPeriods===undefined?'':payment.forPastPeriods?'yes':'no';
+    pastLabel.append(pastSelect);row.append(pastLabel);
+    const togglePast=()=>{pastLabel.hidden=!['decree606','decree175','nonworkingCare'].includes(kindSelect.value)};
+    kindSelect.addEventListener('input',()=>{payment.kind=kindSelect.value;togglePast();render()});
+    pastSelect.addEventListener('input',()=>{payment.forPastPeriods=pastSelect.value===''?undefined:pastSelect.value==='yes';render()});
+    togglePast();
     const select=document.createElement('select');
     const placeholder=new Option('Выберите ребёнка','');select.add(placeholder);
     childOptions.forEach(c=>select.add(new Option(c.label,c.id)));
     select.value=payment.childId;
     select.addEventListener('input',()=>{payment.childId=select.value;render()});
     const childLabel=document.createElement('label');childLabel.textContent='Кому назначено пособие';childLabel.append(select);row.append(childLabel);
-    for(const [key,label,type] of [['amount','Сумма в месяц, ₽','number'],['from','С месяца получения','month'],['to','По месяц получения включительно','month']]) {
+    for(const [key,label,type] of [['amount','Полученная сумма за каждый указанный месяц, ₽','number'],['from','С месяца получения','month'],['to','По месяц получения включительно','month']]) {
       const wrapper=document.createElement('label');wrapper.textContent=label;
       const input=document.createElement('input');input.type=type;if(type==='number')input.min='0';input.value=payment[key]??'';
       input.addEventListener('input',()=>{payment[key]=input.value;render()});wrapper.append(input);row.append(wrapper);
@@ -309,7 +322,7 @@ function benefitRowsForWindow(applicationMonth) {
   for(const p of benefitPayments) {
     if(!p.from || !p.to || p.from>p.to) {missing.push('Укажите начало и конец выплаты пособия');continue}
     for(const month of window) if(month>=p.from && month<=p.to)
-      payments.push({childId:p.childId,month,amount:p.amount===''?null:Number(p.amount)});
+      payments.push({childId:p.childId,kind:p.kind||'unified',forPastPeriods:p.forPastPeriods,month,amount:p.amount===''?null:Number(p.amount)});
   }
   return {payments,missing};
 }
