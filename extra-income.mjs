@@ -45,6 +45,11 @@ export const OTHER_BENEFIT_KINDS = {
   funeral:{label:'Социальное пособие на погребение',excluded:true},
   emergencyAid:{label:'Единовременная помощь в связи с ЧС или терактом',excluded:true},
   childTreatmentAid:{label:'Единовременная материальная помощь на лечение ребёнка',excluded:true},
+  disabledChildCare:{label:'Ежемесячная выплата по уходу родителю ребёнка-инвалида или инвалида с детства I группы',excluded:true},
+  parentAward:{label:'Выплата за звание «Мать-героиня», орден или медаль «Родительская слава»',excluded:true},
+  rehabilitationEquipment:{label:'Компенсация за самостоятельно приобретённые средства реабилитации',excluded:true},
+  homeEducationMeals:{label:'Компенсация бесплатного двухразового питания ребёнку с ОВЗ при обучении дома',excluded:true},
+  fallenProviderHomeRepair:{label:'Целевые федеральные средства на ремонт дома семьи погибшего кормильца',excluded:true},
 };
 
 export function additionalIncomeForApplication(entries,applicationMonth,excludedPersonIndices=[]) {
