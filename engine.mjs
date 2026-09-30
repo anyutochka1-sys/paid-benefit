@@ -25,23 +25,40 @@ const monthRange = (start, end) => {
   return first <= last ? Array.from({ length: last - first + 1 }, (_, i) => monthString(first + i)) : [];
 };
 
+// Validate each declared period before it can affect the income requirement.
+export function reasonPeriod(reason) {
+  if(!reason.start||!reason.end)return {status:'unknown',months:[],reason:'Укажите оба месяца периода причины'};
+  const valid=value=>/^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+  if(!valid(reason.start)||!valid(reason.end))return {status:'unknown',months:[],reason:'Укажите корректные месяцы периода причины'};
+  if(reason.start>reason.end)return {status:'unknown',months:[],reason:'Начало периода причины не может быть позже окончания'};
+  return {status:'known',months:monthRange(reason.start,reason.end)};
+}
+
 // Reasons: unemployment requires an official employment-centre registration;
 // only six months may be credited. Pregnancy has a separate statutory override.
 export function minimumIncomeTest(adult, applicationMonth, mrot) {
   const window = incomeWindow(applicationMonth);
   const credited = new Set();
   const unemploymentMonths = new Set();
+  const pregnantMonths = new Set();
   const warnings = [];
   let uncertain = false;
   const filingDate=adult.applicationDate || `${applicationMonth}-01`;
   for (const reason of adult.reasons ?? []) {
-    if (!reason.start || !reason.end) continue;
+    const period=reasonPeriod(reason);
+    if(period.status==='unknown') {
+      uncertain=true;
+      warnings.push(period.reason+'.');
+      continue;
+    }
+    const months=period.months.filter(m=>window.includes(m));
+    if(!months.length)continue;
     if (!['unemployment', 'pregnancy', 'careUnderThree', 'fullTimeStudent', 'careDisabledChild', 'careDisabledAdult', 'treatment', 'military', 'incarceration', 'indigenous', 'pensionRecipient'].includes(reason.type)) {
+      uncertain=true;
       warnings.push('Эта причина требует дополнительной проверки.');
       continue;
     }
-    let months = monthRange(reason.start, reason.end).filter(m => window.includes(m));
-    if(reason.type==='treatment' && monthRange(reason.start,reason.end).length<=3) {
+    if(reason.type==='treatment' && period.months.length<=3) {
       warnings.push('Непрерывное лечение должно длиться свыше трёх месяцев.');
       continue;
     }
@@ -64,11 +81,10 @@ export function minimumIncomeTest(adult, applicationMonth, mrot) {
         continue;
       }
     }
-    if (reason.type !== 'pregnancy') months.forEach(m => credited.add(m));
+    if(reason.type==='pregnancy')months.forEach(m=>pregnantMonths.add(m));
+    else months.forEach(m => credited.add(m));
   }
   [...unemploymentMonths].sort().slice(0, 6).forEach(m => credited.add(m));
-  const pregnantMonths = new Set((adult.reasons ?? []).filter(r => r.type === 'pregnancy' && r.start && r.end)
-    .flatMap(r => monthRange(r.start, r.end).filter(m => window.includes(m))));
   const pregnancyOverride = pregnantMonths.size >= 6 || (adult.pregnancyWeeksAtApplication ?? 0) >= 12;
   pregnantMonths.forEach(m => credited.add(m));
   const exempt = pregnancyOverride || credited.size >= 10 || adult.singleParent === true || adult.multipleChildrenExemption === true;
@@ -98,6 +114,6 @@ export function assessMonth(data, applicationMonth) {
   if (adultChecks.some(x => !x.passed && !x.uncertain)) blockers.push('Не выполнено требование минимального дохода взрослого.');
   // Other statutory tests are not inferred from missing answers.
   const required = ['assetsChecked', 'citizenshipChecked', 'alimonyChecked', 'regionalRulesChecked'];
-  if (required.some(key => data[key] !== true) || adultChecks.some(x=>x.uncertain&&!x.passed)) return { month: applicationMonth, status: 'needs-review', window, incomePerPerson, adultChecks, blockers, reason: 'Не проверены имущество, гражданство, алименты, региональные условия или подтверждение ухода.' };
+  if (required.some(key => data[key] !== true) || adultChecks.some(x=>x.uncertain&&!x.passed)) return { month: applicationMonth, status: 'needs-review', window, incomePerPerson, adultChecks, blockers, reason: 'Не проверены имущество, гражданство, алименты, региональные условия или уважительные причины отсутствия дохода.' };
   return { month: applicationMonth, status: blockers.length ? 'likely-ineligible' : 'preliminary-eligible', window, incomePerPerson, adultChecks, blockers };
 }
