@@ -24,3 +24,14 @@ test('enough entered earnings confirm minimum, but a birthday in window needs re
   const young={...child,birthDate:'2008-03-15'};
   assert.equal(adultStudentChecks([young],{included:[young]},entries,'2026-09','2026-09-01',27093)[0].status,'unknown');
 });
+test('post-eighteenth-birthday earnings alone can confirm the adult child minimum',()=>{
+  const child={...student,birthDate:'2008-03-15',educationFrom:'',educationTo:''};
+  const entry={childId:'c',type:'employment',amount:60000,from:'2026-04',to:'2026-07'};
+  const [check]=adultStudentChecks([child],{included:[child]},[entry],'2026-09','2026-09-01',27093);
+  assert.equal(check.status,'yes');
+  assert.equal(check.earned,240000);
+  const birthdayOnly={...entry,from:'2026-03',to:'2026-06'};
+  assert.equal(adultStudentChecks([child],{included:[child]},[birthdayOnly],'2026-09','2026-09-01',27093)[0].status,'unknown');
+  const firstDay={...child,birthDate:'2008-03-01'};
+  assert.equal(adultStudentChecks([firstDay],{included:[firstDay]},[birthdayOnly],'2026-09','2026-09-01',27093)[0].status,'yes');
+});
