@@ -16,12 +16,13 @@ import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,fore
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20260930-18';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
 import {confirmedRegionalWage} from './rosstat-wages.mjs';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
+let restoringDraft=false;
 const today=new Date();
 const currentMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
 $('start').value=currentMonth;
@@ -540,6 +541,8 @@ function depositData() {
   }));
 }
 function render() {
+  if(restoringDraft)return;
+  updateRelevantFields();
   const start=$('start').value; if (!start) return;
   $('mobilized-spouse').closest('label').hidden=$('marital-status').value!=='married';
   refreshAssetOwners();
@@ -707,7 +710,7 @@ function render() {
       const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
       if(!regularChildren)return `${label}: Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${newbornText} ${priorSupportText}`;
       return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽${alimony.wageYear?' (минимум по окончательным данным Росстата за '+alimony.wageYear+' год)':''}`:'нужны данные ('+alimony.reason+')'}. Доходы детей: ${childEarnings.status==='known'?`${childEarnings.amount.toLocaleString('ru-RU')} ₽`:'уточнить ('+childEarnings.issues.join('; ')+')'}. Дополнительные источники: ${supplemental.status==='known'?`${supplemental.amount.toLocaleString('ru-RU')} ₽; исключено по п. 53: ${supplemental.excluded.reduce((sum,item)=>sum+item.amount,0).toLocaleString('ru-RU')} ₽`:'нужны данные ('+supplemental.issues.join('; ')+')'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. БиР за вошедшие месяцы: ${maternityIncome.status==='known'?`${maternityIncome.amount.toLocaleString('ru-RU')} ₽`:'уточнить период начисления'}. ${newbornText} ${regularText} ${priorSupportText}`;
-    }).join(' '):$('pregnancy-applying').checked?'Заявление на ребёнка не выбрано.':'Отметьте ребёнка или заявление по беременности.';
+    }).join(' '):$('pregnancy-applying').checked?'Заявление на ребёнка не выбрано.':applicationSelection.requested.length?'Дети отмечены. Уточните сведения в блоке «Дети из заявления» — до этого доход и ступень для заявления не рассчитываются.':'Отметьте ребёнка или заявление по беременности.';
     let pregnancyText='',pregnancyMonthly=null;
     if($('pregnancy-applying').checked) {
       if(capacity.pregnancy?.status==='block')pregnancyText=capacity.pregnancy.reason+'.';
@@ -785,6 +788,7 @@ function render() {
   }
   const best=candidates.reduce((current,item)=>!current||item.tier>current.tier?item:current,null);
   const bestText=best?` Среди месяцев с сопоставимыми данными наибольшая предварительная ступень — <strong>${best.tier}%</strong> при подаче <strong>${best.date}</strong>. Если ступень одинакова, показан первый месяц.`:'';
+  renderCompletionChecklist();
   $('results').innerHTML=`<p class="forecast-overview">Прогноз на 12 месяцев: <strong>${overview.blocked}</strong> с препятствием, <strong>${overview.clear}</strong> без выявленных препятствий по проверенным критериям, <strong>${overview.needs}</strong> требуют уточнения.${bestText} Оценка предварительная и зависит от полноты сведений и будущих доходов; откройте месяц для подробностей.</p>`+output.join('');
 }
 $('add').onclick=addReason;
@@ -826,3 +830,102 @@ showStep(0);
 fetch('./data/rosstat-wages.json').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
+
+
+function updateRelevantFields() {
+  $('pregnancy-registered').closest('label').hidden=!$('pregnancy-applying').checked;
+  if($('pregnancy-applying').checked&&$('pregnancy-details'))$('pregnancy-details').open=true;
+  $('sole-guardian').closest('label').hidden=![...document.querySelectorAll('#children .child-role')].some(el=>el.value==='ward');
+  $('grace-used').closest('label').hidden=!$('large-family').checked;
+  $('address-proof').closest('label').hidden=!['temporary','actual'].includes($('residence-basis').value);
+  const start=$('start').value||currentMonth;
+  const horizon=applicationDateForMonth(monthString(monthIndex(start)+11),1);
+  for(const row of document.querySelectorAll('#children .form-row')) {
+    const birth=row.querySelector('.birth').value;
+    row.querySelector('.student').closest('label').hidden=!!birth&&ageAt(birth,horizon)<18;
+  }
+}
+
+const draftKey='anna-benefit-draft-v1';
+const draftRows=[['children',addChild],['reasons',addReason],['cars',addCar],['properties',addProperty],['other-vehicles',addOtherVehicle],['deposits',addDeposit]];
+const readControl=el=>({value:el.value,checked:el.checked});
+function writeControl(el,data) {if(!el||!data)return;el.value=data.value??'';if(el.type==='checkbox')el.checked=!!data.checked;}
+function captureDraft() {
+  const fixed={};document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.id!=='save-draft')fixed[el.id]=readControl(el)});
+  const rows={};for(const [id] of draftRows)rows[id]=[...$(id).children].map(row=>({childId:row.dataset.childId,fields:[...row.querySelectorAll('input,select')].map(readControl)}));
+  return {version:1,fixed,rows,step:currentStep,nextChildId,incomePeople,savedSpouse,benefitPayments,maternityPayments,additionalEntries,childIncomeEntries,priorSupportEntries,extraAlimonyObligations,alimonyAllocation:[...alimonyAllocation],alimonyWageRecords:[...alimonyWageRecords],sources:[...sourceEnabled]};
+}
+function saveDraft() {
+  if(restoringDraft||!$('save-draft').checked)return;
+  try {localStorage.setItem(draftKey,JSON.stringify(captureDraft()));$('draft-status').textContent='Черновик сохранён в этом браузере.'}
+  catch {$('draft-status').textContent='Браузер не разрешил сохранить черновик. Не закрывайте страницу до завершения.'}
+}
+function restoreDraft(data) {
+  if(data?.version!==1||!data.fixed||!data.rows||!Array.isArray(data.incomePeople)||data.incomePeople.length<1||data.incomePeople.length>2)throw new Error('Неверный черновик');
+  restoringDraft=true;
+  try {
+    for(const [id,value] of Object.entries(data.fixed))writeControl($(id),value);
+    for(const [id,create] of draftRows) {
+      $(id).replaceChildren();
+      for(const saved of (data.rows[id]||[]).slice(0,100)) {
+        create();const row=$(id).lastElementChild;
+        if(saved.childId)row.dataset.childId=saved.childId;
+        [...row.querySelectorAll('input,select')].forEach((el,i)=>writeControl(el,saved.fields[i]));
+      }
+    }
+    for(const [target,key] of [[incomePeople,'incomePeople'],[benefitPayments,'benefitPayments'],[maternityPayments,'maternityPayments'],[additionalEntries,'additionalEntries'],[childIncomeEntries,'childIncomeEntries'],[priorSupportEntries,'priorSupportEntries'],[extraAlimonyObligations,'extraAlimonyObligations']])target.splice(0,target.length,...(data[key]||[]));
+    nextChildId=data.nextChildId||1;savedSpouse=data.savedSpouse||null;
+    sourceEnabled.clear();for(const key of data.sources||[])sourceEnabled.add(key);
+    updatePmSelection();
+    for(const [id,value] of Object.entries(data.fixed))writeControl($(id),value);
+    alimonyAllocation.clear();for(const [key,value] of data.alimonyAllocation||[])alimonyAllocation.set(key,value);
+    alimonyWageRecords.clear();for(const [key,value] of data.alimonyWageRecords||[])alimonyWageRecords.set(key,value);
+    lastWageRegion=$('pm-region').value;
+    sourceSection.querySelectorAll('input:not(#no-income)').forEach(box=>box.checked=sourceEnabled.has(box.value));
+    $('income-people').hidden=!sourceEnabled.has('employment');$('income-mode').closest('label').hidden=!sourceEnabled.has('employment');
+    extraSection.hidden=![...sourceEnabled].some(key=>ADDITIONAL_TYPES[key]);childIncomeSection.hidden=!sourceEnabled.has('childIncome');
+    benefitsSection.hidden=!sourceEnabled.has('childBenefit');maternitySection.hidden=!sourceEnabled.has('maternity');$('deposit-section').hidden=!sourceEnabled.has('deposit');
+    renderIncomeForm();renderBenefitRows();renderMaternityRows();renderExtraRows();renderChildIncomeRows();renderPriorSupportRows();renderAlimonyAllocationRows();renderExtraAlimonyObligations();renderAlimonyWageYears();
+    priorSupportPanel.hidden=$('prior-measure').value!=='yes';$('capacity-dates').hidden=!['limited','incapable'].includes($('applicant-capacity').value);
+    refreshAssetOwners();
+    for(const [id] of draftRows)for(const [i,row] of [...$(id).children].entries()) {
+      const saved=data.rows[id]?.[i];if(saved)[...row.querySelectorAll('input,select')].forEach((el,j)=>writeControl(el,saved.fields[j]));
+      if(id==='reasons')row.querySelector('.type').dispatchEvent(new Event('change'));
+      if(id==='properties'||id==='other-vehicles')row.querySelector('.type').dispatchEvent(new Event('input'));
+      if(id==='children')row.querySelector('.applying').dispatchEvent(new Event('input'));
+    }
+    refreshMaritalForm();
+  } finally {restoringDraft=false}
+  render();showStep(Number.isInteger(data.step)?data.step:0);
+}
+$('save-draft').addEventListener('change',()=>{
+  if($('save-draft').checked)saveDraft();else {try{localStorage.removeItem(draftKey)}catch{}$('draft-status').textContent='Сохранение выключено; сохранённый черновик удалён.'}
+});
+$('clear-draft').onclick=()=>{try{localStorage.removeItem(draftKey)}catch{}$('save-draft').checked=false;$('draft-status').textContent='Сохранённый черновик удалён. Введённые ответы остаются на странице.'};
+let draftTimer;
+for(const event of ['input','change','click'])document.addEventListener(event,()=>{clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,200)});
+window.addEventListener('pagehide',saveDraft);
+$('print-results').onclick=()=>{
+  document.querySelectorAll('#results details').forEach(el=>{el.dataset.printOpen=String(el.open);el.open=true});
+  window.print();
+};
+window.addEventListener('afterprint',()=>document.querySelectorAll('#results details').forEach(el=>{el.open=el.dataset.printOpen==='true';delete el.dataset.printOpen}));
+try {const raw=localStorage.getItem(draftKey);if(raw){restoreDraft(JSON.parse(raw));$('save-draft').checked=true;$('draft-status').textContent='Черновик восстановлен. Проверьте даты и суммы перед расчётом.'}}
+catch {$('draft-status').textContent='Не удалось восстановить черновик. Заполните анкету заново.'}
+updateRelevantFields();
+
+function renderCompletionChecklist() {
+  const issues=[];
+  const check=(id,label,step)=>{if(!$(id).value)issues.push({label,step,selector:'#'+id})};
+  for(const [id,label,step] of [['applicant-citizen','Гражданство заявителя',0],['applicant-residence','Проживание в России',0],['applicant-capacity','Судебные решения о дееспособности',0],['residence-basis','Адрес подачи',0],['prior-measure','Прежние меры поддержки',0],['marital-status','Семейное положение заявителя',1],['pm-region','Регион проживания',1]])check(id,label,step);
+  if(!sourceEnabled.size&&!$('no-income').checked)issues.push({label:'Виды дохода или подтверждение их отсутствия',step:1,selector:'#no-income'});
+  document.querySelectorAll('#children .form-row').forEach((row,i)=>{
+    for(const [cls,label] of [['birth','дата рождения'],['married','семейное положение'],['citizen','гражданство и проживание']])if(!row.querySelector('.'+cls).value)issues.push({label:`Ребёнок ${i+1}: ${label}`,step:0,selector:`#children .form-row:nth-child(${i+1}) .${cls}`});
+    if(row.querySelector('.applying').checked&&row.querySelector('.child-role').value!=='ward'&&!row.querySelector('.applicant-rights').value)issues.push({label:`Ребёнок ${i+1}: родительские права заявителя`,step:0,selector:`#children .form-row:nth-child(${i+1}) .applicant-rights`});
+  });
+  const box=$('completion-check');if(!box)return;box.replaceChildren();box.hidden=!issues.length;
+  if(!issues.length)return;
+  const title=document.createElement('h3');title.textContent='Что заполнить для расчёта';box.append(title);
+  const text=document.createElement('p');text.textContent='Начните с этих ответов. Дополнительные уточнения по доходам и документам показаны внутри каждого месяца.';box.append(text);
+  for(const issue of issues){const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=issue.label;button.onclick=()=>{showStep(issue.step);const field=document.querySelector(issue.selector);for(let parent=field?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;field?.focus();field?.scrollIntoView({block:'center',behavior:'smooth'})};box.append(button)}
+}

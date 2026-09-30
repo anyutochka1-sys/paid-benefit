@@ -18,6 +18,7 @@ jobs:
           fetch-depth: 0
       - name: Сверить суммы с таблицей СФР
         run: |
+          set -o pipefail
           python3 scripts/check_pm.py --update | tee pm-changes.txt
           cat pm-changes.txt >> "$GITHUB_STEP_SUMMARY"
       - name: Проверить защиту от изменений структуры
@@ -28,18 +29,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --quiet -- regional-pm-data.mjs; then
+          if git diff --quiet -- regional-pm-data.mjs regional-pm-future.mjs; then
             echo 'Официальные суммы не изменились.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git checkout -B bot/pm-2026-review
-          git add regional-pm-data.mjs
+          git add regional-pm-data.mjs regional-pm-future.mjs
           git commit -m 'Review revised 2026 SFR subsistence minimum'
           git push --force-with-lease origin HEAD:refs/heads/bot/pm-2026-review
           if [ "$(gh pr list --head bot/pm-2026-review --json number --jq 'length')" = '0' ]; then
             gh pr create --base main --head bot/pm-2026-review \
-              --title 'Проверить обновление ПМ СФР за 2026 год' \
+              --title 'Проверить годовые данные ПМ СФР' \
               --body 'Еженедельная сверка официальной таблицы СФР обнаружила изменения. Проверьте цифры, нормативные акты и влияние на контрольные случаи перед объединением.'
           fi

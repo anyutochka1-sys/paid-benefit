@@ -16,3 +16,5 @@ test('обычный субъект выбирается без местност
   assert.equal(pmFor(2027,'24','город Красноярск').status,'unknown');
   assert.equal(pmFor(2026,'24','неизвестная местность').status,'unknown');
 });
+
+test('future year keeps region choices without substituting old benefit amounts',()=>{assert.ok(pmRegions(2027).length>80);assert.equal(pmFor(2027,'63').status,'unknown')});

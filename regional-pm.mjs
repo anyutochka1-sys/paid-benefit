@@ -1,10 +1,10 @@
 import {regionalPm2026} from './regional-pm-data.mjs';
 
-const tables = {2026: regionalPm2026};
+import {regionalPmFuture} from './regional-pm-future.mjs';
+const tables = {2026: regionalPm2026,...regionalPmFuture};
 
 export function pmRegions(year) {
-  const table=tables[year];
-  if(!table)return [];
+  const table=tables[year]||tables[2026];
   return Object.entries(table.regions).map(([code,region])=>({code,name:region.name})).sort((a,b)=>a.name.localeCompare(b.name,'ru'));
 }
 

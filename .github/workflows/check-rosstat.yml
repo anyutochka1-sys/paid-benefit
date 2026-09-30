@@ -25,6 +25,7 @@ jobs:
       - run: pip install openpyxl==3.1.5
       - name: Проверить годовую таблицу Росстата
         run: |
+          set -o pipefail
           python3 scripts/check_rosstat.py --update | tee rosstat-changes.txt
           cat rosstat-changes.txt >> "$GITHUB_STEP_SUMMARY"
       - name: Проверить защиту от предварительных и неполных данных

@@ -41,3 +41,13 @@ details.result { display:block; margin:8px 0; padding:0; border:1px solid var(--
 .result-section + .result-section { margin-top:18px; padding-top:16px; border-top:1px solid var(--line) }
 .result-section h3 { font-size:1rem; color:var(--teal); margin:0 0 7px; line-height:1.4 }
 .result-section p { margin:0; line-height:1.65 }
+
+.draft-tools { padding:14px 18px; border:1px solid var(--line); border-radius:12px; margin-bottom:20px }
+.draft-tools .check { flex-direction:row; align-items:center; font-size:.9rem; margin:0 }
+.draft-tools button { margin-top:10px }
+#draft-status { display:block; font-size:.85rem }
+.completion-check { background:#f2dfbd; border-radius:12px; padding:16px; margin-bottom:18px }
+.review-link { display:block; background:transparent; color:var(--teal); text-align:left; text-decoration:underline; padding:7px 0; overflow-wrap:anywhere }
+.form-row > *, .reason > * { min-width:0 }
+@media(max-width:420px) { main { padding:20px 12px 50px } .panel { padding:18px 14px } .form-row,.reason,.income-grid { grid-template-columns:1fr } .form-row .check,.reason label:first-child { grid-column:auto } .section-heading { flex-wrap:wrap } }
+@media print { body { background:white; color:black } main { max-width:none;padding:0 } header { padding:0 } nav,.draft-tools,.wizard-actions,button,main > .panel:not(:last-of-type) { display:none!important } main > .panel:last-of-type { display:block!important;border:0;box-shadow:none;padding:0 } .completion-check { background:white } .result { break-inside:avoid } .result > summary::after { display:none } .result-section { break-inside:avoid } }

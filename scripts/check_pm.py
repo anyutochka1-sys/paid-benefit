@@ -58,9 +58,9 @@ def number(value):
     return int(amount) if amount.is_integer() else amount
 
 
-def parse(html):
+def parse(html, year=2026):
     heading = re.search(r'Величина прожиточного минимума[^<]{0,200}на (20\d\d) год', html)
-    if not heading or heading.group(1) != '2026':
+    if not heading or int(heading.group(1)) != year:
         raise ValueError('Страница СФР уже не является таблицей 2026 года; нужен новый год и отдельная сверка')
     table = Table()
     table.feed(html)
@@ -120,7 +120,34 @@ def main():
     parser.add_argument('--update', action='store_true', help='Подготовить обновлённый снимок для review')
     args = parser.parse_args()
     html = args.html.read_text(encoding='utf-8') if args.html else urlopen(Request(URL, headers={'User-Agent': 'BenefitPMMonitor/1.0'}), timeout=30).read().decode('utf-8')
-    source = parse(html)
+    heading = re.search(r'Величина прожиточного минимума[^<]{0,200}на (20\d\d) год', html)
+    if not heading:
+        raise ValueError('Не найден год официальной таблицы СФР')
+    year = int(heading.group(1))
+    if not 2026 <= year <= date.today().year + 1:
+        raise ValueError('Неожиданный год таблицы СФР')
+    source = parse(html, year)
+    if year != 2026:
+        future_path = DATA.parent / 'regional-pm-future.mjs'
+        future_prefix = '// Новые годы из официальной таблицы СФР. Изменения проходят проверку перед публикацией.\nexport const regionalPmFuture = '
+        content = future_path.read_text(encoding='utf-8')
+        if not content.startswith(future_prefix) or not content.endswith(';\n'):
+            raise ValueError('Неизвестный формат новых годовых таблиц')
+        years = json.loads(content[len(future_prefix):-2])
+        key = str(year)
+        if key in years:
+            changes = compare_and_update(source, years[key], date.today().isoformat())
+        else:
+            previous = json.loads(DATA.read_text(encoding='utf-8')[len(PREFIX):-2])
+            candidate = json.loads(json.dumps(previous))
+            compare_and_update(source, candidate, date.today().isoformat())
+            candidate.update(year=year, retrieved=date.today().isoformat(), source=URL)
+            years[key] = candidate
+            changes = [f'Новая полная официальная таблица ПМ на {year} год: требуется проверка']
+        print('\n'.join(changes) if changes else 'Суммы ПМ нового года не изменились')
+        if changes and args.update:
+            future_path.write_text(future_prefix + json.dumps(years, ensure_ascii=False, indent=2) + ';\n', encoding='utf-8')
+        return
     content = DATA.read_text(encoding='utf-8')
     if not content.startswith(PREFIX) or not content.endswith(';\n'):
         raise ValueError('Формат файла с данными изменился')
