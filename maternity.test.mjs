@@ -17,3 +17,9 @@ test('six-month extended leave follows its documented six months',()=>{
 test('missing charged period never books full amount in payment month',()=>{
   assert.equal(maternityIncomeForApplication([{amount:250000,startMonth:'2026-01'}],'2026-03').status,'unknown');
 });
+test('confirmed mobilized adult income is omitted while the other adult remains',()=>{
+  const payments=[ordinary[0],{personIndex:1,amount:100000,startMonth:'2026-01',chargedMonths:5}];
+  const result=maternityIncomeForApplication(payments,'2026-07',[1]);
+  assert.equal(result.amount,250000);
+  assert.equal(result.included.length,1);
+});
