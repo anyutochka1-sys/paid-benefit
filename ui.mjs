@@ -1,3 +1,4 @@
+import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
@@ -23,6 +24,33 @@ const $ = id => document.getElementById(id);
 const today=new Date();
 const currentMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
 $('start').value=currentMonth;
+const priorSupportEntries=[];
+const priorSupportPanel=document.createElement('div');
+priorSupportPanel.innerHTML='<p class="hint">Укажите действующие выплаты, назначенные с оценкой дохода, в отношении вас или детей. Для каждого периода с одной суммой добавьте отдельную строку. Этот раздел для перехода с прежних выплат на единое пособие. Уже назначенное единое пособие укажите в карточке ребёнка: его продление не относим автоматически к замене прежних мер. Для иных региональных выплат сначала нужно проверить применимость правила. Заработок, маткапитал и выплаты без оценки дохода сюда не добавляйте. Ввод здесь служит только сравнению сумм; учитываемые поступления за расчётный период указываются отдельно в разделе доходов.</p><div id="prior-support-rows"></div><button type="button" id="add-prior-support">+ Добавить прежнюю выплату</button><label class="check"><input type="checkbox" id="prior-support-complete"> Перечислены все такие выплаты на меня и детей из заявления</label>';
+$('prior-measure').closest('label').after(priorSupportPanel);
+priorSupportPanel.hidden=true;
+function renderPriorSupportRows() {
+  const list=$('prior-support-rows');list.replaceChildren();
+  const choices=[['applicant','Заявитель (пособие по беременности)'],...childData().map((child,i)=>[`child:${child.id}`,child.name||`Ребёнок ${i+1}`])];
+  priorSupportEntries.forEach((entry,index)=>{
+    const row=document.createElement('div');row.className='form-row';
+    row.innerHTML='<label>Вид прежней выплаты<select class="prior-kind"><option value="">Выберите</option><option value="firstChildOld">Прежняя выплата на первого ребёнка до 3 лет</option><option value="thirdChildOld">Прежняя выплата на третьего / последующего ребёнка до 3 лет</option><option value="old3to7">Прежняя выплата от 3 до 7 лет</option><option value="old8to17">Прежняя выплата от 8 до 17 лет</option><option value="oldPregnancy">Прежнее пособие беременной до введения единого</option><option value="unified">Уже назначенное единое пособие — продление</option><option value="regionalOther">Иная региональная / другая выплата — нужно проверить</option></select></label><label>Название в решении о назначении<input class="prior-name"></label><label>В отношении кого назначена<select class="prior-target"><option value="">Выберите</option></select></label><label>Назначена с оценкой среднедушевого дохода?<select class="prior-assessed"><option value="">Уточните</option><option value="yes">Да, по условиям выплаты</option><option value="no">Нет</option></select></label><label>Ежемесячная сумма, ₽<input class="prior-amount" type="number" min="0" step="0.01"></label><label>Назначена с месяца<input class="prior-from" type="month"></label><label>По месяц включительно<input class="prior-to" type="month"></label><button class="remove" type="button">Убрать</button>';
+    for(const [value,label] of choices)row.querySelector('.prior-target').add(new Option(label,value));
+    for(const [selector,key] of [['.prior-kind','kind'],['.prior-name','name'],['.prior-target','target'],['.prior-assessed','incomeAssessed'],['.prior-amount','monthly'],['.prior-from','from'],['.prior-to','to']]) {
+      const input=row.querySelector(selector);input.value=entry[key]??'';
+      input.oninput=()=>{entry[key]=key==='monthly'?(input.value===''?null:Number(input.value)):input.value;$('prior-support-complete').checked=false;render()};
+    }
+    row.querySelector('.remove').onclick=()=>{priorSupportEntries.splice(index,1);$('prior-support-complete').checked=false;renderPriorSupportRows();render()};
+    list.append(row);
+  });
+}
+$('add-prior-support').onclick=()=>{priorSupportEntries.push({name:'',target:'',monthly:null,from:'',to:'',incomeAssessed:'',kind:''});$('prior-support-complete').checked=false;renderPriorSupportRows();render()};
+$('prior-support-complete').addEventListener('input',render);
+$('prior-measure').addEventListener('input',()=>{priorSupportPanel.hidden=$('prior-measure').value!=='yes';renderPriorSupportRows();render()});
+function priorSupportFor(targets,month,newMonthly,jointContextUnresolved=false) {
+  return comparePriorSupport({answer:$('prior-measure').value,entries:priorSupportEntries,complete:$('prior-support-complete').checked,targets,knownTargets:['applicant',...childData().map(child=>`child:${child.id}`)],applicationMonth:month,newMonthly,jointContextUnresolved});
+}
+
 function updatePmSelection() {
   const year=Number($('start').value.slice(0,4));
   const region=$('pm-region'),area=$('pm-area');
@@ -519,6 +547,10 @@ function render() {
   const start=$('start').value; if (!start) return;
   $('mobilized-spouse').closest('label').hidden=$('marital-status').value!=='married';
   refreshAssetOwners();
+  for(const input of document.querySelectorAll('#prior-support-rows .prior-target')) {
+    const current=input.value;input.replaceChildren(new Option('Выберите',''),new Option('Заявитель (пособие по беременности)','applicant'));
+    childData().forEach((child,i)=>input.add(new Option(child.name||`Ребёнок ${i+1}`,`child:${child.id}`)));input.value=current;
+  }
   const sourceComplete=sourceEnabled.size>0||$('no-income').checked;
   const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData(),deposits=sourceEnabled.has('deposit')?depositData():[];
   const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked,careRelationship:row.querySelector('.care-relationship select').value}));
@@ -634,7 +666,7 @@ function render() {
       else if(alimony.status==='known') {alimony.amount+=amounts.reduce((sum,value)=>sum+value,0);alimony.method='multiple-obligations'}
     }
     let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
-    const scenarioTiers=[];
+    const scenarioTiers=[],priorSupportChecks=[];
     const incomeText=selected.length?scenarios.map((group,scenarioIndex)=>{
       const awardChecks=group.map(child=>awardConflict(child,month,{jointRenewal}));
       if(awardChecks.some(check=>check.status==='block'))scenarioBlocks=true;
@@ -653,14 +685,20 @@ function render() {
       if(regularChildren && tier?.status==='estimate')scenarioTiers.push(tier.tier);
       if(regularChildren && tier?.status==='income-too-high'&&grace?.status!=='unknown')scenarioBlocks=true;
       if(regularChildren && (tier?.status!=='estimate'||members.unanswered.length))scenarioComplete=false;
+      const newMonthly=pmChild>0&&(!regularChildren||tier?.status==='estimate')?pmChild*((regularChildren?(tier.tier/100)*regularChildren:0)+newborns.reduce((sum,item)=>sum+item.result.tier/100,0)):null;
+      const priorSupport=priorSupportFor(group.map(child=>`child:${child.id}`),month,newMonthly,$('pregnancy-applying').checked);
+      priorSupportChecks.push(priorSupport);
+      if(priorSupport.status==='block')scenarioBlocks=true;
+      if(priorSupport.status==='unknown')scenarioComplete=false;
+      const priorSupportText=`Сравнение с прежними выплатами: ${priorSupport.reason}${Number.isFinite(priorSupport.oldMonthly)?`; прежние ${priorSupport.oldMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}${Number.isFinite(priorSupport.newMonthly)?`; новые ${priorSupport.newMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}.`;
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
       const label=$('application-mode').value==='separate'?`Заявление на ребёнка ${childNumber} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
       const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
       const newbornText=newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'';
       const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
-      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽${alimony.wageYear?' (минимум по окончательным данным Росстата за '+alimony.wageYear+' год)':''}`:'нужны данные ('+alimony.reason+')'}. Доходы детей: ${childEarnings.status==='known'?`${childEarnings.amount.toLocaleString('ru-RU')} ₽`:'уточнить ('+childEarnings.issues.join('; ')+')'}. Дополнительные источники: ${supplemental.status==='known'?`${supplemental.amount.toLocaleString('ru-RU')} ₽; исключено по п. 53: ${supplemental.excluded.reduce((sum,item)=>sum+item.amount,0).toLocaleString('ru-RU')} ₽`:'нужны данные ('+supplemental.issues.join('; ')+')'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. БиР за вошедшие месяцы: ${maternityIncome.status==='known'?`${maternityIncome.amount.toLocaleString('ru-RU')} ₽`:'уточнить период начисления'}. ${newbornText} ${regularText}`;
+      return `${label}: доход ${combinedIncome===null?'нужны данные':combinedIncome.toLocaleString('ru-RU')+' ₽'}. Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${benefitText} Алименты: ${alimony.status==='known'?`${alimony.amount.toLocaleString('ru-RU')} ₽${alimony.wageYear?' (минимум по окончательным данным Росстата за '+alimony.wageYear+' год)':''}`:'нужны данные ('+alimony.reason+')'}. Доходы детей: ${childEarnings.status==='known'?`${childEarnings.amount.toLocaleString('ru-RU')} ₽`:'уточнить ('+childEarnings.issues.join('; ')+')'}. Дополнительные источники: ${supplemental.status==='known'?`${supplemental.amount.toLocaleString('ru-RU')} ₽; исключено по п. 53: ${supplemental.excluded.reduce((sum,item)=>sum+item.amount,0).toLocaleString('ru-RU')} ₽`:'нужны данные ('+supplemental.issues.join('; ')+')'}. Проценты по вкладам в доходе: ${depositIncome.status==='known'?`${depositIncome.amount.toLocaleString('ru-RU')} ₽`:'нужны данные ('+depositIncome.reason+')'}. БиР за вошедшие месяцы: ${maternityIncome.status==='known'?`${maternityIncome.amount.toLocaleString('ru-RU')} ₽`:'уточнить период начисления'}. ${newbornText} ${regularText} ${priorSupportText}`;
     }).join(' '):$('pregnancy-applying').checked?'Заявление на ребёнка не выбрано.':'Отметьте ребёнка или заявление по беременности.';
-    let pregnancyText='';
+    let pregnancyText='',pregnancyMonthly=null;
     if($('pregnancy-applying').checked) {
       if(capacity.pregnancy?.status==='block')pregnancyText=capacity.pregnancy.reason+'.';
       else if(capacity.status==='unknown')pregnancyText='По беременности: сначала уточните судебное решение о дееспособности и даты.';
@@ -672,6 +710,7 @@ function render() {
         const pregnancyBenefits=childBenefitIncome(benefitRows.payments,children,[],month,filingDate);
         const pregnancyIncome=!sourceComplete||incomeResult.total===null||pregnancyBenefits.total===null||benefitRows.missing.length||pregnancyBenefits.missing.length||alimony.status!=='known'||depositIncome.status!=='known'||maternityIncome.status!=='known'||supplemental.status!=='known'||childEarnings.status!=='known'?null:incomeResult.total+pregnancyBenefits.total+alimony.amount+depositIncome.amount+maternityIncome.amount+supplemental.amount+childEarnings.amount;
         const result=pregnancyTier({income12:pregnancyIncome,familySize:members.unanswered.length?null:members.included.length,pmPerson,pmWorking:pm.status==='known'?pm.working:null});
+        if(result.status==='estimate')pregnancyMonthly=result.monthly;
         pregnancyText=result.status==='estimate'?`Отдельное заявление по беременности: предварительная ступень ${result.tier}% от ПМ трудоспособных (${result.monthly.toLocaleString('ru-RU')} ₽ в месяц). Прежние выплаты на детей, остающихся в семье, учтены в доходе этого заявления: ${pregnancyBenefits.total.toLocaleString('ru-RU')} ₽ за расчётный период. Сроки выплаты и остальные критерии ещё требуют проверки.`:result.status==='income-too-high'?'По беременности: доход отдельного заявления выше указанного ПМ на человека.':'По беременности: для ступени нужны подтверждённые доходы и ПМ.';
       }
     }
@@ -693,12 +732,17 @@ function render() {
     });
     const studentChecks=adultStudentChecks(children,members,sourceEnabled.has('childIncome')?childIncomeEntries:[],month,filingDate,RULES[year].mrot);
     const adultText=[...adults.map(a=>`${a.label}: ${a.mobilizedReview?'мобилизация по Указу № 647; минимум 8 МРОТ требует отдельной проверки':a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`),...studentChecks.map(check=>`Ребёнок ${children.findIndex(child=>child.id===check.childId)+1} (18–22 года): ${check.status==='yes'?check.reason:check.reason+'; индивидуальный порог 8 МРОТ пока не подтверждён'}`)].join('; ');
+    if($('pregnancy-applying').checked) {
+      const priorSupport=priorSupportFor(['applicant'],month,pregnancyMonthly,selected.length>0);priorSupportChecks.push(priorSupport);
+      if(priorSupport.status==='block')scenarioBlocks=true;
+      pregnancyText+=` Сравнение с прежними выплатами по беременности: ${priorSupport.reason}.`;
+    }
     const applicantCheck=$('applicant-citizen').value==='no'||$('applicant-residence').value==='no'?'no':$('applicant-citizen').value&&$('applicant-residence').value?'yes':'unknown';
     const addressBasis=$('residence-basis').value;
     const addressReview=!addressBasis||addressBasis!=='permanent'&&$('address-proof').value!=='yes';
-    const priorMeasureReview=$('prior-measure').value!=='no';
+    const priorMeasureReview=priorSupportChecks.length?priorSupportChecks.some(check=>check.status==='unknown'):$('prior-measure').value!=='no';
     const contextReview=capacity.status==='unknown'||addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
-    const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'не указаны'}. ${mobilizedIndices.length?'Зарплата, дополнительные поступления, БиР и проценты по счетам отмеченных мобилизованных взрослых исключены; получателей детских выплат и алиментов, статус по Указу № 647 и правило минимального дохода нужно проверить по документам.':''}`;
+    const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'сравнение для выбранных заявлений выполнено ниже'}. ${mobilizedIndices.length?'Зарплата, дополнительные поступления, БиР и проценты по счетам отмеченных мобилизованных взрослых исключены; получателей детских выплат и алиментов, статус по Указу № 647 и правило минимального дохода нужно проверить по документам.':''}`;
     const explicitBlockers=capacity.status==='block'||applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
     const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&capacity.status!=='unknown'&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
     const clear=!explicitBlockers&&headline.startsWith('По проверенным критериям');
