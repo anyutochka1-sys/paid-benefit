@@ -18,6 +18,7 @@ export const ADDITIONAL_TYPES = {
   lottery:{label:'Выигрыш в лотерею / тотализаторе',period:'monthly',qualifies:false},
   selfEmployed:{label:'Самозанятость',period:'monthly',qualifies:true},
   foreignEarned:{label:'Заработок в иностранной валюте',period:'monthly',qualifies:true},
+  foreignOther:{label:'Другой доход, полученный за пределами РФ',period:'monthly',qualifies:false},
   securities:{label:'Ценные бумаги / дивиденды',period:'annual',qualifies:false},
   business:{label:'Доход ИП за налоговый год',period:'annual',qualifies:true},
   propertySale:{label:'Налоговая база от продажи имущества',period:'annual',qualifies:false},
@@ -115,9 +116,13 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(definition.period==='annual'&&!Number.isInteger(entry.taxYear) || definition.period==='monthly'&&(!entry.from||!entry.to||entry.from>entry.to)) {
       issues.push('Уточните налоговый год или месяцы получения дохода');continue;
     }
-    if(entry.type==='foreignEarned'&&months.length) {
+    if(entry.type==='foreignOther' && !['pension','scholarship','military','business','selfEmployed','author','other'].includes(entry.foreignCategory)) {
+      issues.push('Уточните вид зарубежного дохода для проверки минимального заработка');continue;
+    }
+    if(['foreignEarned','foreignOther'].includes(entry.type)&&months.length) {
       const date=foreignRateDate(applicationMonth);
-      if(!/^[A-Z]{3}$/.test(entry.currency||'') || entry.rateDate!==date || !Number.isFinite(entry.rublesPerUnit) || entry.rublesPerUnit<=0) {
+      const rubles=entry.currency==='RUB';
+      if(!/^[A-Z]{3}$/.test(entry.currency||'') || !rubles && (entry.rateDate!==date || !Number.isFinite(entry.rublesPerUnit) || entry.rublesPerUnit<=0)) {
         issues.push(`Для заработка в валюте укажите буквенный код валюты и курс ЦБ в рублях за 1 единицу на ${date}; прошлый курс для другого месяца подачи не подходит`);
         continue;
       }
@@ -133,11 +138,12 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:
       entry.type==='business'?entry.amount-(entry.targetedBusinessSupportAmount||0)-(entry.businessBasis==='usnDocumented'?entry.expenses:0):
       entry.amount-birthExclusion;
-    const value=(definition.period==='annual'?relevantAmount/12:relevantAmount)*(entry.type==='foreignEarned'&&months.length?entry.rublesPerUnit:1);
+    const value=(definition.period==='annual'?relevantAmount/12:relevantAmount)*(['foreignEarned','foreignOther'].includes(entry.type)&&months.length&&entry.currency!=='RUB'?entry.rublesPerUnit:1);
+    const qualifies=definition.qualifies || entry.type==='foreignOther'&&['pension','scholarship','military','business','selfEmployed','author'].includes(entry.foreignCategory);
     const person=byPerson.get(entry.personIndex)||{};
     for(const month of months) {
       const previous=person[month]||{total:0,qualifying:0};
-      person[month]={total:previous.total+value,qualifying:previous.qualifying+(definition.qualifies?value:0)};
+      person[month]={total:previous.total+value,qualifying:previous.qualifying+(qualifies?value:0)};
     }
     byPerson.set(entry.personIndex,person);
   }
