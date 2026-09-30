@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ageAt,includedFamily,childCanApply,applicantParentalRights,checkCars} from './family-assets.mjs';
+import {ageAt,includedFamily,childCanApply,applicantParentalRights,checkCars,fourChildCarStatus} from './family-assets.mjs';
 
 test('parental-rights refusal concerns this applicant and this child, not the other parent',()=>{
   const child={role:'child',applying:true,secondParentStatus:'deprived-rights'};
@@ -55,4 +55,19 @@ test('two cars allowed for qualifying family, but not three',()=>{
   const context={applicationYear:2026,multipleChildren:true,disabledFamilyMember:false,supportVehicle:false,fourOrMoreChildren:false};
   assert.equal(checkCars([{manufactureYear:2015,horsepower:80},{manufactureYear:2016,horsepower:90}],context).status,'yes');
   assert.equal(checkCars([{manufactureYear:2015,horsepower:80},{manufactureYear:2016,horsepower:90},{manufactureYear:2017,horsepower:70}],context).status,'no');
+});
+test('powerful car counts included minors only and reviews a possible fourth adult student',()=>{
+  const children=[0,1,2,3].map(i=>({id:String(i),role:'child',birthDate:'2015-01-01',married:false}));
+  const applicationDate='2026-09-01';
+  const assets={applicationYear:2026,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false};
+  const powerful=[{manufactureYear:2024,horsepower:250,acquiredWithFourChildren:true}];
+  const included=includedFamily(children,applicationDate);
+  assert.equal(checkCars(powerful,{...assets,...fourChildCarStatus(children,included,applicationDate)}).status,'yes');
+  const withExcluded=[...children.slice(0,3),{...children[3],married:true}];
+  const excluded=includedFamily(withExcluded,applicationDate);
+  assert.equal(checkCars(powerful,{...assets,...fourChildCarStatus(withExcluded,excluded,applicationDate)}).status,'no');
+  const adult={...children[3],birthDate:'2006-01-01',fullTimeStudent:true};
+  const withStudentChildren=[...children.slice(0,3),adult];
+  const withStudent=includedFamily(withStudentChildren,applicationDate);
+  assert.equal(checkCars(powerful,{...assets,...fourChildCarStatus(withStudentChildren,withStudent,applicationDate)}).status,'unknown');
 });
