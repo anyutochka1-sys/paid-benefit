@@ -32,6 +32,8 @@ export function minimumIncomeTest(adult, applicationMonth, mrot) {
   const credited = new Set();
   const unemploymentMonths = new Set();
   const warnings = [];
+  let uncertain = false;
+  const filingDate=adult.applicationDate || `${applicationMonth}-01`;
   for (const reason of adult.reasons ?? []) {
     if (!reason.start || !reason.end) continue;
     if (!['unemployment', 'pregnancy', 'careUnderThree', 'fullTimeStudent', 'careDisabledChild', 'careDisabledAdult', 'treatment', 'military', 'incarceration', 'indigenous', 'pensionRecipient'].includes(reason.type)) {
@@ -51,6 +53,17 @@ export function minimumIncomeTest(adult, applicationMonth, mrot) {
       months.forEach(m => unemploymentMonths.add(m));
       continue;
     }
+    if (reason.type === 'careDisabledAdult' && filingDate >= '2026-07-21') {
+      if (reason.careRelationship === 'ineligible') {
+        warnings.push('Уход за человеком вне предусмотренного законом круга членов семьи с 21 июля 2026 года не засчитывается.');
+        continue;
+      }
+      if (reason.careRelationship !== 'eligible') {
+        warnings.push('Уточните родство и подтверждение ухода за нетрудоспособным членом семьи.');
+        uncertain = true;
+        continue;
+      }
+    }
     if (reason.type !== 'pregnancy') months.forEach(m => credited.add(m));
   }
   [...unemploymentMonths].sort().slice(0, 6).forEach(m => credited.add(m));
@@ -62,7 +75,7 @@ export function minimumIncomeTest(adult, applicationMonth, mrot) {
   const minimum = exempt ? 0 : mrot * 8 * (12 - credited.size) / 12;
   const qualifyingTypes = new Set(['employment', 'sickLeave', 'business', 'selfEmployed', 'pension', 'scholarship', 'military', 'copyright', 'foreignEarned']);
   const earned = window.reduce((sum, month) => sum + (adult.income?.[month] ?? []).filter(row => qualifyingTypes.has(row.type)).reduce((s, row) => s + Number(row.amount || 0), 0), 0);
-  return { passed: earned >= minimum, earned, minimum, creditedMonths: credited.size, exempt, warnings };
+  return { passed: earned >= minimum, earned, minimum, creditedMonths: credited.size, exempt, uncertain, warnings };
 }
 
 export function assessMonth(data, applicationMonth) {
@@ -78,9 +91,9 @@ export function assessMonth(data, applicationMonth) {
   const adultChecks = (data.adults ?? []).map(adult => minimumIncomeTest(adult, applicationMonth, rules.mrot));
   const blockers = [];
   if (incomePerPerson > pm.perCapita) blockers.push('Среднедушевой доход выше прожиточного минимума.');
-  if (adultChecks.some(x => !x.passed)) blockers.push('Не выполнено требование минимального дохода взрослого.');
+  if (adultChecks.some(x => !x.passed && !x.uncertain)) blockers.push('Не выполнено требование минимального дохода взрослого.');
   // Other statutory tests are not inferred from missing answers.
   const required = ['assetsChecked', 'citizenshipChecked', 'alimonyChecked', 'regionalRulesChecked'];
-  if (required.some(key => data[key] !== true)) return { month: applicationMonth, status: 'needs-review', window, incomePerPerson, adultChecks, blockers, reason: 'Не проверены имущество, гражданство, алименты или региональные условия.' };
+  if (required.some(key => data[key] !== true) || adultChecks.some(x=>x.uncertain&&!x.passed)) return { month: applicationMonth, status: 'needs-review', window, incomePerPerson, adultChecks, blockers, reason: 'Не проверены имущество, гражданство, алименты, региональные условия или подтверждение ухода.' };
   return { month: applicationMonth, status: blockers.length ? 'likely-ineligible' : 'preliminary-eligible', window, incomePerPerson, adultChecks, blockers };
 }
