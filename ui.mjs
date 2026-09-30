@@ -162,12 +162,22 @@ function renderChildIncomeRows() {
   const childOptions=childData().map((child,index)=>({id:child.id,label:document.querySelector(`[data-child-id="${child.id}"] .child-name`)?.value||`Ребёнок ${index+1}`}));
   childIncomeEntries.forEach((entry,index)=>{
     const row=document.createElement('div');row.className='form-row';
-    row.innerHTML='<label>Кто получил<select class="child"><option value="">Выберите ребёнка</option></select></label><label>Вид<select class="type"><option value="employment">Зарплата / ГПХ</option><option value="scholarship">Стипендия</option><option value="publicDutyCompensation">Компенсация за государственные обязанности</option><option value="other">Другой учитываемый доход</option></select></label><label>За месяц, ₽<input class="amount" type="number" min="0"></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><button class="remove" type="button">Убрать</button>';
+    row.innerHTML='<label>Кто получил<select class="child"><option value="">Выберите ребёнка</option></select></label><label>Вид<select class="type"><option value="employment">Зарплата / ГПХ</option><option value="scholarship">Стипендия</option><option value="publicDutyCompensation">Компенсация за государственные обязанности</option><option value="other">Другой учитываемый доход</option></select></label><label>За месяц, ₽<input class="amount" type="number" min="0"></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="birthday-income-date">Если доход пришёл в месяц 18-летия, укажите дату получения<input class="receipt-date" type="date"></label><button class="remove" type="button">Убрать</button>';
     childOptions.forEach(child=>row.querySelector('.child').add(new Option(child.label,child.id)));
     for(const [selector,key] of [['.child','childId'],['.type','type'],['.amount','amount'],['.from','from'],['.to','to']]) {
       const input=row.querySelector(selector);input.value=entry[key]??'';
-      input.oninput=()=>{entry[key]=key==='amount'?(input.value===''?null:Number(input.value)):input.value;render()};
+      input.oninput=()=>{entry[key]=key==='amount'?(input.value===''?null:Number(input.value)):input.value;if(['childId','from','to'].includes(key))toggleBirthdayDate();render()};
     }
+    const dateInput=row.querySelector('.receipt-date');dateInput.value=entry.receiptDate||'';
+    dateInput.oninput=()=>{entry.receiptDate=dateInput.value;render()};
+    const toggleBirthdayDate=()=>{
+      const child=childData().find(c=>c.id===entry.childId);
+      const birthdayMonth=child?.birthDate?`${Number(child.birthDate.slice(0,4))+18}-${child.birthDate.slice(5,7)}`:'';
+      const relevant=!!birthdayMonth&&!!entry.from&&!!entry.to&&entry.from<=birthdayMonth&&birthdayMonth<=entry.to;
+      row.querySelector('.birthday-income-date').hidden=!relevant;
+      if(!relevant){entry.receiptDate='';dateInput.value=''}
+    };
+    toggleBirthdayDate();
     row.querySelector('.remove').onclick=()=>{childIncomeEntries.splice(index,1);renderChildIncomeRows();render()};
     $('child-income-entries').append(row);
   });
