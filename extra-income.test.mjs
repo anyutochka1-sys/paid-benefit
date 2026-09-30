@@ -48,6 +48,24 @@ test('pregnancy unified-benefit arrears are excluded but its regular payment is 
   assert.equal(result.amount,30000);
   assert.equal(result.excluded[0].amount,30000);
 });
+test('insurance, MSE rehabilitation and spent targeted aid require their specific evidence',()=>{
+  const common={personIndex:0,type:'otherBenefit',from:'2026-04',to:'2026-04',amount:50000};
+  const entries=[
+    {...common,benefitKind:'insuranceDamage',verifiedInsuranceDamage:true},
+    {...common,benefitKind:'mseRehabilitation',mseAdditionalExpenses:true},
+    {...common,benefitKind:'targetedAssetSupport',assetPurpose:'vehicle',spentOnPurpose:true}
+  ];
+  const result=additionalIncomeForApplication(entries,'2026-09');
+  assert.equal(result.amount,0);
+  assert.equal(result.excluded.length,3);
+  for(const entry of [
+    {...entries[0],verifiedInsuranceDamage:undefined},
+    {...entries[0],to:'2026-05'},
+    {...entries[1],mseAdditionalExpenses:undefined},
+    {...entries[2],spentOnPurpose:false},
+    {...entries[2],assetPurpose:''}
+  ]) assert.equal(additionalIncomeForApplication([entry],'2026-09').status,'unknown');
+});
 
 test('an unspecified other benefit cannot silently enter or leave household income',()=>{
   const entry={personIndex:0,type:'otherBenefit',from:'2026-01',to:'2026-01',amount:50000};
