@@ -7,6 +7,13 @@ const excluded = item => item.wardOwned || item.seized || item.registrationBan |
 
 export function checkProperty(items, {familySize, rural, multipleChildren, disabledFamilyMember, supportVehicle}) {
   if (!Array.isArray(items) || !familySize) return {status:'unknown',reasons:['Нужен состав семьи']};
+  // A missing share can change whether any object is counted at all. Do not
+  // turn a potential one-third exclusion into a definite property refusal.
+  if(items.some(item=>!item.wardOwned&&!item.seized&&!item.registrationBan &&
+      !(item.supported&&['apartment','house','land'].includes(item.type)) &&
+      !(item.auxiliaryExcluded&&item.type==='nonresidential') &&
+      (!Number.isFinite(item.familyShare)||item.familyShare<0||item.familyShare>1)))
+    return {status:'review',reasons:[],review:['Укажите совокупную долю членов семьи в каждом объекте недвижимости']};
   const relevant=items.filter(item=>!excluded(item));
   const reasons=[], review=[];
   const group=type=>relevant.filter(item=>item.type===type);
