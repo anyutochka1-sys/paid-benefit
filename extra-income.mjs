@@ -92,6 +92,12 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
       if(entry.businessBasis==='usnDocumented' && (!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount||entry.expensesDocumented!==true)) {
         issues.push('Для УСН «доходы» укажите подтверждённые расходы не выше выручки и возможность представить документы в СФР');continue;
       }
+      const grant=entry.targetedBusinessSupportAmount??0;
+      if(!Number.isFinite(grant)||grant<0||grant>entry.amount || grant>0 && (entry.businessBasis==='documentedOther'||entry.targetedBusinessSupportDocumented!==true
+        || entry.businessBasis==='usnDocumented'&&entry.expensesExcludeGrantCosts!==true
+        || entry.businessBasis==='usnDocumented'&&grant+entry.expenses>entry.amount)) {
+        issues.push('Уточните целевую субсидию ИП и документы; расходы не должны повторно включать затраты, оплаченные из субсидии');continue;
+      }
     }
     const months=definition.period==='annual'
       ? window.filter(m=>Number(m.slice(0,4))===entry.taxYear)
@@ -110,10 +116,13 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
       excluded.push({type:entry.benefitKind,label:benefitKind.label,amount:entry.amount*months.length});
       continue;
     }
+    if(entry.type==='business'&&entry.targetedBusinessSupportAmount>0&&months.length)
+      excluded.push({type:'businessTargetedSupport',label:'Подтверждённая целевая поддержка предпринимательства',amount:entry.targetedBusinessSupportAmount*months.length/12});
     const birthExclusion=entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid'&&entry.birthAidFirstYear?entry.taxExemptAmount:0;
     if(birthExclusion && months.length) excluded.push({type:'employerBirthAid',label:'Необлагаемая часть помощи работодателя при рождении',amount:birthExclusion});
-    const relevantAmount=entry.type==='securities'||entry.type==='business'&&entry.businessBasis==='usnDocumented'
-      ?entry.amount-entry.expenses:entry.amount-birthExclusion;
+    const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:
+      entry.type==='business'?entry.amount-(entry.targetedBusinessSupportAmount||0)-(entry.businessBasis==='usnDocumented'?entry.expenses:0):
+      entry.amount-birthExclusion;
     const value=(definition.period==='annual'?relevantAmount/12:relevantAmount)*(entry.type==='foreignEarned'&&months.length?entry.rublesPerUnit:1);
     const person=byPerson.get(entry.personIndex)||{};
     for(const month of months) {
