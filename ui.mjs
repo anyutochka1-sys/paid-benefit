@@ -1,3 +1,4 @@
+import {resultCard,childLabel} from './result-card.mjs';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
@@ -540,9 +541,6 @@ function depositData() {
     nominalWardAccount:row.querySelector('.nominal').checked
   }));
 }
-function resultCard(date,window,label,detail,tone,open) {
-  return `<details class="result"${open?' open':''}><summary><span class="result-date">${date}<small>Доходы: ${window[0]} — ${window.at(-1)}</small></span><span class="${tone}">${label}</span></summary><div class="result-detail">${detail}</div></details>`;
-}
 function render() {
   const start=$('start').value; if (!start) return;
   $('mobilized-spouse').closest('label').hidden=$('marital-status').value!=='married';
@@ -596,7 +594,7 @@ function render() {
     const childEarnings=childIncomeForApplication(sourceEnabled.has('childIncome')?childIncomeEntries:[],children,members,month);
     const applicationSelection=applicationChildren(children,filingDate);
     const selected=applicationSelection.selected;
-    const applicationSelectionText=applicationSelection.requested.length?'Дети, отмеченные для заявления: '+applicationSelection.requested.map(check=>`Ребёнок ${children.findIndex(child=>child.id===check.child.id)+1}: ${check.status==='yes'?'возраст, семейное положение, гражданство и проживание позволяют подать; остальные критерии проверяем отдельно':check.status==='unknown'?'нужно уточнить — '+check.reason:'подать нельзя — '+check.reason}`).join('; ')+'.':'';
+    const applicationSelectionText=applicationSelection.requested.length?'Дети, отмеченные для заявления: '+applicationSelection.requested.map(check=>`${childLabel(check.child,children.findIndex(child=>child.id===check.child.id))}: ${check.status==='yes'?'возраст, семейное положение, гражданство и проживание позволяют подать; остальные критерии проверяем отдельно':check.status==='unknown'?'нужно уточнить — '+check.reason:'подать нельзя — '+check.reason}`).join('; ')+'.':'';
     const scenarios=$('application-mode').value==='separate'?selected.map(c=>[c]):[selected];
     const jointRenewal=$('application-mode').value==='together'&&selected.some(c=>c.awardRecipient==='self'&&c.awardEnd?.slice(0,7)===month);
     const benefitRows=sourceEnabled.has('childBenefit')?benefitRowsForWindow(month):{payments:[],missing:[]};
@@ -704,7 +702,7 @@ function render() {
       if(priorSupport.status==='unknown')scenarioComplete=false;
       const priorSupportText=`Сравнение с прежними выплатами: ${priorSupport.reason}${Number.isFinite(priorSupport.oldMonthly)?`; прежние ${priorSupport.oldMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}${Number.isFinite(priorSupport.newMonthly)?`; новые ${priorSupport.newMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}.`;
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
-      const label=$('application-mode').value==='separate'?`Заявление на ребёнка ${childNumber} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
+      const label=$('application-mode').value==='separate'?`Заявление: ${childLabel(group[0],childNumber-1)} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
       const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
       const newbornText=(newbornUnknowns.length?`Упрощённое назначение новорождённому требует уточнения: ${newbornUnknowns.map(x=>x.result.reason).join('; ')}. `:'')+(newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'');
       const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
