@@ -56,3 +56,13 @@ test('documented court receipts split between included and excluded children wit
   assert.equal(allocatedAlimonyIncome(received,{young:20000},['young','adult'],['young'],'2026-09').status,'unknown');
   assert.equal(allocatedAlimonyIncome(received,{young:20000,adult:5000},['young','adult'],['young'],'2026-09').status,'unknown');
 });
+test('separate informal and notarized obligations each use their own regional floor',()=>{
+  const common={maritalStatus:'divorced',divorceMonth:'2025-01',officialWage:90000,wageFinal:true,declaredMonthly:0};
+  const informal=alimonyForApplication({...common,arrangement:'informal',childrenForAlimony:1},'2026-09');
+  const notarized=alimonyForApplication({...common,arrangement:'notary',childrenForAlimony:1,declaredMonthly:12000},'2026-09');
+  const oneAgreementForTwo=alimonyForApplication({...common,arrangement:'notary',childrenForAlimony:2,declaredMonthly:12000},'2026-09');
+  assert.equal(informal.amount,270000);
+  assert.equal(notarized.amount,270000);
+  assert.equal(oneAgreementForTwo.amount,360000);
+  assert.equal(informal.amount+notarized.amount,540000);
+});
