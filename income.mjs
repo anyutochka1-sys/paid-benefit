@@ -1,8 +1,8 @@
 import {incomeWindow} from './engine.mjs';
 
-export function regularIncomeMonths(person,applicationMonth) {
+export function regularIncomeMonths(person,applicationMonth,{knownThrough,projectFuture=false}={}) {
   if(!Number.isFinite(person.regularAmount)||person.regularAmount<0||!person.regularFrom||!person.regularTo||person.regularFrom>person.regularTo)return {};
-  return Object.fromEntries(incomeWindow(applicationMonth).map(month=>[month,month>=person.regularFrom&&month<=person.regularTo?person.regularAmount:0]));
+  return Object.fromEntries(incomeWindow(applicationMonth).map(month=>[month,knownThrough&&month>knownThrough&&!projectFuture?undefined:month>=person.regularFrom&&month<=person.regularTo?person.regularAmount:0]));
 }
 
 // The shortcut total is tied to exactly one 12-month window. Reusing it for a
