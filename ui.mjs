@@ -60,10 +60,43 @@ const benefitsSection=document.createElement('section');
 benefitsSection.innerHTML='<div class="section-heading"><h3>Пособия на детей, которые уже получали</h3><button id="add-benefit" type="button">+ Указать выплату</button></div><p class="hint">Укажите вид, ребёнка и фактически полученную сумму по месяцам. Разовую доплату за прошлые периоды укажите одной строкой в месяце поступления. Прежнее единое пособие на ребёнка в новом заявлении исключается, на другого ребёнка обычно учитывается. Не добавляйте эти суммы также к зарплате или другим пособиям.</p><div id="benefits"></div>';
 $('income-people').after(benefitsSection);
 const alimonySection=document.createElement('section');
-alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><label id="spouse-status-field" hidden>Статус нынешнего супруга на дату заявления<select id="spouse-status"><option value="unknown">Уточните</option><option value="ordinary">Входит в состав семьи</option><option value="parentalRightsLost">Лишён / ограничен в правах на ребёнка из заявления</option><option value="stateCare">На полном государственном обеспечении</option><option value="conscript">Служба по призыву / военный курсант без контракта</option><option value="imprisoned">Отбывает лишение свободы</option><option value="forcedTreatment">На принудительном лечении по решению суда</option><option value="custody">Заключён под стражу</option><option value="missing">Признан безвестно отсутствующим / объявлен умершим</option><option value="wanted">Находится в розыске</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><p class="hint">Отметьте детей одного алиментного обязательства в их карточках. Если дети от разных вторых родителей, потребуется отдельный расчёт по каждому обязательству. Статус второго родителя укажите в карточке ребёнка. Лишение свободы и лишение родительских прав сами по себе не означают статус единственного родителя.</p><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
+alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><label id="spouse-status-field" hidden>Статус нынешнего супруга на дату заявления<select id="spouse-status"><option value="unknown">Уточните</option><option value="ordinary">Входит в состав семьи</option><option value="parentalRightsLost">Лишён / ограничен в правах на ребёнка из заявления</option><option value="stateCare">На полном государственном обеспечении</option><option value="conscript">Служба по призыву / военный курсант без контракта</option><option value="imprisoned">Отбывает лишение свободы</option><option value="forcedTreatment">На принудительном лечении по решению суда</option><option value="custody">Заключён под стражу</option><option value="missing">Признан безвестно отсутствующим / объявлен умершим</option><option value="wanted">Находится в розыске</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><p class="hint">Отметьте детей одного алиментного обязательства в их карточках. Если дети от разных вторых родителей, добавьте отдельную строку для каждого обязательства ниже. Статус второго родителя укажите в карточке ребёнка. Лишение свободы и лишение родительских прав сами по себе не означают статус единственного родителя.</p><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
 const alimonyAllocation=new Map();
+const extraAlimonyObligations=[];
+const extraObligationsPanel=document.createElement('div');
+extraObligationsPanel.innerHTML='<div class="section-heading"><h4>Другой плательщик алиментов</h4><button type="button" class="add-obligation">+ Добавить обязательство</button></div><p class="hint">В карточках детей снимите отметку первого обязательства с детей, которых укажете здесь, и укажите сумму первого платежа отдельно. Добавляйте строку для другого плательщика. При одном плательщике с несколькими документами общий расчёт требует проверки.</p><div class="obligation-rows"></div>';
+$('alimony-fields').append(extraObligationsPanel);
+function renderExtraAlimonyObligations() {
+  const list=extraObligationsPanel.querySelector('.obligation-rows');list.replaceChildren();
+  const children=childData();
+  extraAlimonyObligations.forEach((item,index)=>{
+    const row=document.createElement('div');row.className='form-row';
+    row.innerHTML='<strong>Обязательство '+(index+2)+'</strong><div class="obligation-children"><span>На каких детей это обязательство?</span></div><label>Основание<select class="kind"><option value="">Выберите</option><option value="court">Решение суда</option><option value="court-order">Судебный приказ</option><option value="bailiffs">Исполнительное производство</option><option value="notary">Нотариальное соглашение</option><option value="informal">Не оформлены</option></select></label><label class="actual-amount">Фактически поступало за месяц, ₽<input class="monthly" type="number" min="0" step="any"></label><label class="from-field">С какого месяца<input class="from" type="month"></label><label class="to-field">По какой месяц включительно<input class="to" type="month"></label><label class="notary-field">Ежемесячная сумма по соглашению, ₽<input class="notary" type="number" min="0" step="any"></label><label class="check">Это другой плательщик, не указанный выше или в других строках<input class="distinct-payer" type="checkbox"></label><button class="remove" type="button">Убрать</button>';
+    const choices=row.querySelector('.obligation-children');
+    children.forEach((child,i)=>{
+      const label=document.createElement('label');label.className='check';
+      const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=item.childIds.includes(child.id);
+      checkbox.addEventListener('input',()=>{item.childIds=checkbox.checked?[...item.childIds,child.id]:item.childIds.filter(id=>id!==child.id);render()});
+      label.append(checkbox,document.createTextNode(' '+(child.name||`Ребёнок ${i+1}`)));choices.append(label);
+    });
+    for(const [key,selector] of [['arrangement','.kind'],['monthly','.monthly'],['from','.from'],['to','.to'],['notaryMonthly','.notary']]) {
+      const input=row.querySelector(selector);input.value=item[key]??'';
+      input.addEventListener('input',()=>{item[key]=input.value;toggle();render()});
+    }
+    row.querySelector('.distinct-payer').checked=item.distinctPayer===true;
+    row.querySelector('.distinct-payer').addEventListener('input',e=>{item.distinctPayer=e.target.checked;render()});
+    const toggle=()=>{row.querySelector('.notary-field').hidden=item.arrangement!=='notary'||$('marital-status').value!=='divorced'};
+    row.querySelector('.remove').onclick=()=>{extraAlimonyObligations.splice(index,1);renderExtraAlimonyObligations();render()};
+    list.append(row);toggle();
+  });
+}
+extraObligationsPanel.querySelector('.add-obligation').onclick=()=>{
+  sourceEnabled.add('alimony');sourceSection.querySelector('input[value="alimony"]').checked=true;
+  extraAlimonyObligations.push({childIds:[],arrangement:'',monthly:'',from:'',to:'',notaryMonthly:'',distinctPayer:false});
+  renderExtraAlimonyObligations();render();
+};
 const alimonySplit=document.createElement('details');
-alimonySplit.innerHTML='<summary>Алименты приходили на детей с разным статусом?</summary><p class="hint">Если одни дети входят в состав семьи, а другие нет, укажите сумму на каждого за месяц. Общая сумма должна совпасть с указанной выше. Для судебного акта и иных случаев без расчётного минимума учтём только суммы на детей из состава семьи. При нотариальном соглашении или неоформленных алиментах после развода нужен отдельный расчёт по обязательствам.</p><div class="alimony-split-rows"></div>';
+alimonySplit.innerHTML='<summary>Алименты приходили на детей с разным статусом?</summary><p class="hint">Если одни дети входят в состав семьи, а другие нет, укажите сумму на каждого за месяц. Общая сумма должна совпасть с указанной выше. Для судебного акта и иных случаев без расчётного минимума учтём только суммы на детей из состава семьи. При нотариальном соглашении или неоформленных алиментах после развода укажите отдельные обязательства ниже; если одно обязательство охватывает включённых и исключённых детей, вывод остаётся открытым.</p><div class="alimony-split-rows"></div>';
 $('alimony-actual-fields').append(alimonySplit);
 function renderAlimonyAllocationRows() {
   const list=alimonySplit.querySelector('.alimony-split-rows');list.replaceChildren();
@@ -146,6 +179,9 @@ function renderExtraRows() {
     const row=document.createElement('div');row.className='form-row';
     if(!sourceEnabled.has(entry.type))return;
     row.innerHTML=`<label>Кто получил<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><strong>${ADDITIONAL_TYPES[entry.type].label}</strong><label class="benefit-kind-field">Какое именно пособие?<select class="benefit-kind"><option value="">Выберите вид</option></select></label><label>${entry.type==='securities'?'Доход до расходов':entry.type==='foreignEarned'?'Сумма за месяц в валюте':'Сумма, ₽'}<input class="amount" type="number" min="0" step="any"></label><label class="expenses-field">Расходы по операциям, ₽<input class="expenses" type="number" min="0"></label><label class="tax-field">Налоговый год<input class="tax-year" type="number" min="2024" max="2030"></label><label class="from-field">С какого месяца<input class="from" type="month"></label><label class="to-field">По какой месяц включительно<input class="to" type="month"></label><label class="birth-aid-field">Выплачено в течение первого года после рождения / усыновления / установления опеки?<select class="first-year"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label class="tax-free-field">Какая часть не облагалась НДФЛ, ₽<input class="tax-free" type="number" min="0"></label><div class="foreign-field"><label>Буквенный код валюты (например, USD)<input class="currency" maxlength="3" placeholder="USD"></label><label>Дата курса ЦБ<input class="rate-date" type="date"></label><label>Курс ЦБ: рублей за 1 единицу валюты<input class="rate" type="number" min="0" step="any"></label><p class="hint foreign-rate-hint"></p></div><button class="remove" type="button">Убрать</button>`;
+    const proof=document.createElement('div');proof.className='exclusion-proof';
+    proof.innerHTML='<label class="insurance-proof">Это единовременное страховое возмещение за вред жизни, здоровью или личному/общему имуществу?<select class="insurance-confirm"><option value="">Уточните по документу</option><option value="yes">Да</option><option value="no">Нет / не знаю</option></select></label><label class="mse-proof">Есть решение МСЭ, что ежемесячная сумма покрывает дополнительные расходы на медицинскую, социальную или профессиональную реабилитацию?<select class="mse-confirm"><option value="">Уточните</option><option value="yes">Да</option><option value="no">Нет / не знаю</option></select></label><label class="asset-purpose-field">На что направлена целевая господдержка?<select class="asset-purpose"><option value="">Уточните</option><option value="realEstate">Объект недвижимости</option><option value="vehicle">Авто или мототранспорт</option><option value="equipment">Самоходная машина или другая техника</option></select></label><label class="asset-spent-field">Вся указанная сумма израсходована на эту покупку?<select class="asset-spent"><option value="">Уточните по документу</option><option value="yes">Да</option><option value="no">Нет / не знаю</option></select></label><p class="hint">Если назначение или расходование не подтверждены, результат останется открытым. Не переносите сумму в «иное учитываемое пособие» до выяснения вида выплаты.</p>';
+    row.querySelector('.remove').before(proof);
     Object.entries(OTHER_BENEFIT_KINDS).forEach(([key,kind])=>row.querySelector('.benefit-kind').add(new Option(kind.label,key)));
     row.querySelector('.person').value=String(entry.personIndex);
     row.querySelector('.amount').value=entry.amount??'';
@@ -156,6 +192,10 @@ function renderExtraRows() {
     row.querySelector('.benefit-kind').value=entry.benefitKind||'';
     row.querySelector('.first-year').value=entry.birthAidFirstYear===undefined?'':entry.birthAidFirstYear?'yes':'no';
     row.querySelector('.tax-free').value=entry.taxExemptAmount??'';
+    row.querySelector('.insurance-confirm').value=entry.verifiedInsuranceDamage===undefined?'':entry.verifiedInsuranceDamage?'yes':'no';
+    row.querySelector('.mse-confirm').value=entry.mseAdditionalExpenses===undefined?'':entry.mseAdditionalExpenses?'yes':'no';
+    row.querySelector('.asset-purpose').value=entry.assetPurpose||'';
+    row.querySelector('.asset-spent').value=entry.spentOnPurpose===undefined?'':entry.spentOnPurpose?'yes':'no';
     row.querySelector('.currency').value=entry.currency||'';
     row.querySelector('.rate-date').value=entry.rateDate||'';
     row.querySelector('.rate').value=entry.rublesPerUnit??'';
@@ -164,7 +204,10 @@ function renderExtraRows() {
       const link=document.createElement('a');link.href=`https://www.cbr.ru/currency_base/daily/?UniDbQuery.Posted=True&UniDbQuery.To=${quoted}`;link.target='_blank';link.rel='noopener';link.textContent=`Посмотреть курс ЦБ на ${quoted}`;
       row.querySelector('.foreign-rate-hint').replaceChildren(link,document.createTextNode('. Если ЦБ указывает курс за 10 или 100 единиц, разделите его на это число. Для другого месяца подачи дата курса изменится.'));
     }
-    const toggle=()=>{const annual=ADDITIONAL_TYPES[entry.type].period==='annual',birthAid=entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid';row.querySelector('.tax-field').hidden=!annual;row.querySelector('.from-field').hidden=annual;row.querySelector('.to-field').hidden=annual;row.querySelector('.expenses-field').hidden=entry.type!=='securities';row.querySelector('.benefit-kind-field').hidden=entry.type!=='otherBenefit';row.querySelector('.birth-aid-field').hidden=!birthAid;row.querySelector('.tax-free-field').hidden=!birthAid||entry.birthAidFirstYear!==true;row.querySelector('.foreign-field').hidden=entry.type!=='foreignEarned'};
+    const toggle=()=>{const annual=ADDITIONAL_TYPES[entry.type].period==='annual',birthAid=entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid',kind=entry.type==='otherBenefit'?entry.benefitKind:'';row.querySelector('.tax-field').hidden=!annual;row.querySelector('.from-field').hidden=annual;row.querySelector('.to-field').hidden=annual;row.querySelector('.expenses-field').hidden=entry.type!=='securities';row.querySelector('.benefit-kind-field').hidden=entry.type!=='otherBenefit';row.querySelector('.birth-aid-field').hidden=!birthAid;row.querySelector('.tax-free-field').hidden=!birthAid||entry.birthAidFirstYear!==true;row.querySelector('.foreign-field').hidden=entry.type!=='foreignEarned';proof.hidden=!['insuranceDamage','mseRehabilitation','targetedAssetSupport'].includes(kind);row.querySelector('.insurance-proof').hidden=kind!=='insuranceDamage';row.querySelector('.mse-proof').hidden=kind!=='mseRehabilitation';row.querySelector('.asset-purpose-field').hidden=kind!=='targetedAssetSupport';row.querySelector('.asset-spent-field').hidden=kind!=='targetedAssetSupport'};
+    for(const [selector,key] of [['.insurance-confirm','verifiedInsuranceDamage'],['.mse-confirm','mseAdditionalExpenses'],['.asset-spent','spentOnPurpose']])
+      row.querySelector(selector).oninput=e=>{entry[key]=e.target.value===''?undefined:e.target.value==='yes';render()};
+    row.querySelector('.asset-purpose').oninput=e=>{entry.assetPurpose=e.target.value;render()};
     row.querySelector('.first-year').oninput=e=>{entry.birthAidFirstYear=e.target.value===''?undefined:e.target.value==='yes';toggle();render()};
     for(const [selector,key] of [['.person','personIndex'],['.benefit-kind','benefitKind'],['.tax-free','taxExemptAmount'],['.currency','currency'],['.rate-date','rateDate'],['.rate','rublesPerUnit'],['.amount','amount'],['.expenses','expenses'],['.tax-year','taxYear'],['.from','from'],['.to','to']])
       row.querySelector(selector).oninput=e=>{entry[key]=['personIndex','amount','expenses','taxYear','taxExemptAmount','rublesPerUnit'].includes(key)?e.target.value===''?null:Number(e.target.value):key==='currency'?e.target.value.toUpperCase():e.target.value;toggle();render()};
@@ -293,9 +336,9 @@ function addChild() {
   row.querySelector('.child-role').addEventListener('input',updateRightsField);
   row.querySelector('.applying').addEventListener('input',updateRightsField);
   updateRightsField();
-  row.querySelector('.remove').onclick=()=>{row.remove();renderBenefitRows();renderChildIncomeRows();renderAlimonyAllocationRows();render()};
-  row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{renderBenefitRows();renderChildIncomeRows();renderAlimonyAllocationRows();refreshMaritalForm()}));
-  $('children').append(row); renderBenefitRows(); renderChildIncomeRows();renderAlimonyAllocationRows(); render();
+  row.querySelector('.remove').onclick=()=>{row.remove();renderBenefitRows();renderChildIncomeRows();renderAlimonyAllocationRows();renderExtraAlimonyObligations();render()};
+  row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{renderBenefitRows();renderChildIncomeRows();renderAlimonyAllocationRows();renderExtraAlimonyObligations();refreshMaritalForm()}));
+  $('children').append(row); renderBenefitRows(); renderChildIncomeRows();renderAlimonyAllocationRows();renderExtraAlimonyObligations(); render();
 }
 function renderBenefitRows() {
   const childOptions=[...document.querySelectorAll('#children .form-row')].map((row,i)=>({id:row.dataset.childId,label:row.querySelector('.child-name').value||`Ребёнок ${i+1}`}));
@@ -512,6 +555,44 @@ function render() {
     }
     if(receiving && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните фактически поступившие алименты и период'}
     if(alimonyChildren.length && maritalStatus==='divorced' && !['court','court-order','bailiffs'].includes($('alimony-kind').value) && !['sole','other'].includes(secondParent)) {alimony.status='unknown';alimony.reason=secondParent==='mixed'?'У детей разные вторые родители: укажите отдельные алиментные обязательства; общий расчёт сейчас недоступен':'Уточните статус второго родителя у детей, указанных в алиментном обязательстве'}
+    if(sourceEnabled.has('alimony')&&extraAlimonyObligations.length) {
+      const used=new Set(children.filter(c=>c.alimonyApplies).map(c=>c.id));
+      const amounts=[];let issue='';
+      for(const [index,item] of extraAlimonyObligations.entries()) {
+        const group=item.childIds.map(id=>children.find(c=>c.id===id));
+        if(!item.distinctPayer || !item.childIds.length || group.some(c=>!c) || group.some(c=>used.has(c.id)) || new Set(item.childIds).size!==item.childIds.length) {
+          issue=`Обязательство ${index+2}: подтвердите отдельного плательщика и укажите детей без повторов`;break;
+        }
+        group.forEach(c=>used.add(c.id));
+        const eligible=group.filter(c=>members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18);
+        const uncertain=group.some(c=>!c.birthDate || members.unanswered.some(p=>p.person.id===c.id)
+          || c.birthDate&&ageAt(c.birthDate,filingDate)>=18&&ageAt(c.birthDate,filingDate)<23&&members.included.some(p=>p.id===c.id));
+        if(uncertain || eligible.length && eligible.length!==group.length) {
+          issue=`Обязательство ${index+2}: уточните детей вне состава семьи и региональное правило до 23 лет`;break;
+        }
+        if(!eligible.length) {amounts.push(0);continue}
+        const monthly=item.monthly===''&&item.arrangement==='notary'?0:item.monthly===''?NaN:Number(item.monthly);
+        const notary=item.notaryMonthly===''?NaN:Number(item.notaryMonthly);
+        if(!item.arrangement || !Number.isFinite(monthly) || monthly<0 || item.from!==''&&item.to==='' || item.to!==''&&item.from==='' || item.from&&item.to&&item.from>item.to
+          || monthly>0&&(!item.from||!item.to) || item.arrangement==='notary'&&maritalStatus==='divorced'&&(!Number.isFinite(notary)||notary<0)) {
+          issue=`Обязательство ${index+2}: уточните основание, сумму и месяцы поступления`;break;
+        }
+        const groupSecondParent=soleParentStatus(eligible.map(c=>c.role==='ward'?{...c,secondParentStatus:'blank'}:c));
+        if(maritalStatus==='divorced'&&!['court','court-order','bailiffs'].includes(item.arrangement)&&!['sole','other'].includes(groupSecondParent)) {
+          issue=`Обязательство ${index+2}: уточните второго родителя детей этого обязательства`;break;
+        }
+        const byMonth=Object.fromEntries(incomeWindow(month).map(m=>[m,item.from&&item.to&&m>=item.from&&m<=item.to?monthly:0]));
+        const result=alimonyForApplication({maritalStatus,singleParent:maritalStatus==='divorced'&&groupSecondParent==='sole',arrangement:item.arrangement,
+          divorceMonth:$('divorce-month').value,childrenForAlimony:eligible.length,
+          declaredMonthly:item.arrangement==='notary'&&maritalStatus==='divorced'?notary:monthly,
+          declaredByMonth:item.arrangement==='informal'&&item.from&&item.to?byMonth:undefined,
+          receivedByMonth:byMonth,wageRecords:[year-2,year-1].map(wageRecordFor).filter(Boolean)},month);
+        if(result.status!=='known') {issue=`Обязательство ${index+2}: ${result.reason}`;break}
+        amounts.push(result.amount);
+      }
+      if(issue) {alimony.status='unknown';alimony.reason=issue}
+      else if(alimony.status==='known') {alimony.amount+=amounts.reduce((sum,value)=>sum+value,0);alimony.method='multiple-obligations'}
+    }
     let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
     const scenarioTiers=[];
     const incomeText=selected.length?scenarios.map((group,scenarioIndex)=>{
