@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ageAt,includedFamily,childCanApply,applicantParentalRights,checkCars,fourChildCarStatus} from './family-assets.mjs';
+import {ageAt,includedFamily,childCanApply,applicantParentalRights,checkCars,fourChildCarStatus,applicationChildren} from './family-assets.mjs';
 
 test('parental-rights refusal concerns this applicant and this child, not the other parent',()=>{
   const child={role:'child',applying:true,secondParentStatus:'deprived-rights'};
@@ -70,4 +70,33 @@ test('powerful car counts included minors only and reviews a possible fourth adu
   const withStudentChildren=[...children.slice(0,3),adult];
   const withStudent=includedFamily(withStudentChildren,applicationDate);
   assert.equal(checkCars(powerful,{...assets,...fourChildCarStatus(withStudentChildren,withStudent,applicationDate)}).status,'unknown');
+});
+
+test('requested children with missing facts remain in review beside a confirmed sibling',()=>{
+  const good={id:'a',role:'child',applying:true,birthDate:'2020-01-01',married:false,russianCitizen:true,livesInRussia:true};
+  const incomplete={...good,id:'b',russianCitizen:undefined};
+  const result=applicationChildren([good,incomplete,{...incomplete,id:'c',applying:false}],'2026-09-01');
+  assert.equal(result.requested.length,2);
+  assert.deepEqual(result.selected.map(child=>child.id),['a']);
+  assert.equal(result.review,true);
+  assert.equal(result.blocked,false);
+  assert.equal(applicationChildren([good,{...incomplete,russianCitizen:true}],'2026-09-01').review,false);
+});
+test('a selected child becomes unavailable on the exact seventeenth birthday',()=>{
+  const child={id:'a',applying:true,birthDate:'2009-09-10',married:false,russianCitizen:true,livesInRussia:true};
+  assert.equal(applicationChildren([child],'2026-09-09').selected.length,1);
+  assert.equal(applicationChildren([child],'2026-09-10').blocked,true);
+  assert.equal(applicationChildren([{...child,applying:false}],'2026-09-10').blocked,false);
+});
+test('future birth is excluded from family size and application until the birth date',()=>{
+  const child={id:'a',role:'child',birthDate:'2026-10-01',married:false,russianCitizen:true,livesInRussia:true};
+  assert.equal(includedFamily([child],'2026-09-30').included.length,0);
+  assert.equal(childCanApply(child,'2026-09-30').status,'no');
+  assert.equal(includedFamily([child],'2026-10-01').included.length,1);
+  assert.equal(childCanApply(child,'2026-10-01').status,'yes');
+});
+test('missing marital status cannot silently confirm a child application',()=>{
+  const child={birthDate:'2020-01-01',russianCitizen:true,livesInRussia:true};
+  assert.equal(childCanApply(child,'2026-09-01').status,'unknown');
+  assert.equal(childCanApply({...child,married:false},'2026-09-01').status,'yes');
 });

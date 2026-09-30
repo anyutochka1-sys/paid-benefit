@@ -3,7 +3,7 @@ import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-7';
-import { includedFamily, childCanApply, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20260930-10';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 import {CHILD_BENEFIT_KINDS,childBenefitIncome} from './benefits.mjs';
@@ -593,7 +593,9 @@ function render() {
     const incomeResult=incomeForMonth(countedAdults.map(({person,index})=>({...person,months:baseMonths(person,index),total:mobilizedIndices.includes(index)?0:sourceEnabled.has('employment')?person.total:0,mode:mobilizedIndices.includes(index)?'monthly':sourceEnabled.has('employment')&&$('income-mode').value==='total'?'total':'monthly',baseApplicationMonth:start})),month);
     const supplemental=additionalIncomeForApplication(withOfficialRates(additionalEntries.filter(e=>sourceEnabled.has(e.type)),month,cbrRateTable),month,[...new Set([...mobilizedIndices,...(spouseExcluded?[1]:[])])]);
     const childEarnings=childIncomeForApplication(sourceEnabled.has('childIncome')?childIncomeEntries:[],children,members,month);
-    const selected=children.filter((c,j)=>c.applying && applicable[j].status==='yes');
+    const applicationSelection=applicationChildren(children,filingDate);
+    const selected=applicationSelection.selected;
+    const applicationSelectionText=applicationSelection.requested.length?'Дети, отмеченные для заявления: '+applicationSelection.requested.map(check=>`Ребёнок ${children.findIndex(child=>child.id===check.child.id)+1}: ${check.status==='yes'?'возраст, семейное положение, гражданство и проживание позволяют подать; остальные критерии проверяем отдельно':check.status==='unknown'?'нужно уточнить — '+check.reason:'подать нельзя — '+check.reason}`).join('; ')+'.':'';
     const scenarios=$('application-mode').value==='separate'?selected.map(c=>[c]):[selected];
     const jointRenewal=$('application-mode').value==='together'&&selected.some(c=>c.awardRecipient==='self'&&c.awardEnd?.slice(0,7)===month);
     const benefitRows=sourceEnabled.has('childBenefit')?benefitRowsForWindow(month):{payments:[],missing:[]};
@@ -671,7 +673,7 @@ function render() {
       if(issue) {alimony.status='unknown';alimony.reason=issue}
       else if(alimony.status==='known') {alimony.amount+=amounts.reduce((sum,value)=>sum+value,0);alimony.method='multiple-obligations'}
     }
-    let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true,newbornReview=false;
+    let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0&&!applicationSelection.review&&!applicationSelection.blocked,shortcutOnly=true,newbornReview=false;
     const scenarioTiers=[],priorSupportChecks=[];
     const incomeText=selected.length?scenarios.map((group,scenarioIndex)=>{
       const awardChecks=group.map(child=>awardConflict(child,month,{jointRenewal}));
@@ -726,7 +728,7 @@ function render() {
     }
     if(!RULES[year]) {
       overview.needs++;
-      output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',`${familyText} ${assetText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.`,'unknown',i===0));
+      output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',`${applicationSelectionText} ${familyText} ${assetText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.`,'unknown',i===0));
       continue;
     }
     // Future pregnancy conditions require an explicit continuation forecast.
@@ -755,15 +757,15 @@ function render() {
     const addressBasis=$('residence-basis').value;
     const addressReview=!addressBasis||addressBasis!=='permanent'&&$('address-proof').value!=='yes';
     const priorMeasureReview=priorSupportChecks.length?priorSupportChecks.some(check=>check.status==='unknown'):$('prior-measure').value!=='no';
-    const contextReview=pregnancyState.status==='forecast'||capacity.status==='unknown'||addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
+    const contextReview=applicationSelection.review||pregnancyState.status==='forecast'||capacity.status==='unknown'||addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'сравнение для выбранных заявлений выполнено ниже'}. ${mobilizedIndices.length?'Зарплата, дополнительные поступления, БиР и проценты по счетам отмеченных мобилизованных взрослых исключены; получателей детских выплат и алиментов, статус по Указу № 647 и правило минимального дохода нужно проверить по документам.':''}`;
-    const explicitBlockers=capacity.status==='block'||applicantCheck==='no'||rightsBlocked||needsMeansAssessment&&([carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed))||scenarioBlocks;
-    const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&!newbornReview&&selected.length&&capacity.status!=='unknown'&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
+    const explicitBlockers=applicationSelection.blocked||capacity.status==='block'||applicantCheck==='no'||rightsBlocked||needsMeansAssessment&&([carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed))||scenarioBlocks;
+    const headline=explicitBlockers?'Есть препятствие по введённым данным':!applicationSelection.review&&shortcutOnly&&!newbornReview&&selected.length&&capacity.status!=='unknown'&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
     const clear=!explicitBlockers&&headline.startsWith('По проверенным критериям');
     overview[explicitBlockers?'blocked':clear?'clear':'needs']++;
     const comparableTier=clear&&scenarios.length===1&&scenarioTiers.length===1?scenarioTiers[0]:null;
     if(comparableTier!==null)candidates.push({date:filingDate,tier:comparableTier});
-    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${rightsText} ${capacityText} ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}${!newbornOnly&&adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
+    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${applicationSelectionText} ${rightsText} ${capacityText} ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}${!newbornOnly&&adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
   }
   const best=candidates.reduce((current,item)=>!current||item.tier>current.tier?item:current,null);
   const bestText=best?` Среди месяцев с сопоставимыми данными наибольшая предварительная ступень — <strong>${best.tier}%</strong> при подаче <strong>${best.date}</strong>. Если ступень одинакова, показан первый месяц.`:'';

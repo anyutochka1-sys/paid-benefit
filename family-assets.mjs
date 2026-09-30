@@ -24,6 +24,7 @@ export function includedFamily(people, applicationDate) {
       continue;
     }
     if (!['child', 'ward'].includes(person.role)) { unanswered.push({person, reason:'Неизвестная роль в семье'}); continue; }
+    if(person.birthDate&&person.birthDate>applicationDate){excluded.push({person,reason:'Дата рождения позже даты заявления'});continue}
     if (person.deathDate && person.deathDate<=applicationDate) { excluded.push({person,reason:'Ребёнок умер до даты заявления'}); continue; }
     if(person.familyStatus==='stateCare'&&person.role!=='ward') {excluded.push({person,reason:'Ребёнок на полном государственном обеспечении'});continue}
     if(['conscript','imprisoned','forcedTreatment','custody','missing','wanted'].includes(person.familyStatus)) {excluded.push({person,reason:'Ребёнок исключён по пункту 46'});continue}
@@ -41,6 +42,7 @@ export function includedFamily(people, applicationDate) {
 }
 
 export function childCanApply(person, applicationDate) {
+  if(person.birthDate&&person.birthDate>applicationDate)return {status:'no',reason:'Дата рождения позже даты обращения: на ещё не родившегося ребёнка подать нельзя'};
   if(person.deathDate && person.deathDate<=applicationDate)return {status:'no',reason:'Ребёнок умер до даты обращения'};
   if(person.married===true)return {status:'no',reason:'Ребёнок состоит в браке и не входит в состав семьи'};
   if(person.familyStatus==='stateCare'&&person.role!=='ward'||['conscript','imprisoned','forcedTreatment','custody','missing','wanted'].includes(person.familyStatus))
@@ -49,6 +51,7 @@ export function childCanApply(person, applicationDate) {
     return {status:'unknown', reason:'Нужны дата рождения, гражданство и проживание ребёнка'};
   if (ageAt(person.birthDate, applicationDate) >= 17) return {status:'no', reason:'На дату обращения ребёнку исполнилось 17 лет'};
   if (!person.russianCitizen || !person.livesInRussia) return {status:'no', reason:'Требуются гражданство РФ и постоянное проживание в РФ'};
+  if(person.married===undefined)return {status:'unknown',reason:'Уточните семейное положение ребёнка'};
   return {status:'yes'};
 }
 
@@ -93,4 +96,10 @@ export function checkCars(cars, context) {
     }
   }
   return {status:reasons.length?'no':review.length?'unknown':'yes', reasons,review, countedCars:counted.length};
+}
+
+// Retain every requested child, including those with missing or blocking facts.
+export function applicationChildren(children,applicationDate) {
+  const requested=children.filter(child=>child.applying).map(child=>({child,...childCanApply(child,applicationDate)}));
+  return {requested,selected:requested.filter(check=>check.status==='yes').map(check=>check.child),review:requested.some(check=>check.status==='unknown'),blocked:requested.some(check=>check.status==='no')};
 }
