@@ -72,6 +72,9 @@ test('an unspecified other benefit cannot silently enter or leave household inco
   const result=additionalIncomeForApplication([entry],'2026-09');
   assert.equal(result.status,'unknown');
   assert.equal(result.amount,null);
+  const unsure=additionalIncomeForApplication([{...entry,benefitKind:'uncertain'}],'2026-09');
+  assert.equal(unsure.status,'unknown');
+  assert.match(unsure.issues[0],/Вид выплаты/);
 });
 
 test('employer birth aid excludes only the verified tax-free part paid in the first year',()=>{
