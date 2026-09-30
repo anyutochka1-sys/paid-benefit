@@ -29,3 +29,13 @@ test('month of eighteenth birthday needs an exact payment date',()=>{
   const r=childIncomeForApplication([{childId:'c',type:'employment',from:'2026-02',to:'2026-02',amount:10000}],[adult],{included:[adult],unanswered:[]},'2026-09');
   assert.equal(r.status,'unknown');
 });
+test('birthday-month wages use the exact receipt date and minor education rule',()=>{
+  const adult={...child,birthDate:'2008-02-12'};
+  const base={childId:'c',type:'employment',from:'2026-02',to:'2026-02',amount:10000};
+  const before=childIncomeForApplication([{...base,receiptDate:'2026-02-11'}],[adult],{included:[adult],unanswered:[]},'2026-09');
+  assert.equal(before.status,'known');
+  assert.equal(before.amount,0);
+  const after=childIncomeForApplication([{...base,receiptDate:'2026-02-12'}],[adult],{included:[adult],unanswered:[]},'2026-09');
+  assert.equal(after.amount,10000);
+  assert.equal(childIncomeForApplication([{...base,receiptDate:'2026-03-01'}],[adult],{included:[adult],unanswered:[]},'2026-09').status,'unknown');
+});
