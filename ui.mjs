@@ -17,6 +17,9 @@ import {confirmedRegionalWage} from './rosstat-wages.mjs';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
+const today=new Date();
+const currentMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+$('start').value=currentMonth;
 function updatePmSelection() {
   const year=Number($('start').value.slice(0,4));
   const region=$('pm-region'),area=$('pm-area');
@@ -69,7 +72,7 @@ function wageRecordFor(year) {
   return automatic.status==='known'?automatic:null;
 }
 function renderAlimonyWageYears() {
-  const year=Number(($('start').value||'2026-09').slice(0,4));
+  const year=Number(($('start').value||currentMonth).slice(0,4));
   wageFields.innerHTML='<p class="hint">Окончательные годовые данные Росстата подставляются после еженедельной сверки и подтверждения даты публикации. До этого их можно указать вручную; предварительные данные не подставляются. Для будущего года окно останется открытым до публикации. <a href="https://rosstat.gov.ru/labor_market_employment_salaries" target="_blank" rel="noopener">Раздел зарплат Росстата</a>.</p>';
   for(const y of [year-2,year-1,year]) {
     const record=wageRecordFor(y)||{},row=document.createElement('div');row.className='form-row';row.dataset.year=String(y);
@@ -216,7 +219,7 @@ function refreshMaritalForm() {
 }
 alimonySection.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',refreshMaritalForm));
 function incomeMonths() {
-  const start=monthIndex($('start').value||'2026-09');
+  const start=monthIndex($('start').value||currentMonth);
   return Array.from({length:23},(_,i)=>monthString(start-13+i));
 }
 function renderIncomeForm() {
@@ -229,11 +232,13 @@ function renderIncomeForm() {
     const typeHint=document.createElement('p');typeHint.className='hint';typeHint.textContent='Зарплата и вознаграждение по договору ГПХ, начислено до НДФЛ';section.append(typeHint);
     if(mode==='period') {
       const wrapper=document.createElement('div');wrapper.className='form-row';
-      wrapper.innerHTML='<label>Одинаковая сумма за месяц, ₽<input class="regular-amount" type="number" min="0"></label><label>С месяца<input class="regular-from" type="month"></label><label>По месяц включительно<input class="regular-to" type="month"></label>';
+      wrapper.innerHTML='<label>Одинаковая сумма за месяц, ₽<input class="regular-amount" type="number" min="0"></label><label>С месяца<input class="regular-from" type="month"></label><label>По месяц включительно<input class="regular-to" type="month"></label><label class="check"><input class="project-future" type="checkbox"> Предполагаю такую же зарплату в будущие месяцы указанного периода</label>';
       for(const [selector,key] of [['.regular-amount','regularAmount'],['.regular-from','regularFrom'],['.regular-to','regularTo']]) {
         const input=wrapper.querySelector(selector);input.value=person[key]??'';
         input.oninput=()=>{person[key]=key==='regularAmount'?(input.value===''?null:Number(input.value)):input.value;render()};
       }
+      wrapper.querySelector('.project-future').checked=person.projectFuture===true;
+      wrapper.querySelector('.project-future').oninput=e=>{person.projectFuture=e.target.checked;render()};
       section.append(wrapper);
     } else if(mode==='total') {
       const label=document.createElement('label'); label.textContent='Начисленные доходы за первый расчётный период, ₽';
@@ -431,7 +436,7 @@ function render() {
     const allDepositsKnown=countedDeposits.filter(d=>!d.nominalWardAccount).every(d=>d.taxYear===year-1 && Number.isFinite(d.interestForRelevantTaxYear));
     const depositCheck=allDepositsKnown&&pmPerson!==null?checkDepositInterest(countedDeposits,{applicationMonth:month,perCapitaMinimum:pmPerson}):{status:'unknown'};
     const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые члены семьи)':''}${spouseRuleExcluded?' (супруг исключён по п. 46)':''}. ${assetOwnerReview?'Для одного или нескольких объектов нужно уточнить владельца или его включение в состав семьи. ':''}Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}. Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по указанным объектам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):propertyCheck.review?.join('; ')||'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по указанным объектам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):otherCheck.review?.join('; ')||'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
-    const baseMonths=person=>!sourceEnabled.has('employment')?Object.fromEntries(incomeWindow(month).map(m=>[m,0])):$('income-mode').value==='period'?regularIncomeMonths(person,month):person.months;
+    const baseMonths=person=>!sourceEnabled.has('employment')?Object.fromEntries(incomeWindow(month).map(m=>[m,0])):$('income-mode').value==='period'?regularIncomeMonths(person,month,{knownThrough:currentMonth,projectFuture:person.projectFuture===true}):person.months;
     const incomeResult=incomeForMonth(countedAdults.map(({person})=>({...person,months:baseMonths(person),total:sourceEnabled.has('employment')?person.total:0,mode:sourceEnabled.has('employment')&&$('income-mode').value==='total'?'total':'monthly',baseApplicationMonth:start})),month);
     const supplemental=additionalIncomeForApplication(additionalEntries.filter(e=>sourceEnabled.has(e.type)),month,spouseExcluded||$('marital-status').value!=='married'?[1]:[]);
     const childEarnings=childIncomeForApplication(sourceEnabled.has('childIncome')?childIncomeEntries:[],children,members,month);
