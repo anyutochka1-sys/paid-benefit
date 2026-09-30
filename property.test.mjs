@@ -1,7 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
+import {checkProperty as rawCheckProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 const context={familySize:4,rural:false,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false};
+const checkProperty=(items,ctx)=>rawCheckProperty(items.map(item=>({...item,familyShare:item.familyShare??1})),ctx);
+test('unknown ownership share never becomes a definite apartment refusal',()=>{
+  const result=rawCheckProperty([{type:'apartment',area:90,familyShare:1},{type:'apartment',area:90}],context);
+  assert.equal(result.status,'review');
+  assert.equal(rawCheckProperty([{type:'apartment',area:90,familyShare:1},{type:'apartment',area:90,familyShare:1/3}],context).status,'yes');
+});
 test('one apartment unlimited, two exceed 24 square metres per person only above threshold',()=>{
   assert.equal(checkProperty([{type:'apartment',area:200}],context).status,'yes');
   assert.equal(checkProperty([{type:'apartment',area:48},{type:'apartment',area:48}],context).status,'yes');
