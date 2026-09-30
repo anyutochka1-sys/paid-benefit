@@ -1,3 +1,4 @@
+import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, monthIndex, monthString, RULES } from './engine.mjs';
@@ -533,6 +534,8 @@ function render() {
     const spouseExcluded=$('marital-status').value!=='married'||spouseRuleExcluded;
     const countedAdults=incomePeople.map((person,index)=>({person,index})).filter(x=>x.index===0||!spouseExcluded);
     const applicable=children.map(child=>childCanApply(child,filingDate));
+    const capacity=applicantCapacity({status:$('applicant-capacity').value,decisionDate:$('capacity-decision').value,restoredDate:$('capacity-restored').value,children,pregnancyApplying:$('pregnancy-applying').checked},filingDate);
+    const capacityText=`Дееспособность заявителя: ${capacity.reason}. ${capacity.children.map(check=>`Ребёнок ${children.findIndex(child=>child.id===check.childId)+1}: ${check.reason}.`).join(' ')}`;
     const rightsChecks=children.map(applicantParentalRights);
     const rightsBlocked=rightsChecks.some(check=>check.status==='block');
     const rightsUnknown=rightsChecks.some(check=>check.status==='unknown');
@@ -659,7 +662,9 @@ function render() {
     }).join(' '):$('pregnancy-applying').checked?'Заявление на ребёнка не выбрано.':'Отметьте ребёнка или заявление по беременности.';
     let pregnancyText='';
     if($('pregnancy-applying').checked) {
-      if(month!==start) pregnancyText='Отдельное заявление по беременности: для будущего месяца уточните срок на дату подачи и дату окончания беременности.';
+      if(capacity.pregnancy?.status==='block')pregnancyText=capacity.pregnancy.reason+'.';
+      else if(capacity.status==='unknown')pregnancyText='По беременности: сначала уточните судебное решение о дееспособности и даты.';
+      else if(month!==start) pregnancyText='Отдельное заявление по беременности: для будущего месяца уточните срок на дату подачи и дату окончания беременности.';
       else if($('pregnancy-registered').value!=='yes') pregnancyText=$('pregnancy-registered').value==='no'?'По беременности: нужна постановка на учёт в ранний срок.':'По беременности: уточните постановку на учёт до 12 недель.';
       else if($('weeks').value==='') pregnancyText='По беременности: укажите срок на дату подачи.';
       else if(Number($('weeks').value)<12) pregnancyText='По беременности: обратиться за назначением можно после наступления 12 недель.';
@@ -692,15 +697,15 @@ function render() {
     const addressBasis=$('residence-basis').value;
     const addressReview=!addressBasis||addressBasis!=='permanent'&&$('address-proof').value!=='yes';
     const priorMeasureReview=$('prior-measure').value!=='no';
-    const contextReview=addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
+    const contextReview=capacity.status==='unknown'||addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'не указаны'}. ${mobilizedIndices.length?'Зарплата, дополнительные поступления, БиР и проценты по счетам отмеченных мобилизованных взрослых исключены; получателей детских выплат и алиментов, статус по Указу № 647 и правило минимального дохода нужно проверить по документам.':''}`;
-    const explicitBlockers=applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
-    const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
+    const explicitBlockers=capacity.status==='block'||applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
+    const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&capacity.status!=='unknown'&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
     const clear=!explicitBlockers&&headline.startsWith('По проверенным критериям');
     overview[explicitBlockers?'blocked':clear?'clear':'needs']++;
     const comparableTier=clear&&scenarios.length===1&&scenarioTiers.length===1?scenarioTiers[0]:null;
     if(comparableTier!==null)candidates.push({date:filingDate,tier:comparableTier});
-    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${rightsText} ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
+    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${rightsText} ${capacityText} ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
   }
   const best=candidates.reduce((current,item)=>!current||item.tier>current.tier?item:current,null);
   const bestText=best?` Среди месяцев с сопоставимыми данными наибольшая предварительная ступень — <strong>${best.tier}%</strong> при подаче <strong>${best.date}</strong>. Если ступень одинакова, показан первый месяц.`:'';
@@ -715,7 +720,8 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
  $('start').addEventListener('input',()=>{renderIncomeForm();renderExtraRows();renderAlimonyWageYears();updatePmSelection()});
  $('pm-region').addEventListener('input',()=>{const code=$('pm-region').value;if(code!==lastWageRegion)alimonyWageRecords.clear();lastWageRegion=code;updatePmSelection();renderAlimonyWageYears()});
  $('pm-area').addEventListener('input',render);
-['applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','large-family','grace-used','disability','support-car','support-motorcycle','support-machine','rural'].forEach(id=>$(id).addEventListener('input',render));
+['capacity-decision','capacity-restored','applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','large-family','grace-used','disability','support-car','support-motorcycle','support-machine','rural'].forEach(id=>$(id).addEventListener('input',render));
+$('applicant-capacity').addEventListener('input',()=>{$('capacity-dates').hidden=!['limited','incapable'].includes($('applicant-capacity').value);render()});
 renderIncomeForm();
 updatePmSelection();
 
