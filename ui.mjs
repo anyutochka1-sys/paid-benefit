@@ -14,6 +14,7 @@ import {largeFamilyGrace} from './large-family-grace.mjs';
 import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs';
 import {pregnancyTier} from './pregnancy.mjs';
 import {confirmedRegionalWage} from './rosstat-wages.mjs';
+import {familyAssets} from './asset-owners.mjs';
 const $ = id => document.getElementById(id);
 function updatePmSelection() {
   const year=Number($('start').value.slice(0,4));
@@ -308,29 +309,40 @@ function benefitRowsForWindow(applicationMonth) {
 }
 function addCar() {
   const row=document.createElement('div'); row.className='form-row';
-  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель / ребёнок в составе семьи</option><option value="spouse">Нынешний супруг</option></select></label><label>Год выпуска<input class="year" type="number" min="1950" max="2030"></label><label>Мощность, л. с.<input class="hp" type="number" min="1"></label><label>Получен при четырёх детях?<select class="acquired"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label class="check"><input class="excluded" type="checkbox"> Под арестом / в розыске / запрет регистрационных действий</label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель</option><option value="spouse">Нынешний супруг</option></select></label><label>Год выпуска<input class="year" type="number" min="1950" max="2030"></label><label>Мощность, л. с.<input class="hp" type="number" min="1"></label><label>Получен при четырёх детях?<select class="acquired"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label class="check"><input class="excluded" type="checkbox"> Под арестом / в розыске / запрет регистрационных действий</label><button class="remove" type="button">Убрать</button>';
   bindRow(row); $('cars').append(row); render();
 }
 function addProperty() {
   const row=document.createElement('div');row.className='form-row';
-  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель / ребёнок в составе семьи</option><option value="spouse">Нынешний супруг</option></select></label><label>Вид<select class="type"><option value="apartment">Квартира</option><option value="house">Дом</option><option value="garden">Садовый дом</option><option value="nonresidential">Нежилое помещение / здание / сооружение</option><option value="garage">Гараж / машино-место</option><option value="land">Участок</option></select></label><label class="area-field">Площадь, м²<input class="area" type="number" min="0"></label><label class="land-field">Площадь, га<input class="hectares" type="number" min="0" step="0.001"></label><label>Доля всей семьи в объекте, %<input class="share" type="number" min="0" max="100" placeholder="100"></label><details><summary>Исключения для этого объекта</summary><label class="check"><input class="supported" type="checkbox"> Предоставлен как целевая господдержка или полностью оплачен ею (без маткапитала)</label><label class="check"><input class="ward-owned" type="checkbox"> Принадлежит подопечному ребёнку</label><label class="check"><input class="excluded" type="checkbox"> Под арестом или запретом регистрации</label><label class="check"><input class="uninhabitable" type="checkbox"> Квартира признана непригодной для проживания</label><label class="check"><input class="severe-illness" type="checkbox"> В квартире живёт член семьи с заболеванием из установленного перечня</label><label class="check"><input class="agricultural" type="checkbox"> Земля сельхозназначения с оборотом по отдельному закону</label><label class="check"><input class="far-east" type="checkbox"> Дальневосточный / арктический гектар</label><label class="check"><input class="auxiliary" type="checkbox"> Хозяйственная постройка на ИЖС / ЛПХ / садовом участке либо общее имущество</label></details><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель</option><option value="spouse">Нынешний супруг</option></select></label><label>Вид<select class="type"><option value="apartment">Квартира</option><option value="house">Дом</option><option value="garden">Садовый дом</option><option value="nonresidential">Нежилое помещение / здание / сооружение</option><option value="garage">Гараж / машино-место</option><option value="land">Участок</option></select></label><label class="area-field">Площадь, м²<input class="area" type="number" min="0"></label><label class="land-field">Площадь, га<input class="hectares" type="number" min="0" step="0.001"></label><label>Доля всей семьи в объекте, %<input class="share" type="number" min="0" max="100" placeholder="100"></label><details><summary>Исключения для этого объекта</summary><label class="check"><input class="supported" type="checkbox"> Предоставлен как целевая господдержка или полностью оплачен ею (без маткапитала)</label><label class="check"><input class="ward-owned" type="checkbox"> Принадлежит подопечному ребёнку</label><label class="check"><input class="excluded" type="checkbox"> Под арестом или запретом регистрации</label><label class="check"><input class="uninhabitable" type="checkbox"> Квартира признана непригодной для проживания</label><label class="check"><input class="severe-illness" type="checkbox"> В квартире живёт член семьи с заболеванием из установленного перечня</label><label class="check"><input class="agricultural" type="checkbox"> Земля сельхозназначения с оборотом по отдельному закону</label><label class="check"><input class="far-east" type="checkbox"> Дальневосточный / арктический гектар</label><label class="check"><input class="auxiliary" type="checkbox"> Хозяйственная постройка на ИЖС / ЛПХ / садовом участке либо общее имущество</label></details><button class="remove" type="button">Убрать</button>';
   bindRow(row); const toggle=()=>{const type=row.querySelector('.type').value;row.querySelector('.area-field').hidden=!['apartment','house'].includes(type);row.querySelector('.land-field').hidden=type!=='land';render()}; row.querySelector('.type').addEventListener('input',toggle);
   $('properties').append(row);toggle();
 }
 function addOtherVehicle() {
   const row=document.createElement('div');row.className='form-row';
-  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель / ребёнок в составе семьи</option><option value="spouse">Нынешний супруг</option></select></label><label>Вид<select class="type"><option value="motorcycle">Мотоцикл</option><option value="boat">Маломерное судно</option><option value="machine">Самоходная машина</option></select></label><label class="year-field">Год выпуска<input class="year" type="number" min="1950" max="2030"></label><label class="check"><input class="excluded" type="checkbox"> Под арестом / в розыске / запрет действий</label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель</option><option value="spouse">Нынешний супруг</option></select></label><label>Вид<select class="type"><option value="motorcycle">Мотоцикл</option><option value="boat">Маломерное судно</option><option value="machine">Самоходная машина</option></select></label><label class="year-field">Год выпуска<input class="year" type="number" min="1950" max="2030"></label><label class="check"><input class="excluded" type="checkbox"> Под арестом / в розыске / запрет действий</label><button class="remove" type="button">Убрать</button>';
   bindRow(row); row.querySelector('.type').addEventListener('input',()=>{row.querySelector('.year-field').hidden=row.querySelector('.type').value==='motorcycle';render()});row.querySelector('.year-field').hidden=true;
   $('other-vehicles').append(row);render();
 }
 function addDeposit() {
   const row=document.createElement('div');row.className='form-row';
-  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель / ребёнок в составе семьи</option><option value="spouse">Нынешний супруг</option></select></label><label>Год получения процентов<input class="tax-year" type="number" min="2024" max="2030"></label><label>Выплачено процентов, ₽<input class="interest" type="number" min="0"></label><label>Счёт закрыт в месяце<input class="closed" type="month"></label><label class="check"><input class="nominal" type="checkbox"> Номинальный счёт ребёнка под опекой</label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель</option><option value="spouse">Нынешний супруг</option></select></label><label>Год получения процентов<input class="tax-year" type="number" min="2024" max="2030"></label><label>Выплачено процентов, ₽<input class="interest" type="number" min="0"></label><label>Счёт закрыт в месяце<input class="closed" type="month"></label><label class="check"><input class="nominal" type="checkbox"> Номинальный счёт ребёнка под опекой</label><button class="remove" type="button">Убрать</button>';
   bindRow(row);$('deposits').append(row);render();
 }
 function bindRow(row) {
   row.querySelector('.remove').onclick=()=>{row.remove();render()};
   row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
+}
+function refreshAssetOwners() {
+  const options=[['applicant','Заявитель'],['spouse','Нынешний супруг'],
+    ...[...document.querySelectorAll('#children .form-row')].map((row,index)=>[`child:${row.dataset.childId}`,row.querySelector('.child-name').value||`Ребёнок ${index+1}`])];
+  document.querySelectorAll('#cars .owner,#properties .owner,#other-vehicles .owner,#deposits .owner').forEach(select=>{
+    const selected=select.value;
+    const available=options.some(([value])=>value===selected)?options:[...options,[selected,'Ребёнок удалён — уточните владельца']];
+    if([...select.options].length===available.length && [...select.options].every((option,index)=>option.value===available[index][0]&&option.textContent===available[index][1]))return;
+    select.replaceChildren(...available.map(([value,label])=>new Option(label,value)));
+    select.value=selected;
+  });
 }
 const yn = value => value==='' ? undefined : value==='yes';
 function childData() {
@@ -389,6 +401,7 @@ function resultCard(date,window,label,detail,tone,open) {
 }
 function render() {
   const start=$('start').value; if (!start) return;
+  refreshAssetOwners();
   const sourceComplete=sourceEnabled.size>0||$('no-income').checked;
   const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData(),deposits=sourceEnabled.has('deposit')?depositData():[];
   const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked,careRelationship:row.querySelector('.care-relationship select').value}));
@@ -399,8 +412,9 @@ function render() {
     const pmPerson=pm.status==='known'?pm.person:null,pmChild=pm.status==='known'?pm.child:null;
     const day=String(Math.max(1,Math.min(28,Number($('day').value)||1))).padStart(2,'0');
     const filingDate=`${month}-${day}`;
-    const members=includedFamily([{role:'applicant'},...(incomePeople.length>1?[{role:'spouse',familyStatus:$('spouse-status').value}]:[]),...children],filingDate);
-    const spouseExcluded=members.excluded.some(x=>x.person.role==='spouse');
+    const members=includedFamily([{role:'applicant'},...($('marital-status').value==='married'&&incomePeople.length>1?[{role:'spouse',familyStatus:$('spouse-status').value}]:[]),...children],filingDate);
+    const spouseRuleExcluded=members.excluded.some(x=>x.person.role==='spouse');
+    const spouseExcluded=$('marital-status').value!=='married'||spouseRuleExcluded;
     const countedAdults=incomePeople.map((person,index)=>({person,index})).filter(x=>x.index===0||!spouseExcluded);
     const applicable=children.map(child=>childCanApply(child,filingDate));
     const rightsChecks=children.map(applicantParentalRights);
@@ -408,14 +422,15 @@ function render() {
     const rightsUnknown=rightsChecks.some(check=>check.status==='unknown');
     const rightsText=rightsBlocked?'Родительские права заявителя: по пункту 31(р) есть основание для отказа по соответствующему ребёнку.':rightsUnknown?'Родительские права заявителя: уточните ответ в карточке ребёнка.':'Родительские права заявителя: по указанным детям препятствий не отмечено.';
     const fourOrMoreChildren=children.filter(c=>c.birthDate && ageAt(c.birthDate,filingDate)<18).length>=4;
-    const owned=items=>items.filter(item=>!((spouseExcluded||$('marital-status').value!=='married')&&item.owner==='spouse'));
-    const carCheck=checkCars(owned(cars),{applicationYear:year,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportVehicle:$('support-car').checked,fourOrMoreChildren});
-    const propertyCheck=checkProperty(owned(properties),{familySize:members.unanswered.length?null:members.included.length,rural:$('rural').value===''?undefined:$('rural').value==='rural',multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportVehicle:$('support-car').checked});
-    const otherCheck=checkOtherVehicles(owned(otherVehicles),{applicationYear:year,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportMotorcycle:$('support-car').checked,supportMachine:$('support-car').checked});
-    const countedDeposits=owned(deposits);
+    const householdAssets=[familyAssets(cars,members),familyAssets(properties,members),familyAssets(otherVehicles,members),familyAssets(deposits,members,{includeWardIncome:true})];
+    const assetOwnerReview=householdAssets.some(group=>group.needsReview);
+    const carCheck=checkCars(householdAssets[0].items,{applicationYear:year,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportVehicle:$('support-car').checked,fourOrMoreChildren});
+    const propertyCheck=checkProperty(householdAssets[1].items,{familySize:members.unanswered.length?null:members.included.length,rural:$('rural').value===''?undefined:$('rural').value==='rural',multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportVehicle:$('support-car').checked});
+    const otherCheck=checkOtherVehicles(householdAssets[2].items,{applicationYear:year,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportMotorcycle:$('support-car').checked,supportMachine:$('support-car').checked});
+    const countedDeposits=householdAssets[3].items;
     const allDepositsKnown=countedDeposits.filter(d=>!d.nominalWardAccount).every(d=>d.taxYear===year-1 && Number.isFinite(d.interestForRelevantTaxYear));
     const depositCheck=allDepositsKnown&&pmPerson!==null?checkDepositInterest(countedDeposits,{applicationMonth:month,perCapitaMinimum:pmPerson}):{status:'unknown'};
-    const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые члены семьи)':''}${spouseExcluded?' (супруг исключён по п. 46)':''}. Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}. Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по указанным объектам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):propertyCheck.review?.join('; ')||'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по указанным объектам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):otherCheck.review?.join('; ')||'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
+    const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые члены семьи)':''}${spouseRuleExcluded?' (супруг исключён по п. 46)':''}. ${assetOwnerReview?'Для одного или нескольких объектов нужно уточнить владельца или его включение в состав семьи. ':''}Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}. Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по указанным объектам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):propertyCheck.review?.join('; ')||'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по указанным объектам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):otherCheck.review?.join('; ')||'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
     const baseMonths=person=>!sourceEnabled.has('employment')?Object.fromEntries(incomeWindow(month).map(m=>[m,0])):$('income-mode').value==='period'?regularIncomeMonths(person,month):person.months;
     const incomeResult=incomeForMonth(countedAdults.map(({person})=>({...person,months:baseMonths(person),total:sourceEnabled.has('employment')?person.total:0,mode:sourceEnabled.has('employment')&&$('income-mode').value==='total'?'total':'monthly',baseApplicationMonth:start})),month);
     const supplemental=additionalIncomeForApplication(additionalEntries.filter(e=>sourceEnabled.has(e.type)),month,spouseExcluded||$('marital-status').value!=='married'?[1]:[]);
@@ -508,7 +523,7 @@ function render() {
     const addressBasis=$('residence-basis').value;
     const addressReview=!addressBasis||addressBasis!=='permanent'&&$('address-proof').value!=='yes';
     const priorMeasureReview=$('prior-measure').value!=='no';
-    const contextReview=addressReview||priorMeasureReview||rightsUnknown;
+    const contextReview=addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview;
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'не указаны'}.`;
     const explicitBlockers=applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
     const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
