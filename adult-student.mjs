@@ -24,7 +24,7 @@ export function adultStudentChecks(children,family,entries,applicationMonth,fili
           earned+=entry.amount;
           // The birthday month may mix minor and adult income. Count it only
           // when the eighteenth birthday was on its first calendar day.
-          if(month>birthdayMonth || month===birthdayMonth&&child.birthDate.slice(8)==='01')certainAdultEarned+=entry.amount;
+          if(month>birthdayMonth || month===birthdayMonth&&(child.birthDate.slice(8)==='01'||/^\d{4}-\d{2}-\d{2}$/.test(entry.receiptDate||'')&&entry.receiptDate.slice(0,7)===month&&entry.receiptDate>=`${birthdayMonth}-${child.birthDate.slice(8)}`))certainAdultEarned+=entry.amount;
         }
       }
       // The treatment of pre-18 earnings in the window depends on the minor's
