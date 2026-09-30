@@ -19,3 +19,14 @@ test('unrecognized presentation classes cannot insert markup',()=>{
   assert.equal(rendered.includes('onclick'),false);
   assert.equal(escapeText('Обычный текст — 100%'),'Обычный текст — 100%');
 });
+
+test('structured result sections escape labels and omit empty sections',()=>{
+  const rendered=resultCard('2026-09-01',['2025-08','2026-07'],'Оценка',[
+    {title:'Дети <b>',text:'Маша & <script>текст</script>'},
+    {title:'Беременность',text:''}
+  ],'unknown',true);
+  assert.ok(rendered.includes('<h3>Дети &lt;b&gt;</h3>'));
+  assert.ok(rendered.includes('Маша &amp; &lt;script&gt;текст&lt;/script&gt;'));
+  assert.equal(rendered.includes('<script>'),false);
+  assert.equal(rendered.includes('Беременность'),false);
+});

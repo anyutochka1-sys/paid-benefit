@@ -37,3 +37,7 @@ details.result { display:block; margin:8px 0; padding:0; border:1px solid var(--
 .source-grid .check { flex-direction:row; align-items:center; margin:4px 0; font-weight:500 }
 @media(max-width:700px) { .source-grid { grid-template-columns:1fr } }
 [hidden] { display:none!important }
+
+.result-section + .result-section { margin-top:18px; padding-top:16px; border-top:1px solid var(--line) }
+.result-section h3 { font-size:1rem; color:var(--teal); margin:0 0 7px; line-height:1.4 }
+.result-section p { margin:0; line-height:1.65 }

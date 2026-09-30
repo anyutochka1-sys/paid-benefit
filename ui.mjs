@@ -1,4 +1,4 @@
-import {resultCard,childLabel} from './result-card.mjs';
+import {resultCard,childLabel} from './result-card.mjs?v=20260930-17';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
@@ -726,7 +726,14 @@ function render() {
     }
     if(!RULES[year]) {
       overview.needs++;
-      output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',`${incomeEntryReviewText} ${applicationSelectionText} ${familyText} ${assetText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.`,'unknown',i===0));
+      const futureYearSections=[
+        {title:'Данные будущего года',text:`${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} МРОТ на ${year} год ещё не загружен.`},
+        {title:'Дети из заявления',text:applicationSelectionText},
+        {title:'Доходы и выплаты на детей',text:`${incomeEntryReviewText} ${incomeText}`},
+        {title:'Отдельное заявление по беременности',text:pregnancyText},
+        {title:'Состав семьи и имущество',text:`${familyText} ${assetText}`}
+      ];
+      output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',futureYearSections,'unknown',i===0));
       continue;
     }
     // Future pregnancy conditions require an explicit continuation forecast.
@@ -765,7 +772,16 @@ function render() {
     overview[explicitBlockers?'blocked':clear?'clear':'needs']++;
     const comparableTier=clear&&scenarios.length===1&&scenarioTiers.length===1?scenarioTiers[0]:null;
     if(comparableTier!==null)candidates.push({date:filingDate,tier:comparableTier});
-    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${applicationSelectionText} ${rightsText} ${capacityText} ${contextText} ${newbornOnly?'':incomeEntryReviewText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}${!newbornOnly&&adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
+    const resultSections=[
+      {title:'Регион и прожиточный минимум',text:pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'},
+      {title:'Заявитель и условия подачи',text:`${applicantCheck==='yes'?'Гражданство и проживание РФ подтверждены':applicantCheck==='no'?'Нет необходимого гражданства или проживания':'Уточните гражданство и проживание'}. ${capacityText} ${contextText}`},
+      {title:'Дети из заявления',text:`${applicationSelectionText} ${rightsText}`},
+      {title:'Минимальный доход',text:`${adultText}.${!newbornOnly&&adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`},
+      {title:'Доходы и выплаты на детей',text:`${newbornOnly?'':incomeEntryReviewText} ${incomeText}`},
+      {title:'Отдельное заявление по беременности',text:pregnancyText},
+      {title:'Состав семьи и имущество',text:`${familyText} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}`}
+    ];
+    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,resultSections,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
   }
   const best=candidates.reduce((current,item)=>!current||item.tier>current.tier?item:current,null);
   const bestText=best?` Среди месяцев с сопоставимыми данными наибольшая предварительная ступень — <strong>${best.tier}%</strong> при подаче <strong>${best.date}</strong>. Если ступень одинакова, показан первый месяц.`:'';
