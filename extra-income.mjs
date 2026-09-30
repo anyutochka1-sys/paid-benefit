@@ -38,6 +38,7 @@ export function foreignRateDate(applicationMonth) {
 // classified after its statutory purpose is known.
 export const OTHER_BENEFIT_KINDS = {
   counted:{label:'Иное учитываемое пособие / компенсация',excluded:false},
+  uncertain:{label:'Не уверена, учитывается ли эта выплата',excluded:false},
   employerBirthAid:{label:'Единовременная материальная помощь работодателя при рождении / усыновлении / опеке',excluded:false},
   maternityCapitalMonthly:{label:'Ежемесячная выплата из материнского капитала на ребёнка до 3 лет',excluded:true},
   maternityCapitalUse:{label:'Средства федерального или регионального материнского капитала (не ежемесячная выплата)',excluded:false},
@@ -65,6 +66,7 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(!definition || !Number.isFinite(entry.amount) || entry.amount<0) {issues.push('Уточните вид и сумму дополнительного дохода');continue}
     const benefitKind=entry.type==='otherBenefit'?OTHER_BENEFIT_KINDS[entry.benefitKind]:null;
     if(entry.type==='otherBenefit'&&!benefitKind) {issues.push('Уточните вид другого пособия: часть выплат исключается по пункту 53');continue}
+    if(entry.type==='otherBenefit'&&entry.benefitKind==='uncertain') {issues.push('Вид выплаты не определён: проверьте основание в решении о назначении или документах');continue}
     if(entry.type==='otherBenefit'&&entry.benefitKind==='maternityCapitalUse') {
       const allowedFederal=['disabledGoods','individualHousing','blockHousing'];
       if(entry.matcapConfirmed!==true || !['federal','regional'].includes(entry.matcapSource)
