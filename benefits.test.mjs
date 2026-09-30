@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {childBenefitIncome} from './benefits.mjs';
+import {childBenefitIncome,expandBenefitPayments} from './benefits.mjs';
 
 const children=[{id:'a',birthDate:'2020-03-01'},{id:'b',birthDate:'2023-04-01'}];
 const payments=Array.from({length:12},(_,i)=>({childId:'a',month:`${i<5?'2025':'2026'}-${String(i<5?i+8:i-4).padStart(2,'0')}`,amount:19243}));
@@ -75,4 +75,23 @@ test('18–22-year-old payment needs a regional basis when the adult child remai
   assert.equal(childBenefitIncome([{...paid,regionalPaymentThrough23:true}],[student,children[1]],['b'],'2026-09').total,20000);
   assert.equal(childBenefitIncome([{...paid,regionalPaymentThrough23:true}],[{...student,fullTimeStudent:false},children[1]],['b'],'2026-09').total,0);
   assert.equal(childBenefitIncome([{...paid,kind:'unified',forPastPeriods:undefined}],[student,children[1]],['b'],'2026-09').total,0);
+});
+
+test('future child benefit receipts need an explicit assumption only when included',()=>{
+  const row={childId:'a',kind:'unified',amount:'20000',from:'2026-10',to:'2026-10'};
+  const unconfirmed=expandBenefitPayments([row],'2026-12',{knownThrough:'2026-09'});
+  assert.equal(childBenefitIncome(unconfirmed.payments,children,['b'],'2026-12').total,null);
+  assert.equal(childBenefitIncome(unconfirmed.payments,children,['a'],'2026-12').total,0);
+  const forecast=expandBenefitPayments([{...row,projectFuture:true}],'2026-12',{knownThrough:'2026-09'});
+  const result=childBenefitIncome(forecast.payments,children,['b'],'2026-12');
+  assert.equal(result.total,20000);
+  assert.equal(result.included[0].projected,true);
+});
+test('past receipts remain known and missing amount or period cannot be fabricated',()=>{
+  const row={childId:'a',kind:'unified',amount:'20000',from:'2026-07',to:'2026-07'};
+  const past=expandBenefitPayments([row],'2026-09',{knownThrough:'2026-09'});
+  assert.equal(childBenefitIncome(past.payments,children,['b'],'2026-09').total,20000);
+  assert.equal(past.payments[0].projected,false);
+  assert.equal(expandBenefitPayments([{...row,to:''}],'2026-09').missing.length,1);
+  assert.equal(childBenefitIncome(expandBenefitPayments([{...row,amount:''}],'2026-09').payments,children,['b'],'2026-09').total,null);
 });

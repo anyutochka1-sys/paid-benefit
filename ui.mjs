@@ -7,7 +7,7 @@ import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth,
 import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20260930-11';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome} from './benefits.mjs';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20260930-15';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
@@ -440,18 +440,16 @@ function renderBenefitRows() {
       const input=document.createElement('input');input.type=type;if(type==='number')input.min='0';input.value=payment[key]??'';
       input.addEventListener('input',()=>{payment[key]=input.value;render()});wrapper.append(input);row.append(wrapper);
     }
+    const forecastLabel=document.createElement('label');forecastLabel.className='check';
+    const forecastInput=document.createElement('input');forecastInput.type='checkbox';forecastInput.className='benefit-project-future';forecastInput.checked=payment.projectFuture===true;
+    forecastInput.addEventListener('input',()=>{payment.projectFuture=forecastInput.checked;render()});
+    forecastLabel.append(forecastInput,document.createTextNode(' Предполагаю такую же сумму пособия в будущие месяцы указанного периода'));row.append(forecastLabel);
     const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='Убрать';remove.onclick=()=>{benefitPayments.splice(index,1);renderBenefitRows();render()};row.append(remove);
     $('benefits').append(row);
   });
 }
 function benefitRowsForWindow(applicationMonth) {
-  const window=incomeWindow(applicationMonth), payments=[],missing=[];
-  for(const p of benefitPayments) {
-    if(!p.from || !p.to || p.from>p.to) {missing.push('Укажите начало и конец выплаты пособия');continue}
-    for(const month of window) if(month>=p.from && month<=p.to)
-      payments.push({childId:p.childId,kind:p.kind||'unified',forPastPeriods:p.forPastPeriods,regionalPaymentThrough23:p.regionalPaymentThrough23,month,amount:p.amount===''?null:Number(p.amount)});
-  }
-  return {payments,missing};
+  return expandBenefitPayments(benefitPayments,applicationMonth,{knownThrough:currentMonth});
 }
 function addCar() {
   const row=document.createElement('div'); row.className='form-row';
@@ -703,7 +701,7 @@ function render() {
       const priorSupportText=`Сравнение с прежними выплатами: ${priorSupport.reason}${Number.isFinite(priorSupport.oldMonthly)?`; прежние ${priorSupport.oldMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}${Number.isFinite(priorSupport.newMonthly)?`; новые ${priorSupport.newMonthly.toLocaleString('ru-RU')} ₽/мес.`:''}.`;
       const childNumber=children.findIndex(c=>c.id===group[0]?.id)+1;
       const label=$('application-mode').value==='separate'?`Заявление: ${childLabel(group[0],childNumber-1)} (${scenarioIndex+1} из ${scenarios.length})`:'Общее заявление';
-      const benefitText=benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`;
+      const benefitText=(benefitResult.included.some(payment=>payment.projected)?'Для будущих месяцев использовано ваше предположение о сумме пособия. ':'')+(benefitUnknown.length?`Уточнить пособия: ${benefitUnknown.join('; ')}.`:`Пособия на остальных детей учтены: ${benefitResult.total.toLocaleString('ru-RU')} ₽; исключены для этого заявления: ${benefitResult.excluded.reduce((sum,p)=>sum+p.amount,0).toLocaleString('ru-RU')} ₽.`);
       const newbornText=(newbornUnknowns.length?`Упрощённое назначение новорождённому требует уточнения: ${newbornUnknowns.map(x=>x.result.reason).join('; ')}. `:'')+(newborns.length?`Новорождённому по действующему решению на старшего: ${newborns.map(x=>`${x.result.tier}% с ${x.result.startMonth} по ${x.result.endsOn}`).join('; ')}; без новой оценки на этот срок. Далее — обычная оценка.`:'');
       const regularText=regularChildren?`${tier?.grace?'По однократному продлению многодетным — предварительно 50% для остальных детей.':`По обычной оценке ${tier?.status==='estimate'?`предварительная ступень ${tier.tier}% для остальных детей.`:tier?.status==='income-too-high'?`доход выше указанного ПМ; ${grace?.reason||'проверьте однократное продление'}.`:'ступень пока неизвестна.'}`}`:'';
       if(!regularChildren)return `${label}: Действующее назначение: ${awardChecks.map(check=>check.status==='clear'?'нет препятствия':check.status==='renewal'?'можно продлить в последний месяц':check.status==='court-exception'?'учесть решение суда':check.reason).join('; ')}. ${newbornText} ${priorSupportText}`;
@@ -722,7 +720,7 @@ function render() {
         const pregnancyIncome=!sourceComplete||incomeResult.total===null||pregnancyBenefits.total===null||benefitRows.missing.length||pregnancyBenefits.missing.length||alimony.status!=='known'||depositIncome.status!=='known'||maternityIncome.status!=='known'||supplemental.status!=='known'||childEarnings.status!=='known'?null:incomeResult.total+pregnancyBenefits.total+alimony.amount+depositIncome.amount+maternityIncome.amount+supplemental.amount+childEarnings.amount;
         const result=pregnancyTier({income12:pregnancyIncome,familySize:members.unanswered.length?null:members.included.length,pmPerson,pmWorking:pm.status==='known'?pm.working:null});
         if(result.status==='estimate')pregnancyMonthly=result.monthly;
-        pregnancyText=result.status==='estimate'?`Отдельное заявление по беременности: предварительная ступень ${result.tier}% от ПМ трудоспособных (${result.monthly.toLocaleString('ru-RU')} ₽ в месяц). Прежние выплаты на детей, остающихся в семье, учтены в доходе этого заявления: ${pregnancyBenefits.total.toLocaleString('ru-RU')} ₽ за расчётный период. Сроки выплаты и остальные критерии ещё требуют проверки.`:result.status==='income-too-high'?'По беременности: доход отдельного заявления выше указанного ПМ на человека.':'По беременности: для ступени нужны подтверждённые доходы и ПМ.';
+        pregnancyText=result.status==='estimate'?`Отдельное заявление по беременности: предварительная ступень ${result.tier}% от ПМ трудоспособных (${result.monthly.toLocaleString('ru-RU')} ₽ в месяц). Прежние выплаты на детей, остающихся в семье, учтены в доходе этого заявления: ${pregnancyBenefits.total.toLocaleString('ru-RU')} ₽ за расчётный период. Сроки выплаты и остальные критерии ещё требуют проверки.${pregnancyBenefits.included.some(payment=>payment.projected)?' Для будущих выплат на детей использовано ваше предположение о сумме.':''}`:result.status==='income-too-high'?'По беременности: доход отдельного заявления выше указанного ПМ на человека.':'По беременности: для ступени нужны подтверждённые доходы и ПМ.';
       }
     }
     if(!RULES[year]) {
