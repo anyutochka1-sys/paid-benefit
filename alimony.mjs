@@ -33,3 +33,16 @@ export function alimonyForApplication(entry, applicationMonth) {
   if(monthly.some(v=>!Number.isFinite(v.declared) || v.declared<0))return {status:'unknown',reason:'Уточните алименты по месяцам'};
   return {status:'known',amount:monthly.reduce((sum,v)=>sum+Math.max(v.declared,minimum),0),method:'floor-or-declared',minimumMonthly:minimum,eligibleMonths,wageYear:wage.year};
 }
+
+// When actual receipts are reported as one total for several children, only
+// documented child-level allocations can separate excluded p. 53(n) receipts.
+export function allocatedAlimonyIncome(receivedByMonth, allocationByChild, recipientIds, includedIds, applicationMonth) {
+  if(!recipientIds.length || !recipientIds.every(id=>Number.isFinite(allocationByChild[id])&&allocationByChild[id]>=0))
+    return {status:'unknown',reason:'Укажите сумму алиментов на каждого ребёнка из перечисленных'};
+  const totalByChild=recipientIds.reduce((sum,id)=>sum+allocationByChild[id],0);
+  const months=incomeWindow(applicationMonth);
+  const positive=months.filter(m=>receivedByMonth[m]>0);
+  if(positive.some(m=>!Number.isFinite(receivedByMonth[m])||Math.abs(totalByChild-receivedByMonth[m])>0.01))
+    return {status:'unknown',reason:'Суммы по детям должны совпасть с общим ежемесячным поступлением'};
+  return {status:'known',method:'allocated-actual',amount:positive.length*includedIds.reduce((sum,id)=>sum+allocationByChild[id],0)};
+}
