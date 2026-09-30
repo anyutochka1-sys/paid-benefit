@@ -20,7 +20,7 @@ export function childIncomeForApplication(entries,children,family,applicationMon
   let amount=0;
   for(const entry of entries) {
     const child=byId.get(entry.childId);
-    if(!child||!entry.from||!entry.to||entry.from>entry.to||!Number.isFinite(entry.amount)||entry.amount<0||!['employment','publicDutyCompensation','other'].includes(entry.type)) {
+    if(!child||!entry.from||!entry.to||entry.from>entry.to||!Number.isFinite(entry.amount)||entry.amount<0||!['employment','scholarship','publicDutyCompensation','other'].includes(entry.type)) {
       issues.push('Уточните ребёнка, вид дохода, сумму и период');continue;
     }
     for(const month of monthsBetween(entry.from,entry.to).filter(m=>window.has(m))) {
