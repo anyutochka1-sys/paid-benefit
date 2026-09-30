@@ -20,9 +20,10 @@ export function checkProperty(items, {familySize, rural, multipleChildren, disab
   for (const [type,limit,label] of [['apartment',24,'квартир'],['house',40,'домов']]) {
     const objects=group(type).filter(x=>!(type==='apartment'&&(x.uninhabitable||x.severeIllnessResidence)));
     if(objects.length>=2) {
+      const hasShares=objects.some(x=>x.familyShare<1);
       if(objects.some(x=>!Number.isFinite(x.area))) review.push(`Укажите площадь всех ${label}`);
-      else if(objects.reduce((s,x)=>s+x.area,0)>limit*familySize) reasons.push(`Площадь ${label} при наличии нескольких объектов выше ${limit} м² на человека`);
-      if(objects.some(x=>x.familyShare!==undefined && x.familyShare<1)) review.push(`Уточните учитываемую площадь долей ${label}`);
+      else if(objects.reduce((s,x)=>s+x.area,0)>limit*familySize && !hasShares) reasons.push(`Площадь ${label} при наличии нескольких объектов выше ${limit} м² на человека`);
+      if(hasShares) review.push(`Проверьте площадь учитываемых долей ${label} по выписке ЕГРН: общая площадь объектов сама по себе не даёт окончательного вывода`);
     }
   }
   for(const [type,limit,label] of [['garden',1,'садовых домов'],['nonresidential',1,'нежилых помещений'],['garage',multipleChildren||disabledFamilyMember||supportVehicle?2:1,'гаражей или машино-мест']]) {
