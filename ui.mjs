@@ -255,9 +255,9 @@ function renderIncomeForm() {
 }
 function addReason() {
   const row = document.createElement('div'); row.className='reason';
-  row.innerHTML=`<label>У кого была причина<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><label>Причина<select class="type">${types.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="check"><input class="registered" type="checkbox"> Состоял(а) на учёте в ЦЗН</label><p class="hint">Для службы и лишения свободы включите в даты не более трёх месяцев после окончания. Основание и период должны подтверждаться документами.</p><button class="remove" type="button">Убрать</button>`;
+  row.innerHTML=`<label>У кого была причина<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><label>Причина<select class="type">${types.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="check"><input class="registered" type="checkbox"> Состоял(а) на учёте в ЦЗН</label><label class="care-relationship" hidden>За кем ухаживали?<select><option value="">Уточните родство и основание</option><option value="eligible">За членом семьи заявителя из предусмотренных законом категорий; подтвержу документами</option><option value="ineligible">За другим человеком</option></select><small>С 21.07.2026 для ухода за взрослым нужен член семьи из категорий ч. 2 ст. 10 закона № 400-ФЗ. <a href="https://sfr.gov.ru/branches/orel/news~2026/07/21/283040" target="_blank" rel="noopener">Пояснение СФР</a>.</small></label><p class="hint">Для службы и лишения свободы включите в даты не более трёх месяцев после окончания. Основание и период должны подтверждаться документами.</p><button class="remove" type="button">Убрать</button>`;
   row.querySelector('.remove').onclick=()=>{row.remove();render()};
-  row.querySelector('.type').onchange=()=>{row.querySelector('.check').hidden=row.querySelector('.type').value!=='unemployment';render()};
+  row.querySelector('.type').onchange=()=>{row.querySelector('.check').hidden=row.querySelector('.type').value!=='unemployment';row.querySelector('.care-relationship').hidden=row.querySelector('.type').value!=='careDisabledAdult';render()};
   row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
   $('reasons').append(row); row.querySelector('.type').dispatchEvent(new Event('change'));
 }
@@ -391,7 +391,7 @@ function render() {
   const start=$('start').value; if (!start) return;
   const sourceComplete=sourceEnabled.size>0||$('no-income').checked;
   const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData(),deposits=sourceEnabled.has('deposit')?depositData():[];
-  const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked}));
+  const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked,careRelationship:row.querySelector('.care-relationship select').value}));
   const output=[], overview={blocked:0,clear:0,needs:0}, candidates=[];
   for(let i=0;i<12;i++) {
     const month=monthString(monthIndex(start)+i), year=Number(month.slice(0,4));
@@ -498,10 +498,10 @@ function render() {
       const includedMinorWards=children.filter(c=>c.role==='ward'&&members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18);
       const guardianUnknown=j===0&&includedMinorWards.length>0&&$('sole-guardian').value==='';
       const soleParent=j===0&&(children.some(c=>members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18&&c.role!=='ward'&&soleParentStatus([c])==='sole')||includedMinorWards.length>0&&$('sole-guardian').value==='yes');
-      const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),pregnancyWeeksAtApplication:j===0&&i===0?Number($('weeks').value):0,income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
+      const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),applicationDate:filingDate,pregnancyWeeksAtApplication:j===0&&i===0?Number($('weeks').value):0,income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
       const amountKnown=!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person)[m])):month===start&&Number.isFinite(person.total);
       const earned=sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
-      return {...result,earned,passed:earned>=result.minimum,known:sourceComplete&&amountKnown&&!guardianUnknown&&person.incomeType!=='other'&&supplemental.status==='known',label:person.label};
+      return {...result,earned,passed:earned>=result.minimum,known:sourceComplete&&amountKnown&&!guardianUnknown&&person.incomeType!=='other'&&supplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),label:person.label};
     });
     const adultText=adults.map(a=>`${a.label}: ${a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`).join('; ');
     const applicantCheck=$('applicant-citizen').value==='no'||$('applicant-residence').value==='no'?'no':$('applicant-citizen').value&&$('applicant-residence').value?'yes':'unknown';
