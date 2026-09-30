@@ -5,7 +5,7 @@ const excluded = item => item.wardOwned || item.seized || item.registrationBan |
   (item.supported && ['apartment','house','land'].includes(item.type)) ||
   (item.auxiliaryExcluded && item.type==='nonresidential') || item.familyShare <= 1/3;
 
-export function checkProperty(items, {familySize, rural, multipleChildren, disabledFamilyMember, supportVehicle}) {
+export function checkProperty(items, {familySize, rural, multipleChildren, disabledFamilyMember, supportVehicle, supportMotorcycle=false}) {
   if (!Array.isArray(items) || !familySize) return {status:'unknown',reasons:['Нужен состав семьи']};
   // A missing share can change whether any object is counted at all. Do not
   // turn a potential one-third exclusion into a definite property refusal.
@@ -26,7 +26,7 @@ export function checkProperty(items, {familySize, rural, multipleChildren, disab
       if(hasShares) review.push(`Проверьте площадь учитываемых долей ${label} по выписке ЕГРН: общая площадь объектов сама по себе не даёт окончательного вывода`);
     }
   }
-  for(const [type,limit,label] of [['garden',1,'садовых домов'],['nonresidential',1,'нежилых помещений'],['garage',multipleChildren||disabledFamilyMember||supportVehicle?2:1,'гаражей или машино-мест']]) {
+  for(const [type,limit,label] of [['garden',1,'садовых домов'],['nonresidential',1,'нежилых помещений'],['garage',multipleChildren||disabledFamilyMember||supportVehicle||supportMotorcycle?2:1,'гаражей или машино-мест']]) {
     if(group(type).length>limit) reasons.push(`Слишком много ${label}: ${group(type).length}`);
   }
   const land=group('land').filter(x=>!x.agriculturalExcluded && !x.farEastHectare);
