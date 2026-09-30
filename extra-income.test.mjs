@@ -101,6 +101,18 @@ test('foreign income uses the CBR rate on the last day of the twelfth lookback m
   assert.match(october.issues[0],/2026-08-31/);
   assert.equal(additionalIncomeForApplication([{...entry,rateDate:'2026-08-31',rublesPerUnit:81}],'2026-10').amount,24300);
 });
+test('other income received abroad counts in rubles or converts currency, with qualifying source checked',()=>{
+  const base={personIndex:0,type:'foreignOther',from:'2026-05',to:'2026-06',amount:10000,foreignCategory:'other',currency:'RUB'};
+  const rubles=additionalIncomeForApplication([base],'2026-09');
+  assert.equal(rubles.amount,20000);
+  assert.equal(rubles.byPerson.get(0)['2026-05'].qualifying,0);
+  const pension=additionalIncomeForApplication([{...base,foreignCategory:'pension'}],'2026-09');
+  assert.equal(pension.byPerson.get(0)['2026-05'].qualifying,10000);
+  const foreign=additionalIncomeForApplication([{...base,amount:100,currency:'USD',rublesPerUnit:80,rateDate:'2026-07-31'}],'2026-09');
+  assert.equal(foreign.amount,16000);
+  assert.equal(additionalIncomeForApplication([{...base,foreignCategory:''}],'2026-09').status,'unknown');
+  assert.equal(additionalIncomeForApplication([{...base,currency:'USD'}],'2026-09').status,'unknown');
+});
 
 test('income of an excluded spouse is omitted from the household',()=>{
   const entries=[{personIndex:1,type:'pension',from:'2025-08',to:'2026-07',amount:15000}];
