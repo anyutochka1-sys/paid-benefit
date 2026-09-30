@@ -62,6 +62,14 @@ export function applicantParentalRights(child) {
   return {status:'unknown', reason:'Уточните родительские права заявителя в отношении ребёнка из заявления'};
 }
 
+export function fourChildCarStatus(children, family, applicationDate) {
+  const included=children.filter(child=>family.included.some(person=>person.id===child.id));
+  const minors=included.filter(child=>child.birthDate&&ageAt(child.birthDate,applicationDate)<18).length;
+  const uncertain=included.filter(child=>!child.birthDate||ageAt(child.birthDate,applicationDate)>=18).length+
+    family.unanswered.filter(x=>['child','ward'].includes(x.person.role)).length;
+  return {fourOrMoreChildren:minors>=4,fourChildrenReview:minors<4&&minors+uncertain>=4};
+}
+
 export function checkCars(cars, context) {
   if (!Array.isArray(cars) || context.applicationYear === undefined ||
     context.multipleChildren === undefined || context.disabledFamilyMember === undefined ||
@@ -74,14 +82,15 @@ export function checkCars(cars, context) {
     counted.push(car);
   }
   const allowed = context.multipleChildren || context.disabledFamilyMember || context.supportVehicle ? 2 : 1;
-  const reasons=[];
+  const reasons=[],review=[];
   if (counted.length > allowed) reasons.push(`Автомобилей ${counted.length}, допустимо ${allowed}`);
   for (const car of counted) {
     if (Number(car.horsepower) >= 250 && context.applicationYear - Number(car.manufactureYear) <= 5) {
-      if (!context.fourOrMoreChildren) reasons.push('Есть автомобиль не старше 5 лет с мощностью от 250 л. с.');
+      if (!context.fourOrMoreChildren && context.fourChildrenReview) review.push('Уточните, учитывается ли ребёнок 18–22 лет или ребёнок с неуточнённым составом семьи для исключения мощного автомобиля');
+      else if (!context.fourOrMoreChildren) reasons.push('Есть автомобиль не старше 5 лет с мощностью от 250 л. с.');
       else if (car.acquiredWithFourChildren === undefined) return {status:'unknown', reasons:['Нужно уточнить обстоятельства приобретения мощного автомобиля семьёй с четырьмя детьми']};
       else if (!car.acquiredWithFourChildren) reasons.push('Мощный автомобиль не отмечен как приобретённый семьёй с четырьмя детьми');
     }
   }
-  return {status:reasons.length?'no':'yes', reasons, countedCars:counted.length};
+  return {status:reasons.length?'no':review.length?'unknown':'yes', reasons,review, countedCars:counted.length};
 }
