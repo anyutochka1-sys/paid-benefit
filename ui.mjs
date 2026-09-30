@@ -3,7 +3,7 @@ import { includedFamily, childCanApply, applicantParentalRights, checkCars, ageA
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 import {CHILD_BENEFIT_KINDS,childBenefitIncome} from './benefits.mjs';
-import {alimonyForApplication} from './alimony.mjs';
+import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs';
 import {maternityIncomeForApplication} from './maternity.mjs';
@@ -61,6 +61,19 @@ benefitsSection.innerHTML='<div class="section-heading"><h3>Пособия на 
 $('income-people').after(benefitsSection);
 const alimonySection=document.createElement('section');
 alimonySection.innerHTML='<h3>Семейное положение и алименты</h3><label>Семейное положение на дату заявления<select id="marital-status"><option value="">Выберите</option><option value="never">В браке никогда не состояла</option><option value="married">Состою в браке (в том числе повторном)</option><option value="divorced">В разводе, новый брак не заключён</option><option value="widowed">Вдова</option></select></label><label id="spouse-status-field" hidden>Статус нынешнего супруга на дату заявления<select id="spouse-status"><option value="unknown">Уточните</option><option value="ordinary">Входит в состав семьи</option><option value="parentalRightsLost">Лишён / ограничен в правах на ребёнка из заявления</option><option value="stateCare">На полном государственном обеспечении</option><option value="conscript">Служба по призыву / военный курсант без контракта</option><option value="imprisoned">Отбывает лишение свободы</option><option value="forcedTreatment">На принудительном лечении по решению суда</option><option value="custody">Заключён под стражу</option><option value="missing">Признан безвестно отсутствующим / объявлен умершим</option><option value="wanted">Находится в розыске</option></select></label><div id="alimony-fields" hidden><label>Алименты на детей фактически поступали?<select id="alimony-received"><option value="no">Нет</option><option value="yes">Да</option></select></label><div id="alimony-actual-fields" hidden><label>Сумма за месяц, ₽<input id="alimony-monthly" type="number" min="0"></label><label>С какого месяца поступали<input id="alimony-from" type="month"></label><label>По какой месяц включительно<input id="alimony-to" type="month"></label></div><div id="alimony-divorced-fields" hidden><label>Месяц расторжения брака<input id="divorce-month" type="month"></label><label>Основание для алиментов на детей<select id="alimony-kind"><option value="">Выберите</option><option value="court">Есть решение суда</option><option value="court-order">Есть судебный приказ</option><option value="bailiffs">Есть исполнительное производство у приставов</option><option value="notary">Нотариальное соглашение</option><option value="informal">Устная договорённость / не оформлены</option></select></label><label id="notary-amount-field" hidden>Ежемесячная сумма по нотариальному соглашению, ₽<input id="notary-amount" type="number" min="0"></label><p class="hint">Отметьте детей одного алиментного обязательства в их карточках. Если дети от разных вторых родителей, потребуется отдельный расчёт по каждому обязательству. Статус второго родителя укажите в карточке ребёнка. Лишение свободы и лишение родительских прав сами по себе не означают статус единственного родителя.</p><div id="alimony-wage-fields"><label>Применимая окончательная средняя зарплата Росстата в регионе, ₽<input id="alimony-wage" type="number" min="0"></label><label class="check"><input id="alimony-final" type="checkbox"> Проверена окончательная годовая публикация Росстата, действующая в месяц обращения</label></div></div></div><p class="hint">Расчётный минимум алиментов применяется только при статусе «в разводе» и отсутствии судебного акта; новый зарегистрированный брак меняет статус. Если вы никогда не были замужем, минимум не вменяется, но полученные алименты учитываются. Единственный родитель и семейное положение — разные вопросы. Не включайте алименты повторно в зарплату.</p>';
+const alimonyAllocation=new Map();
+const alimonySplit=document.createElement('details');
+alimonySplit.innerHTML='<summary>Алименты приходили на детей с разным статусом?</summary><p class="hint">Если одни дети входят в состав семьи, а другие нет, укажите сумму на каждого за месяц. Общая сумма должна совпасть с указанной выше. Для судебного акта и иных случаев без расчётного минимума учтём только суммы на детей из состава семьи. При нотариальном соглашении или неоформленных алиментах после развода нужен отдельный расчёт по обязательствам.</p><div class="alimony-split-rows"></div>';
+$('alimony-actual-fields').append(alimonySplit);
+function renderAlimonyAllocationRows() {
+  const list=alimonySplit.querySelector('.alimony-split-rows');list.replaceChildren();
+  childData().filter(child=>child.alimonyApplies).forEach((child,i)=>{
+    const label=document.createElement('label');label.textContent=`Алименты на ${child.name||`ребёнка ${i+1}`}, ₽ в месяц`;
+    const input=document.createElement('input');input.type='number';input.min='0';input.step='any';input.value=alimonyAllocation.get(child.id)??'';
+    input.addEventListener('input',()=>{if(input.value==='')alimonyAllocation.delete(child.id);else alimonyAllocation.set(child.id,Number(input.value));render()});
+    label.append(input);list.append(label);
+  });
+}
 const alimonyWageRecords=new Map(),wageFields=alimonySection.querySelector('#alimony-wage-fields');
 let rosstatAnnualTable=null,lastWageRegion='';
 function wageRecordFor(year) {
@@ -280,9 +293,9 @@ function addChild() {
   row.querySelector('.child-role').addEventListener('input',updateRightsField);
   row.querySelector('.applying').addEventListener('input',updateRightsField);
   updateRightsField();
-  row.querySelector('.remove').onclick=()=>{row.remove();renderBenefitRows();renderChildIncomeRows();render()};
-  row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{renderBenefitRows();renderChildIncomeRows();refreshMaritalForm()}));
-  $('children').append(row); renderBenefitRows(); renderChildIncomeRows(); render();
+  row.querySelector('.remove').onclick=()=>{row.remove();renderBenefitRows();renderChildIncomeRows();renderAlimonyAllocationRows();render()};
+  row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{renderBenefitRows();renderChildIncomeRows();renderAlimonyAllocationRows();refreshMaritalForm()}));
+  $('children').append(row); renderBenefitRows(); renderChildIncomeRows();renderAlimonyAllocationRows(); render();
 }
 function renderBenefitRows() {
   const childOptions=[...document.querySelectorAll('#children .form-row')].map((row,i)=>({id:row.dataset.childId,label:row.querySelector('.child-name').value||`Ребёнок ${i+1}`}));
@@ -372,7 +385,7 @@ function refreshAssetOwners() {
 const yn = value => value==='' ? undefined : value==='yes';
 function childData() {
   return [...document.querySelectorAll('#children .form-row')].map(row=>({
-    id:row.dataset.childId,role:row.querySelector('.child-role').value,familyStatus:row.querySelector('.child-family-status').value,birthDate:row.querySelector('.birth').value,deathDate:row.querySelector('.death').value,educationStatus:row.querySelector('.education-status').value,educationFrom:row.querySelector('.education-from').value,educationTo:row.querySelector('.education-to').value,
+    id:row.dataset.childId,name:row.querySelector('.child-name').value,role:row.querySelector('.child-role').value,familyStatus:row.querySelector('.child-family-status').value,birthDate:row.querySelector('.birth').value,deathDate:row.querySelector('.death').value,educationStatus:row.querySelector('.education-status').value,educationFrom:row.querySelector('.education-from').value,educationTo:row.querySelector('.education-to').value,
     applying:row.querySelector('.applying').checked,applicantRights:row.querySelector('.applicant-rights').value,
     alimonyApplies:row.querySelector('.alimony-applies').checked,secondParentStatus:row.querySelector('.second-parent-status').value,
     awardRecipient:row.querySelector('.award-recipient').value,courtResidence:yn(row.querySelector('.court-residence').value),
@@ -471,6 +484,8 @@ function render() {
     const receiving=sourceEnabled.has('alimony')&&$('alimony-received').value==='yes';
     const alimonyChildren=children.filter(c=>c.alimonyApplies && members.included.some(p=>p.id===c.id) && c.birthDate && ageAt(c.birthDate,filingDate)<18 && !(c.deathDate&&c.deathDate<=filingDate) && !c.married);
     const excludedAlimonyChildren=children.some(c=>c.alimonyApplies&&!alimonyChildren.includes(c));
+    const ambiguousAlimonyRecipient=children.some(c=>c.alimonyApplies && (!c.birthDate || members.unanswered.some(p=>p.person.id===c.id)
+      || c.birthDate && ageAt(c.birthDate,filingDate)>=18 && ageAt(c.birthDate,filingDate)<23 && members.included.some(p=>p.id===c.id)));
     const secondParent=soleParentStatus(alimonyChildren.map(c=>c.role==='ward'?{...c,secondParentStatus:'blank'}:c));
     const courtAmounts=Object.fromEntries(incomeWindow(month).map(m=>[m,receiving && alimonyFrom && alimonyTo && m>=alimonyFrom && m<=alimonyTo ? Number(alimonyMonthly) : 0]));
     const alimony=maritalStatus?alimonyForApplication({
@@ -482,8 +497,19 @@ function render() {
       receivedByMonth:courtAmounts,wageRecords:[year-2,year-1].map(wageRecordFor).filter(Boolean)
     },month):{status:'unknown',reason:'Укажите семейное положение'};
     if(!alimonyChildren.length && !receiving) {alimony.status='known';alimony.amount=0;alimony.method='no-eligible-child'}
-    if(!alimonyChildren.length && receiving) {alimony.status='unknown';alimony.reason='Уточните, кому перечислялись алименты: на ребёнка вне состава семьи они не учитываются'}
-    if(receiving && excludedAlimonyChildren) {alimony.status='unknown';alimony.reason='Разделите поступления по детям: алименты на умершего или не входящего в состав семьи ребёнка исключаются'}
+    if(!alimonyChildren.length && receiving && excludedAlimonyChildren && !ambiguousAlimonyRecipient) {
+      alimony.status='known';alimony.amount=0;alimony.method='excluded-child';
+    }
+    if(!alimonyChildren.length && receiving && (!excludedAlimonyChildren || ambiguousAlimonyRecipient)) {
+      alimony.status='unknown';alimony.reason='Уточните ребёнка, на которого перечислялись алименты, и возможное региональное правило до 23 лет';
+    }
+    if(receiving && alimonyChildren.length && excludedAlimonyChildren) {
+      const actualOnly=maritalStatus!=='divorced'||['court','court-order','bailiffs'].includes($('alimony-kind').value)||secondParent==='sole';
+      if(actualOnly && !ambiguousAlimonyRecipient) {
+        const recipients=children.filter(c=>c.alimonyApplies).map(c=>c.id);
+        Object.assign(alimony,allocatedAlimonyIncome(courtAmounts,Object.fromEntries(alimonyAllocation),recipients,alimonyChildren.map(c=>c.id),month));
+      } else {alimony.status='unknown';alimony.reason=ambiguousAlimonyRecipient?'Уточните региональное правило для алиментов на ребёнка 18–22 лет':'Для неоформленных алиментов или соглашения нужны отдельные обязательства по детям; общую сумму нельзя делить автоматически'}
+    }
     if(receiving && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните фактически поступившие алименты и период'}
     if(alimonyChildren.length && maritalStatus==='divorced' && !['court','court-order','bailiffs'].includes($('alimony-kind').value) && !['sole','other'].includes(secondParent)) {alimony.status='unknown';alimony.reason=secondParent==='mixed'?'У детей разные вторые родители: укажите отдельные алиментные обязательства; общий расчёт сейчас недоступен':'Уточните статус второго родителя у детей, указанных в алиментном обязательстве'}
     let scenarioBlocks=false,scenarioComplete=scenarios.length>0&&selected.length>0,shortcutOnly=true;
