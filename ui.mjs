@@ -3,7 +3,7 @@ import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-7';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20260930-10';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20260930-11';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 import {CHILD_BENEFIT_KINDS,childBenefitIncome} from './benefits.mjs';
@@ -375,7 +375,7 @@ function renderIncomeForm() {
         label.append(input); grid.append(label);
       }); details.append(grid);section.append(details);
     }
-    if(index>0) {const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='Убрать';remove.onclick=()=>{incomePeople.splice(index,1);renderIncomeForm();render()};section.append(remove)}
+    if(index>0&&$('marital-status').value!=='married') {const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='Убрать';remove.onclick=()=>{incomePeople.splice(index,1);renderIncomeForm();render()};section.append(remove)}
     $('income-people').append(section);
   });
   $('add-adult').disabled=incomePeople.length>1;
@@ -566,7 +566,7 @@ function render() {
     const day=String(Math.max(1,Math.min(28,Number($('day').value)||1))).padStart(2,'0');
     const filingDate=`${month}-${day}`;
     const pregnancyState=pregnancyAtDate({weeks:$('weeks').value,referenceDate:`${start}-${day}`,applicationDate:filingDate,forecastThrough:$('pregnancy-forecast-through').value,endedDate:$('pregnancy-ended').value});
-    const members=includedFamily([{role:'applicant'},...($('marital-status').value==='married'&&incomePeople.length>1?[{role:'spouse',familyStatus:$('spouse-status').value}]:[]),...children],filingDate);
+    const members=includedFamily([{role:'applicant'},...($('marital-status').value==='married'?[{role:'spouse',familyStatus:$('spouse-status').value}]:[]),...children],filingDate);
     const spouseRuleExcluded=members.excluded.some(x=>x.person.role==='spouse');
     const spouseExcluded=$('marital-status').value!=='married'||spouseRuleExcluded;
     const countedAdults=incomePeople.map((person,index)=>({person,index})).filter(x=>x.index===0||!spouseExcluded);
@@ -587,7 +587,7 @@ function render() {
     const countedDeposits=householdAssets[3].items.filter(item=>!mobilizedIndices.includes(item.owner==='applicant'?0:item.owner==='spouse'?1:-1));
     const allDepositsKnown=countedDeposits.filter(d=>!d.nominalWardAccount).every(d=>d.taxYear===year-1 && Number.isFinite(d.interestForRelevantTaxYear));
     const depositCheck=allDepositsKnown&&pmPerson!==null?checkDepositInterest(countedDeposits,{applicationMonth:month,perCapitaMinimum:pmPerson}):{status:'unknown'};
-    const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые члены семьи)':''}${spouseRuleExcluded?' (супруг исключён по п. 46)':''}. ${assetOwnerReview?'Для одного или нескольких объектов нужно уточнить владельца или его включение в состав семьи. ':''}Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}.`;
+    const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые члены семьи)':''}${$('marital-status').value==='married'&&members.unanswered.some(item=>item.person.role==='spouse')?' (уточните статус супруга)':''}${spouseRuleExcluded?' (супруг исключён по п. 46)':''}. ${assetOwnerReview?'Для одного или нескольких объектов нужно уточнить владельца или его включение в состав семьи. ':''}Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}.`;
     const assetText=`Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):carCheck.review?.join('; ')||'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по указанным объектам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):propertyCheck.review?.join('; ')||'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по указанным объектам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):otherCheck.review?.join('; ')||'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
     const baseMonths=(person,index)=>mobilizedIndices.includes(index)||!sourceEnabled.has('employment')?Object.fromEntries(incomeWindow(month).map(m=>[m,0])):$('income-mode').value==='period'?regularIncomeMonths(person,month,{knownThrough:currentMonth,projectFuture:person.projectFuture===true}):person.months;
     const incomeResult=incomeForMonth(countedAdults.map(({person,index})=>({...person,months:baseMonths(person,index),total:mobilizedIndices.includes(index)?0:sourceEnabled.has('employment')?person.total:0,mode:mobilizedIndices.includes(index)?'monthly':sourceEnabled.has('employment')&&$('income-mode').value==='total'?'total':'monthly',baseApplicationMonth:start})),month);
@@ -736,13 +736,15 @@ function render() {
     const adults=countedAdults.map(({person,index:j})=>{
       const income=Object.fromEntries(incomeWindow(month).map(m=>[m,[...(Number.isFinite(baseMonths(person,j)[m])?[{type:person.incomeType,amount:baseMonths(person,j)[m]}]:[]),...(supplemental.byPerson.get(j)?.[m]?.qualifying?[{type:'employment',amount:supplemental.byPerson.get(j)[m].qualifying}]:[])]]));
       const includedMinorWards=children.filter(c=>c.role==='ward'&&members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18);
+      const spouseStatusUnknown=j===1&&members.unanswered.some(item=>item.person.role==='spouse');
       const guardianUnknown=j===0&&includedMinorWards.length>0&&$('sole-guardian').value==='';
       const soleParent=j===0&&(children.some(c=>members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18&&c.role!=='ward'&&soleParentStatus([c])==='sole')||includedMinorWards.length>0&&$('sole-guardian').value==='yes');
       const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),applicationDate:filingDate,pregnancyWeeksAtApplication:j===0?pregnancyState.weeks:0,pregnancyStatusUnknown:j===0&&pregnancyState.status==='unknown'&&($('weeks').value!==''||$('pregnancy-applying').checked||$('pregnancy-forecast-through').value!==''||$('pregnancy-ended').value!==''),income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
+      if(spouseStatusUnknown)result.warnings.push('Уточните статус супруга: до этого его индивидуальный минимум дохода не подтверждён.');
       if(j===0&&pregnancyState.status==='forecast')result.warnings.push(pregnancyState.reason+'.');
       const amountKnown=mobilizedIndices.includes(j)||!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person,j)[m])):month===start&&Number.isFinite(person.total);
       const earned=!mobilizedIndices.includes(j)&&sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
-      return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&person.incomeType!=='other'&&supplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
+      return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&!spouseStatusUnknown&&person.incomeType!=='other'&&supplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
     });
     const needsMeansAssessment=!shortcutOnly||$('pregnancy-applying').checked;
     const newbornOnly=selected.length>0&&!needsMeansAssessment;

@@ -100,3 +100,12 @@ test('missing marital status cannot silently confirm a child application',()=>{
   assert.equal(childCanApply(child,'2026-09-01').status,'unknown');
   assert.equal(childCanApply({...child,married:false},'2026-09-01').status,'yes');
 });
+
+test('missing or unrecognized spouse status stays unresolved instead of being included',()=>{
+  for(const familyStatus of [undefined,'','unknown','unrecognized']) {
+    const family=includedFamily([{role:'applicant'},{role:'spouse',familyStatus}],'2026-09-01');
+    assert.equal(family.included.length,1);
+    assert.equal(family.unanswered.length,1);
+    assert.equal(family.excluded.length,0);
+  }
+});
