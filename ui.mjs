@@ -2,7 +2,7 @@ import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
-import { incomeWindow, minimumIncomeTest, reasonPeriod, monthIndex, monthString, RULES } from './engine.mjs';
+import { incomeWindow, minimumIncomeTest, reasonPeriod, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-7';
 import { includedFamily, childCanApply, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
