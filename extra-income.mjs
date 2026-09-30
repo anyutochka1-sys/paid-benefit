@@ -40,6 +40,7 @@ export const OTHER_BENEFIT_KINDS = {
   counted:{label:'Иное учитываемое пособие / компенсация',excluded:false},
   employerBirthAid:{label:'Единовременная материальная помощь работодателя при рождении / усыновлении / опеке',excluded:false},
   maternityCapitalMonthly:{label:'Ежемесячная выплата из материнского капитала на ребёнка до 3 лет',excluded:true},
+  maternityCapitalUse:{label:'Средства федерального или регионального материнского капитала (не ежемесячная выплата)',excluded:false},
   socialContract:{label:'Государственная социальная помощь по социальному контракту',excluded:true},
   taxRefund:{label:'Возврат НДФЛ из-за налогового вычета',excluded:true},
   funeral:{label:'Социальное пособие на погребение',excluded:true},
@@ -64,6 +65,13 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(!definition || !Number.isFinite(entry.amount) || entry.amount<0) {issues.push('Уточните вид и сумму дополнительного дохода');continue}
     const benefitKind=entry.type==='otherBenefit'?OTHER_BENEFIT_KINDS[entry.benefitKind]:null;
     if(entry.type==='otherBenefit'&&!benefitKind) {issues.push('Уточните вид другого пособия: часть выплат исключается по пункту 53');continue}
+    if(entry.type==='otherBenefit'&&entry.benefitKind==='maternityCapitalUse') {
+      const allowedFederal=['disabledGoods','individualHousing','blockHousing'];
+      if(entry.matcapConfirmed!==true || !['federal','regional'].includes(entry.matcapSource)
+        || entry.matcapSource==='federal'&&!allowedFederal.includes(entry.matcapPurpose)) {
+        issues.push('Уточните источник и документально подтверждённое направление маткапитала: не все виды расходования федеральных средств перечислены в пункте 53');continue;
+      }
+    }
     if(entry.type==='otherBenefit'&&['insuranceDamage','mseRehabilitation','targetedAssetSupport'].includes(entry.benefitKind)) {
       if(entry.benefitKind==='insuranceDamage' && (entry.from!==entry.to || entry.verifiedInsuranceDamage!==true)) {
         issues.push('Для страхового возмещения подтвердите единовременную выплату за вред жизни, здоровью или личному/общему имуществу и месяц получения');continue;
@@ -112,7 +120,7 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
         continue;
       }
     }
-    if(benefitKind?.excluded || entry.type==='otherBenefit'&&['insuranceDamage','mseRehabilitation','targetedAssetSupport'].includes(entry.benefitKind)) {
+    if(benefitKind?.excluded || entry.type==='otherBenefit'&&['insuranceDamage','mseRehabilitation','targetedAssetSupport','maternityCapitalUse'].includes(entry.benefitKind)) {
       excluded.push({type:entry.benefitKind,label:benefitKind.label,amount:entry.amount*months.length});
       continue;
     }
