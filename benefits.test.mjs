@@ -43,3 +43,20 @@ test('missing child link never silently removes an amount',()=>{
   const result=childBenefitIncome([{childId:'unknown',month:'2026-07',amount:19243}],children,['a'],'2026-09');
   assert.equal(result.total,null);
 });
+
+test('arrears for older child programs are excluded only on that child application',()=>{
+  for(const kind of ['decree606','decree175','nonworkingCare']) {
+    const paid=[{childId:'a',month:'2026-07',amount:42000,kind,forPastPeriods:true}];
+    assert.equal(childBenefitIncome(paid,children,['a'],'2026-09').total,0);
+    assert.equal(childBenefitIncome(paid,children,['b'],'2026-09').total,42000);
+    assert.equal(childBenefitIncome([{...paid[0],forPastPeriods:false}],children,['a'],'2026-09').total,42000);
+    assert.equal(childBenefitIncome([{...paid[0],forPastPeriods:undefined}],children,['a'],'2026-09').total,null);
+  }
+});
+test('previous first child payment and historic 8–17 payment follow their separate exclusions',()=>{
+  const first=[{childId:'a',month:'2026-07',amount:20000,kind:'firstChild'}];
+  assert.equal(childBenefitIncome(first,children,['a'],'2026-09').total,0);
+  assert.equal(childBenefitIncome(first,children,['b'],'2026-09').total,20000);
+  const historic=[{...first[0],kind:'oldEightToSeventeen'}];
+  assert.equal(childBenefitIncome(historic,children,['b'],'2026-09').total,0);
+});
