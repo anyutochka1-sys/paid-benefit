@@ -35,6 +35,17 @@ export function childBenefitIncome(payments, children, applicationChildIds, appl
     if (!Number.isFinite(payment.amount) || payment.amount<0) {
       missing.push(`Уточните сумму пособия за ${payment.month}`); continue;
     }
+    const age=ageAt(child.birthDate,applicationDate);
+    const outsideFamily=child.married===true || (child.familyStatus==='stateCare'&&child.role!=='ward')
+      || ['conscript','imprisoned','forcedTreatment','custody','missing','wanted'].includes(child.familyStatus)
+      || age>=18 && child.fullTimeStudent===false;
+    const adultChild=age>=18 && age<23 && !outsideFamily && !(child.deathDate&&child.deathDate<=applicationDate);
+    if(adultChild && !['oldEightToSeventeen','unified'].includes(kind) && payment.regionalPaymentThrough23===undefined) {
+      missing.push(`Уточните региональное основание выплаты на ребёнка 18–22 лет за ${payment.month}`); continue;
+    }
+    if(adultChild && payment.regionalPaymentThrough23===true && (child.fullTimeStudent===undefined || child.married===undefined)) {
+      missing.push(`Уточните очное обучение и семейное положение ребёнка 18–22 лет за ${payment.month}`); continue;
+    }
     const sameChild=selected.has(child.id);
     const excludedByKind=kind==='oldEightToSeventeen'
       || sameChild && (kind==='unified' || kind==='firstChild'
@@ -43,9 +54,11 @@ export function childBenefitIncome(payments, children, applicationChildIds, appl
       ? kind==='oldEightToSeventeen'?'прежнее пособие 8–17 лет исключено по п. 53 «к»':'подача на этого ребёнка: исключение по виду и периоду выплаты'
       : child.deathDate && child.deathDate<=applicationDate
         ? 'ребёнок умер до даты заявления'
-      : child.married
+      : outsideFamily
         ? 'ребёнок не входит в состав семьи'
-      : kind==='unified' && ageAt(child.birthDate,applicationDate)>=17
+      : age>=23 || age>=18 && payment.regionalPaymentThrough23===false
+        ? 'возраст ребёнка на дату подачи заявления (п. 53 «н»)'
+      : kind==='unified' && age>=17
         ? 'ребёнку исполнилось 17 лет'
         : null;
     const record={...payment,reason:excludedReason};
