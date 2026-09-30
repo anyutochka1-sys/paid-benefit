@@ -45,6 +45,9 @@ export const OTHER_BENEFIT_KINDS = {
   funeral:{label:'Социальное пособие на погребение',excluded:true},
   emergencyAid:{label:'Единовременная помощь в связи с ЧС или терактом',excluded:true},
   childTreatmentAid:{label:'Единовременная материальная помощь на лечение ребёнка',excluded:true},
+  insuranceDamage:{label:'Страховое возмещение вреда жизни, здоровью или имуществу',excluded:false},
+  mseRehabilitation:{label:'Выплата на дополнительные расходы по реабилитации по решению МСЭ',excluded:false},
+  targetedAssetSupport:{label:'Целевая господдержка на покупку жилья, транспорта или техники',excluded:false},
   pregnancyBenefitArrears:{label:'Доплата единого пособия беременной за прошлые периоды',excluded:true},
   disabledChildCare:{label:'Ежемесячная выплата по уходу родителю ребёнка-инвалида или инвалида с детства I группы',excluded:true},
   parentAward:{label:'Выплата за звание «Мать-героиня», орден или медаль «Родительская слава»',excluded:true},
@@ -61,6 +64,17 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(!definition || !Number.isFinite(entry.amount) || entry.amount<0) {issues.push('Уточните вид и сумму дополнительного дохода');continue}
     const benefitKind=entry.type==='otherBenefit'?OTHER_BENEFIT_KINDS[entry.benefitKind]:null;
     if(entry.type==='otherBenefit'&&!benefitKind) {issues.push('Уточните вид другого пособия: часть выплат исключается по пункту 53');continue}
+    if(entry.type==='otherBenefit'&&['insuranceDamage','mseRehabilitation','targetedAssetSupport'].includes(entry.benefitKind)) {
+      if(entry.benefitKind==='insuranceDamage' && (entry.from!==entry.to || entry.verifiedInsuranceDamage!==true)) {
+        issues.push('Для страхового возмещения подтвердите единовременную выплату за вред жизни, здоровью или личному/общему имуществу и месяц получения');continue;
+      }
+      if(entry.benefitKind==='mseRehabilitation' && entry.mseAdditionalExpenses!==true) {
+        issues.push('Для реабилитационных расходов требуется решение МСЭ о дополнительных расходах');continue;
+      }
+      if(entry.benefitKind==='targetedAssetSupport' && (entry.from!==entry.to || !['realEstate','vehicle','equipment'].includes(entry.assetPurpose) || entry.spentOnPurpose!==true)) {
+        issues.push('Для целевой господдержки подтвердите покупку указанного имущества на эти средства и месяц получения');continue;
+      }
+    }
     if(entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid') {
       if(entry.from!==entry.to || !entry.from) {issues.push('Помощь работодателя при рождении укажите в одном месяце выплаты');continue}
       if(typeof entry.birthAidFirstYear!=='boolean') {issues.push('Уточните, выплачена ли помощь работодателя в течение первого года после рождения, усыновления или установления опеки');continue}
@@ -84,7 +98,7 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
         continue;
       }
     }
-    if(benefitKind?.excluded) {
+    if(benefitKind?.excluded || entry.type==='otherBenefit'&&['insuranceDamage','mseRehabilitation','targetedAssetSupport'].includes(entry.benefitKind)) {
       excluded.push({type:entry.benefitKind,label:benefitKind.label,amount:entry.amount*months.length});
       continue;
     }
