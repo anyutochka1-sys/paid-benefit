@@ -41,3 +41,24 @@ test('estimate can change from 50 to 100 when a bonus leaves the window',()=>{
   assert.equal(childTier({...args,income12:630000}).tier,50);
   assert.equal(childTier({...args,income12:300000}).tier,100);
 });
+
+test('negative monthly income cannot lower family income',()=>{
+  const months=Object.fromEntries(incomeWindow('2026-09').map(month=>[month,0]));
+  months['2026-01']=-10000;
+  const result=incomeForMonth([{label:'Заявитель',mode:'monthly',months}],'2026-09');
+  assert.equal(result.total,null);
+  assert.ok(result.missing[0].includes('2026-01'));
+  months['2026-01']=0;
+  assert.equal(incomeForMonth([{label:'Заявитель',mode:'monthly',months}],'2026-09').total,0);
+});
+test('negative annual total is unknown while explicit zero is valid',()=>{
+  const person={label:'Заявитель',mode:'total',baseApplicationMonth:'2026-09',total:-1};
+  assert.equal(incomeForMonth([person],'2026-09').total,null);
+  assert.equal(incomeForMonth([{...person,total:0}],'2026-09').total,0);
+});
+test('negative income and inconsistent family counts cannot produce a benefit tier',()=>{
+  const common={income12:0,familySize:3,childrenApplying:1,pmPerson:20000,pmChild:19000};
+  for(const overrides of [{income12:-1},{familySize:2.5},{childrenApplying:1.5},{childrenApplying:4}])
+    assert.equal(childTier({...common,...overrides}).status,'unknown');
+  assert.equal(childTier(common).status,'estimate');
+});

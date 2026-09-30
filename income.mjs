@@ -11,15 +11,14 @@ export function incomeForMonth(people, applicationMonth) {
   const window=incomeWindow(applicationMonth), byPerson=[], missing=[];
   for (const person of people) {
     if (person.mode==='total') {
-      if (person.baseApplicationMonth!==applicationMonth || !Number.isFinite(person.total)) {
-        missing.push(`${person.label}: нужен помесячный прогноз`); continue;
-      }
+      if(person.baseApplicationMonth!==applicationMonth) {missing.push(`${person.label}: нужен помесячный прогноз`);continue;}
+      if(!Number.isFinite(person.total)||person.total<0) {missing.push(`${person.label}: укажите неотрицательную сумму за 12 месяцев`);continue;}
       byPerson.push({label:person.label,amount:person.total}); continue;
     }
     let sum=0;
     for (const m of window) {
       const n=person.months?.[m];
-      if (!Number.isFinite(n)) missing.push(`${person.label}: ${m}`);
+      if (!Number.isFinite(n)||n<0) missing.push(`${person.label}: ${m} — укажите неотрицательную сумму`);
       else sum+=n;
     }
     byPerson.push({label:person.label,amount:sum});
@@ -30,7 +29,7 @@ export function incomeForMonth(people, applicationMonth) {
 // Estimate under p. 7 Decree 2330. Other eligibility tests are separate.
 export function childTier({income12,familySize,childrenApplying,pmPerson,pmChild}) {
   if (![income12,familySize,childrenApplying,pmPerson,pmChild].every(Number.isFinite) ||
-      familySize<1 || childrenApplying<1 || pmPerson<=0 || pmChild<=0)
+      income12<0 || !Number.isInteger(familySize) || !Number.isInteger(childrenApplying) || familySize<1 || childrenApplying<1 || childrenApplying>familySize || pmPerson<=0 || pmChild<=0)
     return {status:'unknown'};
   const base=income12/12/familySize;
   if (base>pmPerson) return {status:'income-too-high',base};

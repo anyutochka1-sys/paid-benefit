@@ -4,7 +4,7 @@ import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
 import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20260930-11';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
 import {CHILD_BENEFIT_KINDS,childBenefitIncome} from './benefits.mjs';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
@@ -591,6 +591,7 @@ function render() {
     const assetText=`Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):carCheck.review?.join('; ')||'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по указанным объектам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):propertyCheck.review?.join('; ')||'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по указанным объектам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):otherCheck.review?.join('; ')||'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
     const baseMonths=(person,index)=>mobilizedIndices.includes(index)||!sourceEnabled.has('employment')?Object.fromEntries(incomeWindow(month).map(m=>[m,0])):$('income-mode').value==='period'?regularIncomeMonths(person,month,{knownThrough:currentMonth,projectFuture:person.projectFuture===true}):person.months;
     const incomeResult=incomeForMonth(countedAdults.map(({person,index})=>({...person,months:baseMonths(person,index),total:mobilizedIndices.includes(index)?0:sourceEnabled.has('employment')?person.total:0,mode:mobilizedIndices.includes(index)?'monthly':sourceEnabled.has('employment')&&$('income-mode').value==='total'?'total':'monthly',baseApplicationMonth:start})),month);
+    const incomeEntryReviewText=incomeResult.missing.length?'Ввод доходов требует уточнения: '+incomeResult.missing.slice(0,3).join('; ')+(incomeResult.missing.length>3?`; ещё ${incomeResult.missing.length-3} незаполненных или неверных сумм`:'')+'.':'';
     const supplemental=additionalIncomeForApplication(withOfficialRates(additionalEntries.filter(e=>sourceEnabled.has(e.type)),month,cbrRateTable),month,[...new Set([...mobilizedIndices,...(spouseExcluded?[1]:[])])]);
     const childEarnings=childIncomeForApplication(sourceEnabled.has('childIncome')?childIncomeEntries:[],children,members,month);
     const applicationSelection=applicationChildren(children,filingDate);
@@ -728,7 +729,7 @@ function render() {
     }
     if(!RULES[year]) {
       overview.needs++;
-      output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',`${applicationSelectionText} ${familyText} ${assetText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.`,'unknown',i===0));
+      output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',`${incomeEntryReviewText} ${applicationSelectionText} ${familyText} ${assetText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.`,'unknown',i===0));
       continue;
     }
     // Future pregnancy conditions require an explicit continuation forecast.
@@ -742,7 +743,7 @@ function render() {
       const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),applicationDate:filingDate,pregnancyWeeksAtApplication:j===0?pregnancyState.weeks:0,pregnancyStatusUnknown:j===0&&pregnancyState.status==='unknown'&&($('weeks').value!==''||$('pregnancy-applying').checked||$('pregnancy-forecast-through').value!==''||$('pregnancy-ended').value!==''),income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
       if(spouseStatusUnknown)result.warnings.push('Уточните статус супруга: до этого его индивидуальный минимум дохода не подтверждён.');
       if(j===0&&pregnancyState.status==='forecast')result.warnings.push(pregnancyState.reason+'.');
-      const amountKnown=mobilizedIndices.includes(j)||!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person,j)[m])):month===start&&Number.isFinite(person.total);
+      const amountKnown=mobilizedIndices.includes(j)||!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person,j)[m])&&baseMonths(person,j)[m]>=0):month===start&&Number.isFinite(person.total)&&person.total>=0;
       const earned=!mobilizedIndices.includes(j)&&sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
       return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&!spouseStatusUnknown&&person.incomeType!=='other'&&supplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
     });
@@ -767,7 +768,7 @@ function render() {
     overview[explicitBlockers?'blocked':clear?'clear':'needs']++;
     const comparableTier=clear&&scenarios.length===1&&scenarioTiers.length===1?scenarioTiers[0]:null;
     if(comparableTier!==null)candidates.push({date:filingDate,tier:comparableTier});
-    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${applicationSelectionText} ${rightsText} ${capacityText} ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}${!newbornOnly&&adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
+    output.push(resultCard(filingDate,incomeWindow(month),`${headline}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${applicationSelectionText} ${rightsText} ${capacityText} ${contextText} ${newbornOnly?'':incomeEntryReviewText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}${!newbornOnly&&adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
   }
   const best=candidates.reduce((current,item)=>!current||item.tier>current.tier?item:current,null);
   const bestText=best?` Среди месяцев с сопоставимыми данными наибольшая предварительная ступень — <strong>${best.tier}%</strong> при подаче <strong>${best.date}</strong>. Если ступень одинакова, показан первый месяц.`:'';
