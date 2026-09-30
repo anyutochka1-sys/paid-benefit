@@ -15,18 +15,24 @@ export function adultStudentChecks(children,family,entries,applicationMonth,fili
       const threshold=result.minimum;
       const birthdayMonth=`${Number(child.birthDate.slice(0,4))+18}-${child.birthDate.slice(5,7)}`;
       const relevant=entries.filter(entry=>entry.childId===child.id);
-      let earned=0,complete=true;
+      let earned=0,certainAdultEarned=0,complete=true;
       for(const entry of relevant) {
         if(!entry.from||!entry.to||entry.from>entry.to||!Number.isFinite(entry.amount)||entry.amount<0){complete=false;continue}
         if(!['employment','scholarship','publicDutyCompensation','other'].includes(entry.type)){complete=false;continue}
         if(!['employment','scholarship'].includes(entry.type))continue;
-        for(const month of window)if(month>=entry.from&&month<=entry.to)earned+=entry.amount;
+        for(const month of window)if(month>=entry.from&&month<=entry.to) {
+          earned+=entry.amount;
+          // The birthday month may mix minor and adult income. Count it only
+          // when the eighteenth birthday was on its first calendar day.
+          if(month>birthdayMonth || month===birthdayMonth&&child.birthDate.slice(8)==='01')certainAdultEarned+=entry.amount;
+        }
       }
       // The treatment of pre-18 earnings in the window depends on the minor's
       // education and exact receipt date in the birthday month.
       const birthdayInWindow=window.includes(birthdayMonth)||window.some(month=>month<birthdayMonth);
-      if(complete&&!birthdayInWindow&&earned>=threshold)
-        return {childId:child.id,status:'yes',reason:'введённый подходящий доход достигает минимума',earned,minimum:threshold,creditedMonths:result.creditedMonths};
-      return {childId:child.id,status:'unknown',reason:birthdayInWindow?'Период включает доход до 18-летия: нужны точные даты и проверка исключений':'Уточните месяцы очной учёбы, все доходы и другие уважительные причины',earned,minimum:threshold,creditedMonths:result.creditedMonths};
+      const confirmedEarned=birthdayInWindow?certainAdultEarned:earned;
+      if(complete&&confirmedEarned>=threshold)
+        return {childId:child.id,status:'yes',reason:birthdayInWindow?'заработок после 18-летия без спорного месяца достигает минимума':'введённый подходящий доход достигает минимума',earned:confirmedEarned,minimum:threshold,creditedMonths:result.creditedMonths};
+      return {childId:child.id,status:'unknown',reason:birthdayInWindow?'Для зачёта дохода до 18-летия и в месяц дня рождения нужны точные даты и проверка исключений':'Уточните месяцы очной учёбы, все доходы и другие уважительные причины',earned:confirmedEarned,minimum:threshold,creditedMonths:result.creditedMonths};
     });
 }
