@@ -20,3 +20,21 @@ test('sole parent status exempts the applicant from the minimum earnings test',(
   assert.equal(result.exempt,true);
   assert.equal(result.minimum,0);
 });
+
+test('adult care credits months before the July 2026 change',()=>{
+  const reasons=[{type:'careDisabledAdult',start:'2025-06',end:'2026-05'}];
+  const result=minimumIncomeTest({reasons,applicationDate:'2026-07-20'},'2026-07',27093);
+  assert.equal(result.exempt,true);
+});
+
+test('from 21 July 2026 adult care needs eligible family relationship',()=>{
+  const reason={type:'careDisabledAdult',start:'2025-06',end:'2026-05'};
+  const unknown=minimumIncomeTest({reasons:[reason],applicationDate:'2026-07-21'},'2026-07',27093);
+  assert.equal(unknown.creditedMonths,0);
+  assert.equal(unknown.uncertain,true);
+  const outsider=minimumIncomeTest({reasons:[{...reason,careRelationship:'ineligible'}],applicationDate:'2026-07-21'},'2026-07',27093);
+  assert.equal(outsider.creditedMonths,0);
+  assert.equal(outsider.uncertain,false);
+  const family=minimumIncomeTest({reasons:[{...reason,careRelationship:'eligible'}],applicationDate:'2026-07-21'},'2026-07',27093);
+  assert.equal(family.exempt,true);
+});
