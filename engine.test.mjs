@@ -43,3 +43,12 @@ test('qualifying salary must be tested for each adult, child benefits cannot sat
 test('unknown next-year PM cannot be presented as approved', () => {
   assert.equal(assessMonth({ familySizeByMonth:{ '2027-01':3 }, pmByYear:{ 2026:{perCapita:20000} } }, '2027-01').status, 'unknown');
 });
+
+test('unknown pregnancy prevents a definite minimum-income failure',()=>{
+  const unknown=minimumIncomeTest({pregnancyStatusUnknown:true},'2026-11',27093);
+  assert.equal(unknown.passed,false);
+  assert.equal(unknown.uncertain,true);
+  assert.equal(minimumIncomeTest({pregnancyWeeksAtApplication:12},'2026-11',27093).exempt,true);
+  assert.equal(minimumIncomeTest({pregnancyStatusUnknown:true,reasons:[{type:'pregnancy',start:'2026-01',end:'2026-06'}]},'2026-11',27093).exempt,true);
+  assert.equal(minimumIncomeTest({},'2026-11',27093).uncertain,false);
+});

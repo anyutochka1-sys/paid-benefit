@@ -72,6 +72,10 @@ export function minimumIncomeTest(adult, applicationMonth, mrot) {
   const pregnancyOverride = pregnantMonths.size >= 6 || (adult.pregnancyWeeksAtApplication ?? 0) >= 12;
   pregnantMonths.forEach(m => credited.add(m));
   const exempt = pregnancyOverride || credited.size >= 10 || adult.singleParent === true || adult.multipleChildrenExemption === true;
+  if(adult.pregnancyStatusUnknown&&!exempt) {
+    uncertain=true;
+    warnings.push('Срок беременности на дату подачи неизвестен: возможное освобождение от минимального дохода требует уточнения.');
+  }
   const minimum = exempt ? 0 : mrot * 8 * (12 - credited.size) / 12;
   const qualifyingTypes = new Set(['employment', 'sickLeave', 'business', 'selfEmployed', 'pension', 'scholarship', 'military', 'copyright', 'foreignEarned']);
   const earned = window.reduce((sum, month) => sum + (adult.income?.[month] ?? []).filter(row => qualifyingTypes.has(row.type)).reduce((s, row) => s + Number(row.amount || 0), 0), 0);

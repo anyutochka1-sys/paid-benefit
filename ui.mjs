@@ -16,7 +16,7 @@ import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
 import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs';
-import {pregnancyTier} from './pregnancy.mjs';
+import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
 import {confirmedRegionalWage} from './rosstat-wages.mjs';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
@@ -561,6 +561,7 @@ function render() {
     const pmPerson=pm.status==='known'?pm.person:null,pmChild=pm.status==='known'?pm.child:null;
     const day=String(Math.max(1,Math.min(28,Number($('day').value)||1))).padStart(2,'0');
     const filingDate=`${month}-${day}`;
+    const pregnancyState=pregnancyAtDate({weeks:$('weeks').value,referenceDate:`${start}-${day}`,applicationDate:filingDate,forecastThrough:$('pregnancy-forecast-through').value,endedDate:$('pregnancy-ended').value});
     const members=includedFamily([{role:'applicant'},...($('marital-status').value==='married'&&incomePeople.length>1?[{role:'spouse',familyStatus:$('spouse-status').value}]:[]),...children],filingDate);
     const spouseRuleExcluded=members.excluded.some(x=>x.person.role==='spouse');
     const spouseExcluded=$('marital-status').value!=='married'||spouseRuleExcluded;
@@ -702,10 +703,10 @@ function render() {
     if($('pregnancy-applying').checked) {
       if(capacity.pregnancy?.status==='block')pregnancyText=capacity.pregnancy.reason+'.';
       else if(capacity.status==='unknown')pregnancyText='По беременности: сначала уточните судебное решение о дееспособности и даты.';
-      else if(month!==start) pregnancyText='Отдельное заявление по беременности: для будущего месяца уточните срок на дату подачи и дату окончания беременности.';
+      else if(pregnancyState.status==='ended'||pregnancyState.status==='unknown') pregnancyText=`По беременности: ${pregnancyState.reason}.`;
       else if($('pregnancy-registered').value!=='yes') pregnancyText=$('pregnancy-registered').value==='no'?'По беременности: нужна постановка на учёт в ранний срок.':'По беременности: уточните постановку на учёт до 12 недель.';
       else if($('weeks').value==='') pregnancyText='По беременности: укажите срок на дату подачи.';
-      else if(Number($('weeks').value)<12) pregnancyText='По беременности: обратиться за назначением можно после наступления 12 недель.';
+      else if(pregnancyState.weeks<12) pregnancyText='По беременности: обратиться за назначением можно после наступления 12 недель.';
       else {
         const pregnancyBenefits=childBenefitIncome(benefitRows.payments,children,[],month,filingDate);
         const pregnancyIncome=!sourceComplete||incomeResult.total===null||pregnancyBenefits.total===null||benefitRows.missing.length||pregnancyBenefits.missing.length||alimony.status!=='known'||depositIncome.status!=='known'||maternityIncome.status!=='known'||supplemental.status!=='known'||childEarnings.status!=='known'?null:incomeResult.total+pregnancyBenefits.total+alimony.amount+depositIncome.amount+maternityIncome.amount+supplemental.amount+childEarnings.amount;
@@ -719,13 +720,15 @@ function render() {
       output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',`${familyText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.`,'unknown',i===0));
       continue;
     }
-    // An entered 12-week condition is applicable only to the selected month.
+    // Future pregnancy conditions require an explicit continuation forecast.
+    if($('pregnancy-applying').checked&&pregnancyState.status==='forecast')pregnancyText+=` ${pregnancyState.reason}.`;
     const adults=countedAdults.map(({person,index:j})=>{
       const income=Object.fromEntries(incomeWindow(month).map(m=>[m,[...(Number.isFinite(baseMonths(person,j)[m])?[{type:person.incomeType,amount:baseMonths(person,j)[m]}]:[]),...(supplemental.byPerson.get(j)?.[m]?.qualifying?[{type:'employment',amount:supplemental.byPerson.get(j)[m].qualifying}]:[])]]));
       const includedMinorWards=children.filter(c=>c.role==='ward'&&members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18);
       const guardianUnknown=j===0&&includedMinorWards.length>0&&$('sole-guardian').value==='';
       const soleParent=j===0&&(children.some(c=>members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18&&c.role!=='ward'&&soleParentStatus([c])==='sole')||includedMinorWards.length>0&&$('sole-guardian').value==='yes');
-      const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),applicationDate:filingDate,pregnancyWeeksAtApplication:j===0&&i===0?Number($('weeks').value):0,income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
+      const result=minimumIncomeTest({reasons:reasons.filter(r=>r.person===j),applicationDate:filingDate,pregnancyWeeksAtApplication:j===0?pregnancyState.weeks:0,pregnancyStatusUnknown:j===0&&pregnancyState.status==='unknown'&&($('weeks').value!==''||$('pregnancy-applying').checked||$('pregnancy-forecast-through').value!==''||$('pregnancy-ended').value!==''),income,singleParent:soleParent,multipleChildrenExemption:j===0&&$('large-family').checked},month,RULES[year].mrot);
+      if(j===0&&pregnancyState.status==='forecast')result.warnings.push(pregnancyState.reason+'.');
       const amountKnown=mobilizedIndices.includes(j)||!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person,j)[m])):month===start&&Number.isFinite(person.total);
       const earned=!mobilizedIndices.includes(j)&&sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
       return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&person.incomeType!=='other'&&supplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
@@ -741,7 +744,7 @@ function render() {
     const addressBasis=$('residence-basis').value;
     const addressReview=!addressBasis||addressBasis!=='permanent'&&$('address-proof').value!=='yes';
     const priorMeasureReview=priorSupportChecks.length?priorSupportChecks.some(check=>check.status==='unknown'):$('prior-measure').value!=='no';
-    const contextReview=capacity.status==='unknown'||addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
+    const contextReview=pregnancyState.status==='forecast'||capacity.status==='unknown'||addressReview||priorMeasureReview||rightsUnknown||assetOwnerReview||mobilizedIndices.length>0||studentChecks.some(check=>check.status!=='yes');
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'сравнение для выбранных заявлений выполнено ниже'}. ${mobilizedIndices.length?'Зарплата, дополнительные поступления, БиР и проценты по счетам отмеченных мобилизованных взрослых исключены; получателей детских выплат и алиментов, статус по Указу № 647 и правило минимального дохода нужно проверить по документам.':''}`;
     const explicitBlockers=capacity.status==='block'||applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
     const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&capacity.status!=='unknown'&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
@@ -764,7 +767,7 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
  $('start').addEventListener('input',()=>{renderIncomeForm();renderExtraRows();renderAlimonyWageYears();updatePmSelection()});
  $('pm-region').addEventListener('input',()=>{const code=$('pm-region').value;if(code!==lastWageRegion)alimonyWageRecords.clear();lastWageRegion=code;updatePmSelection();renderAlimonyWageYears()});
  $('pm-area').addEventListener('input',render);
-['capacity-decision','capacity-restored','applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','large-family','grace-used','disability','support-car','support-motorcycle','support-machine','rural'].forEach(id=>$(id).addEventListener('input',render));
+['capacity-decision','capacity-restored','applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','pregnancy-forecast-through','pregnancy-ended','large-family','grace-used','disability','support-car','support-motorcycle','support-machine','rural'].forEach(id=>$(id).addEventListener('input',render));
 $('applicant-capacity').addEventListener('input',()=>{$('capacity-dates').hidden=!['limited','incapable'].includes($('applicant-capacity').value);render()});
 renderIncomeForm();
 updatePmSelection();
