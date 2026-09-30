@@ -67,7 +67,7 @@ const alimonyAllocation=new Map();
 const extraAlimonyObligations=[];
 const extraObligationsPanel=document.createElement('div');
 extraObligationsPanel.innerHTML='<div class="section-heading"><h4>Другой плательщик алиментов</h4><button type="button" class="add-obligation">+ Добавить обязательство</button></div><p class="hint">В карточках детей снимите отметку первого обязательства с детей, которых укажете здесь, и укажите сумму первого платежа отдельно. Добавляйте строку для другого плательщика. При одном плательщике с несколькими документами общий расчёт требует проверки.</p><div class="obligation-rows"></div>';
-$('alimony-fields').append(extraObligationsPanel);
+alimonySection.querySelector('#alimony-fields').append(extraObligationsPanel);
 function renderExtraAlimonyObligations() {
   const list=extraObligationsPanel.querySelector('.obligation-rows');list.replaceChildren();
   const children=childData();
@@ -99,7 +99,7 @@ extraObligationsPanel.querySelector('.add-obligation').onclick=()=>{
 };
 const alimonySplit=document.createElement('details');
 alimonySplit.innerHTML='<summary>Алименты приходили на детей с разным статусом?</summary><p class="hint">Если одни дети входят в состав семьи, а другие нет, укажите сумму на каждого за месяц. Общая сумма должна совпасть с указанной выше. Для судебного акта и иных случаев без расчётного минимума учтём только суммы на детей из состава семьи. При нотариальном соглашении или неоформленных алиментах после развода укажите отдельные обязательства ниже; если одно обязательство охватывает включённых и исключённых детей, вывод остаётся открытым.</p><div class="alimony-split-rows"></div>';
-$('alimony-actual-fields').append(alimonySplit);
+alimonySection.querySelector('#alimony-actual-fields').append(alimonySplit);
 function renderAlimonyAllocationRows() {
   const list=alimonySplit.querySelector('.alimony-split-rows');list.replaceChildren();
   childData().filter(child=>child.alimonyApplies).forEach((child,i)=>{
