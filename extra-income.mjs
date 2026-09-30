@@ -85,6 +85,14 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     if(entry.type==='securities'&&(!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount)) {
       issues.push('Уточните расходы по операциям с ценными бумагами; они не могут превышать введённую выручку');continue;
     }
+    if(entry.type==='business') {
+      if(!['usnGross','usnDocumented','documentedOther'].includes(entry.businessBasis)) {
+        issues.push('Для ИП уточните налоговый режим и является ли введённая сумма выручкой или документально определённым доходом');continue;
+      }
+      if(entry.businessBasis==='usnDocumented' && (!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount||entry.expensesDocumented!==true)) {
+        issues.push('Для УСН «доходы» укажите подтверждённые расходы не выше выручки и возможность представить документы в СФР');continue;
+      }
+    }
     const months=definition.period==='annual'
       ? window.filter(m=>Number(m.slice(0,4))===entry.taxYear)
       : window.filter(m=>entry.from && entry.to && m>=entry.from && m<=entry.to);
@@ -104,7 +112,8 @@ export function additionalIncomeForApplication(entries,applicationMonth,excluded
     }
     const birthExclusion=entry.type==='otherBenefit'&&entry.benefitKind==='employerBirthAid'&&entry.birthAidFirstYear?entry.taxExemptAmount:0;
     if(birthExclusion && months.length) excluded.push({type:'employerBirthAid',label:'Необлагаемая часть помощи работодателя при рождении',amount:birthExclusion});
-    const relevantAmount=entry.type==='securities'?entry.amount-entry.expenses:entry.amount-birthExclusion;
+    const relevantAmount=entry.type==='securities'||entry.type==='business'&&entry.businessBasis==='usnDocumented'
+      ?entry.amount-entry.expenses:entry.amount-birthExclusion;
     const value=(definition.period==='annual'?relevantAmount/12:relevantAmount)*(entry.type==='foreignEarned'&&months.length?entry.rublesPerUnit:1);
     const person=byPerson.get(entry.personIndex)||{};
     for(const month of months) {
