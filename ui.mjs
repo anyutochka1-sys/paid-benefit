@@ -384,12 +384,15 @@ function depositData() {
     nominalWardAccount:row.querySelector('.nominal').checked
   }));
 }
+function resultCard(date,window,label,detail,tone,open) {
+  return `<details class="result"${open?' open':''}><summary><span class="result-date">${date}<small>Доходы: ${window[0]} — ${window.at(-1)}</small></span><span class="${tone}">${label}</span></summary><div class="result-detail">${detail}</div></details>`;
+}
 function render() {
   const start=$('start').value; if (!start) return;
   const sourceComplete=sourceEnabled.size>0||$('no-income').checked;
   const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData(),deposits=sourceEnabled.has('deposit')?depositData():[];
   const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked}));
-  const output=[];
+  const output=[], overview={blocked:0,clear:0,needs:0};
   for(let i=0;i<12;i++) {
     const month=monthString(monthIndex(start)+i), year=Number(month.slice(0,4));
     const pm=pmFor(year,$('pm-region').value,$('pm-area').value);
@@ -482,7 +485,11 @@ function render() {
         pregnancyText=result.status==='estimate'?`Отдельное заявление по беременности: предварительная ступень ${result.tier}% от ПМ трудоспособных (${result.monthly.toLocaleString('ru-RU')} ₽ в месяц). Прежние выплаты на детей, остающихся в семье, учтены в доходе этого заявления: ${pregnancyBenefits.total.toLocaleString('ru-RU')} ₽ за расчётный период. Сроки выплаты и остальные критерии ещё требуют проверки.`:result.status==='income-too-high'?'По беременности: доход отдельного заявления выше указанного ПМ на человека.':'По беременности: для ступени нужны подтверждённые доходы и ПМ.';
       }
     }
-    if(!RULES[year]) { output.push(`<div class="result"><strong>${filingDate}</strong><span class="unknown">${familyText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.</span></div>`); continue }
+    if(!RULES[year]) {
+      overview.needs++;
+      output.push(resultCard(filingDate,incomeWindow(month),'Для вывода нужны данные на '+year+' год',`${familyText} ${incomeText} ${pregnancyText} ${pm.status==='known'?`ПМ: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason} МРОТ на ${year} год ещё не загружен.`,'unknown',i===0));
+      continue;
+    }
     // An entered 12-week condition is applicable only to the selected month.
     const adults=countedAdults.map(({person,index:j})=>{
       const income=Object.fromEntries(incomeWindow(month).map(m=>[m,[...(Number.isFinite(baseMonths(person)[m])?[{type:person.incomeType,amount:baseMonths(person)[m]}]:[]),...(supplemental.byPerson.get(j)?.[m]?.qualifying?[{type:'employment',amount:supplemental.byPerson.get(j)[m].qualifying}]:[])]]));
@@ -503,9 +510,11 @@ function render() {
     const contextText=`Адрес подачи: ${addressReview?'нужно уточнить основание и подтверждение':'сведения введены, СФР проверит подтверждение'}. Прежние меры поддержки: ${priorMeasureReview?'нужно уточнить вид, получателей и сумму для сравнения по п. 31(м)':'не указаны'}.`;
     const explicitBlockers=applicantCheck==='no'||rightsBlocked||[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')||adults.some(a=>a.known&&!a.passed)||scenarioBlocks;
     const headline=explicitBlockers?'Есть препятствие по введённым данным':shortcutOnly&&selected.length&&applicantCheck!=='no'?'Для новорождённого проверьте упрощённое назначение ниже':scenarioComplete&&!$('pregnancy-applying').checked&&!contextReview&&applicantCheck==='yes'&&adults.every(a=>a.known||a.exempt)&&[carCheck,propertyCheck,otherCheck,depositCheck].every(c=>c.status==='yes')?'По проверенным критериям препятствий нет; полная оценка ещё не готова':'Для вывода нужны дополнительные данные';
-    output.push(`<div class="result"><strong>${filingDate}<small> · доходы ${incomeWindow(month)[0]} — ${incomeWindow(month).at(-1)}</small></strong><span class="${explicitBlockers?'bad':'unknown'}">${headline}. ${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${rightsText} ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}</span></div>`);
+    const clear=!explicitBlockers&&headline.startsWith('По проверенным критериям');
+    overview[explicitBlockers?'blocked':clear?'clear':'needs']++;
+    output.push(resultCard(filingDate,incomeWindow(month),headline,`${pm.status==='known'?`ПМ ${pm.area}: ${pm.person.toLocaleString('ru-RU')} ₽ на человека, ${pm.child.toLocaleString('ru-RU')} ₽ на ребёнка.`:pm.reason+'.'} Заявитель: ${applicantCheck==='yes'?'гражданство и проживание РФ подтверждены':applicantCheck==='no'?'нет необходимого гражданства или проживания':'уточните гражданство и проживание'}. ${rightsText} ${contextText} Минимальный доход: ${adultText}. ${incomeText} ${pregnancyText} ${familyText}${adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`,explicitBlockers?'bad':clear?'ok':'unknown',i===0));
   }
-  $('results').innerHTML=output.join('');
+  $('results').innerHTML=`<p class="forecast-overview">Прогноз на 12 месяцев: <strong>${overview.blocked}</strong> с препятствием, <strong>${overview.clear}</strong> без выявленных препятствий по проверенным критериям, <strong>${overview.needs}</strong> требуют уточнения. Оценка предварительная; откройте месяц для подробностей.</p>`+output.join('');
 }
 $('add').onclick=addReason;
 $('add-child').onclick=addChild; $('add-car').onclick=addCar;
