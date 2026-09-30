@@ -36,6 +36,17 @@ test('old motorboat ignored; two recent boats fail',()=>{
   assert.equal(checkOtherVehicles([{type:'boat',manufactureYear:2020},{type:'boat',manufactureYear:2025}],c).status,'yes');
   assert.equal(checkOtherVehicles([{type:'boat',manufactureYear:2021},{type:'boat',manufactureYear:2025}],c).status,'no');
 });
+test('supported vehicle exceptions remain specific to their type',()=>{
+  const ordinary={applicationYear:2026,multipleChildren:false,disabledFamilyMember:false,supportMotorcycle:false,supportMachine:false};
+  const bikes=[{type:'motorcycle'},{type:'motorcycle'}];
+  const machines=[{type:'machine',manufactureYear:2025},{type:'machine',manufactureYear:2025}];
+  assert.equal(checkOtherVehicles(bikes,{...ordinary,supportVehicle:true}).status,'no');
+  assert.equal(checkOtherVehicles(bikes,{...ordinary,supportMotorcycle:true}).status,'yes');
+  assert.equal(checkOtherVehicles(machines,{...ordinary,supportMotorcycle:true}).status,'no');
+  assert.equal(checkOtherVehicles(machines,{...ordinary,supportMachine:true}).status,'yes');
+  const assets={...context,supportVehicle:false,supportMotorcycle:true};
+  assert.equal(checkProperty([{type:'garage',familyShare:1},{type:'garage',familyShare:1}],assets).status,'yes');
+});
 test('partly owned flats or houses cannot cause a definite refusal from gross area alone',()=>{
   const context={familySize:3,rural:false,multipleChildren:false,disabledFamilyMember:false,supportVehicle:false};
   for(const type of ['apartment','house']) {
