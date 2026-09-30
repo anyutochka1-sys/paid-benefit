@@ -45,6 +45,7 @@ export const OTHER_BENEFIT_KINDS = {
   funeral:{label:'Социальное пособие на погребение',excluded:true},
   emergencyAid:{label:'Единовременная помощь в связи с ЧС или терактом',excluded:true},
   childTreatmentAid:{label:'Единовременная материальная помощь на лечение ребёнка',excluded:true},
+  pregnancyBenefitArrears:{label:'Доплата единого пособия беременной за прошлые периоды',excluded:true},
   disabledChildCare:{label:'Ежемесячная выплата по уходу родителю ребёнка-инвалида или инвалида с детства I группы',excluded:true},
   parentAward:{label:'Выплата за звание «Мать-героиня», орден или медаль «Родительская слава»',excluded:true},
   rehabilitationEquipment:{label:'Компенсация за самостоятельно приобретённые средства реабилитации',excluded:true},
