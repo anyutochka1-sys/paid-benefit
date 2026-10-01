@@ -30,3 +30,8 @@ test('structured result sections escape labels and omit empty sections',()=>{
   assert.equal(rendered.includes('<script>'),false);
   assert.equal(rendered.includes('Беременность'),false);
 });
+
+test('result dates and income windows use readable Russian months',()=>{
+  const rendered=resultCard('2026-10-01',['2025-09','2026-08'],'Оценка',[{title:'Срок',text:'С 2026-10 по 2027-03-31'}],'unknown',false);
+  assert.ok(rendered.includes('Октябрь 2026'));assert.ok(rendered.includes('сентябрь 2025 — август 2026'));assert.ok(rendered.includes('31 марта 2027'));assert.equal(rendered.includes('2026-10-01'),false);
+});
