@@ -82,3 +82,7 @@ header { padding:24px 0 12px } h1 { font-size:clamp(2rem,5vw,3.2rem); max-width:
 .basic-grid > .field-help { grid-column:1/-1 }
 
 header { padding:14px 0 8px } h1 { font-size:clamp(1.8rem,4vw,2.6rem) } header p { font-size:1rem;margin:12px 0 }
+
+.renewal-help { border-top:1px solid var(--line);margin-top:20px;padding-top:12px }
+.sources-help { font-size:.85rem;line-height:1.6 }
+@media(max-width:600px) { header h1 { font-size:1.65rem;margin:10px 0 } header p { font-size:.9rem;line-height:1.5 }.step-links { flex-wrap:nowrap;overflow-x:auto;padding-bottom:7px }.step-links button { flex-shrink:0 }.step-help { font-size:.9rem;margin:8px 0 }.check input[type=checkbox] { flex:0 0 auto;width:20px;height:20px }.panel h2 { font-size:1.5rem } }
