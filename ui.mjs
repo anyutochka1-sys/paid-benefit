@@ -811,6 +811,7 @@ const basicPanel=document.createElement('section');basicPanel.className='panel';
 basicPanel.innerHTML='<h2>Начнём с вашей семьи</h2><p class="step-intro">Выберите регион и семейное положение. Эти ответы определят, что спросим дальше.</p><div class="basic-grid"></div>';
 const basicGrid=basicPanel.querySelector('.basic-grid');
 basicGrid.append($('pm-region').closest('.demo-pm'));
+basicGrid.querySelector('.demo-pm h3').textContent='Где вы живёте?';
 for(const id of ['marital-status','spouse-status','large-family','disability','start','day'])basicGrid.append($(id).closest('label'));
 const dayDetails=document.createElement('details');dayDetails.className='field-help';dayDetails.innerHTML='<summary>Выбрать точный день подачи</summary><p class="hint">Если этого дня нет в месяце, используем последний день месяца.</p>';dayDetails.append(basicGrid.querySelector('#day').closest('label'));basicGrid.append(dayDetails);
 originalPanels[0].querySelector('h2').textContent='Условия подачи заявления';
@@ -980,6 +981,10 @@ function organizeChildCard(row) {
   const core=document.createElement('div');core.className='child-core';
   for(const cls of ['child-name','birth','child-role','applying','citizen','married','applicant-rights','second-parent-status','student','award-recipient'])core.append(row.querySelector('.'+cls).closest('label'));
   title.after(core);
+  for(const [cls,text] of [['award-recipient','Единое пособие уже назначено? Кому?'],['applicant-rights','Суд ограничивал или лишал вас прав на этого ребёнка?'],['married','Ребёнок состоит в браке?']]) {
+    const label=row.querySelector('.'+cls).closest('label');label.firstChild.textContent=text;
+  }
+
   const award=[...row.querySelectorAll('details')].find(d=>d.querySelector('.award-tier'));award.classList.add('award-fields');award.querySelector('summary').textContent='Размер и срок уже назначенного пособия';
   row.querySelector('.remove').textContent='Удалить ребёнка';
 }

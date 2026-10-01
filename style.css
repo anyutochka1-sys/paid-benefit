@@ -80,3 +80,5 @@ header { padding:24px 0 12px } h1 { font-size:clamp(2rem,5vw,3.2rem); max-width:
 @media print { main > .panel { display:none!important } #result-panel { display:block!important } .draft-tools,.step-help { display:none!important } #results details { display:block } }
 .basic-grid .check { flex-direction:row;align-items:center }
 .basic-grid > .field-help { grid-column:1/-1 }
+
+header { padding:14px 0 8px } h1 { font-size:clamp(1.8rem,4vw,2.6rem) } header p { font-size:1rem;margin:12px 0 }
