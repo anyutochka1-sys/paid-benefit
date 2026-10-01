@@ -51,3 +51,32 @@ details.result { display:block; margin:8px 0; padding:0; border:1px solid var(--
 .form-row > *, .reason > * { min-width:0 }
 @media(max-width:420px) { main { padding:20px 12px 50px } .panel { padding:18px 14px } .form-row,.reason,.income-grid { grid-template-columns:1fr } .form-row .check,.reason label:first-child { grid-column:auto } .section-heading { flex-wrap:wrap } }
 @media print { body { background:white; color:black } main { max-width:none;padding:0 } header { padding:0 } nav,.draft-tools,.wizard-actions,button,main > .panel:not(:last-of-type) { display:none!important } main > .panel:last-of-type { display:block!important;border:0;box-shadow:none;padding:0 } .completion-check { background:white } .result { break-inside:avoid } .result > summary::after { display:none } .result-section { break-inside:avoid } }
+
+/* Анкета: последовательные шаги и отдельные карточки детей. */
+header { padding:24px 0 12px } h1 { font-size:clamp(2rem,5vw,3.2rem); max-width:820px }
+#progress { display:block;overflow:visible;margin:20px 0 6px;padding:0 }
+.step-counter { font-size:1rem;color:var(--teal);font-weight:700;margin:0 0 12px }
+.step-links { display:flex;gap:7px;flex-wrap:wrap }
+.step-links button { background:#f2dfbd;color:#70491e;font-size:.82rem;padding:8px 11px }
+.step-links button.active { background:var(--teal);color:white }
+.step-help,.step-intro { color:#61716b;line-height:1.6 }
+.basic-grid,.child-core { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px }
+.basic-grid .demo-pm { grid-column:1/-1;margin:0;padding:0;border:0 }
+.child-card { display:block;border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0;background:white }
+.child-card-title { margin:0 0 14px;color:var(--teal) }
+.child-core label { margin:8px 0;font-size:.95rem }
+.child-card > details { border-top:1px solid var(--line);padding-top:12px }
+.child-card > .check { display:flex;flex-direction:row;align-items:center;margin:12px 0 }
+.child-card > .remove { margin-top:12px }
+.draft-tools { margin:8px 0;padding:12px 16px }
+.draft-tools .check { margin-top:12px }
+.pregnancy-choice { border-top:1px solid var(--line);margin-top:22px;padding-top:12px }
+.pregnancy-choice > .check { flex-direction:row;align-items:center }
+.result-overview { border:1px solid var(--line);border-radius:14px;padding:18px;margin:18px 0;background:#f4ead8 }
+.result-overview h3 { margin:0;color:var(--teal) }.result-overview p { margin:10px 0 0 }
+.result > summary .result-date { min-width:150px }
+.wizard-actions { position:sticky;bottom:0;padding:14px 0;background:var(--cream);z-index:2;border-top:1px solid var(--line) }
+@media(max-width:600px) { .basic-grid,.child-core { grid-template-columns:1fr } .basic-grid .demo-pm { grid-column:auto }.child-card { padding:14px }.step-links button { font-size:.75rem;padding:7px 9px }.wizard-actions button { min-width:0 } }
+@media print { main > .panel { display:none!important } #result-panel { display:block!important } .draft-tools,.step-help { display:none!important } #results details { display:block } }
+.basic-grid .check { flex-direction:row;align-items:center }
+.basic-grid > .field-help { grid-column:1/-1 }
