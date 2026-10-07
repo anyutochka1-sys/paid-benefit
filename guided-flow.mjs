@@ -52,7 +52,9 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   group(4,'property','Уточним вашу недвижимость',parents.property,[$('properties'),nodes.propertyAdds,field('rural')],{when:()=>[...document.querySelectorAll('.asset-choice:checked')].some(box=>!['asset-car','asset-vehicle'].includes(box.id))});
   group(4,'vehicles','Уточним транспорт семьи',parents.cars,[$('add-car'),$('cars'),field('support-car')],{when:()=>$('asset-car').checked});
   group(4,'other-vehicles','Расскажите об остальном транспорте',parents.property,[$('vehicle-fields')],{when:()=>$('asset-vehicle').checked});
-  group(5,'citizenship','Проверим основные условия',parents.conditions,[nodes.conditionsQuick,field('applicant-citizen'),field('applicant-residence'),field('applicant-capacity'),$('capacity-dates')],{required:['#applicant-citizen','#applicant-residence','#applicant-capacity']});
+  const conditionDetails=document.createElement('details');conditionDetails.className='optional-details';conditionDetails.innerHTML='<summary>Есть отличия или хочу проверить ответы</summary>';conditionDetails.append(field('applicant-citizen'),field('applicant-residence'),field('applicant-capacity'),$('capacity-dates'));
+  group(5,'citizenship','Проверим основные условия',parents.conditions,[nodes.conditionsQuick,conditionDetails],{required:['#applicant-citizen','#applicant-residence','#applicant-capacity']});
+  const conditionButton=nodes.conditionsQuick.querySelector('button'),confirmConditions=conditionButton.onclick;conditionButton.textContent='Да, всё верно';conditionButton.onclick=()=>{confirmConditions();if(!requiredMissing().length)advance();else conditionDetails.open=true;};
   group(5,'address','По какому адресу будете подавать?',parents.conditions,[field('residence-basis'),field('address-proof')],{required:['#residence-basis','#address-proof']});
   group(5,'prior','Переходите с другой выплаты?',parents.conditions,[field('prior-measure'),nodes.priorSupportPanel,$('renewal-help')],{required:['#prior-measure']});
   group(6,'result','Ваш предварительный результат',parents.result,[...parents.result.children]);
