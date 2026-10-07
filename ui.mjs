@@ -1,27 +1,29 @@
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext} from './benefit-amounts.mjs?v=20261007-31';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261007-31';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261007-31';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261007-31';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261007-32';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261007-32';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext} from './benefit-amounts.mjs?v=20261007-32';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261007-32';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261007-32';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261007-32';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261007-31';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261007-32';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261007-31';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261007-32';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261007-31';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261007-32';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261007-31';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261007-32';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261007-31';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261007-32';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -68,10 +70,12 @@ function updatePmSelection() {
   region.replaceChildren(new Option('Выберите регион',''));
   pmRegions(year).forEach(r=>region.add(new Option(r.name,r.code)));
   if([...region.options].some(o=>o.value===oldRegion))region.value=oldRegion;
-  area.replaceChildren(new Option('Выберите местность',''));
+  area.replaceChildren(new Option('Выберите зону',''));
   const areaYear=year===2027&&pmFor(year,region.value,oldArea).reason?.includes('ещё не загружены')?2026:year;
-  pmAreas(areaYear,region.value).forEach(name=>area.add(new Option(name,name)));
-  if([...area.options].some(o=>o.value===oldArea))area.value=oldArea;
+  const zones=pmZones(areaYear,region.value);
+  zones.forEach(zone=>{const option=new Option(zone.label,zone.value);option.dataset.search=zone.areas.join(' ');area.add(option)});
+  area.value=zoneValue(zones,oldArea);
+  syncSearchableSelect(region);syncSearchableSelect(area);
   area.closest('label').hidden=area.options.length===1;
   if(region.value!==oldRegion){alimonyWageRecords.clear();lastWageRegion=region.value;renderAlimonyWageYears()}
   render();
@@ -489,7 +493,7 @@ function renderBenefitRows() {
       const sameLabel=document.createElement('label');sameLabel.textContent='Пособие получали в том же регионе и населённом пункте, где подаёте сейчас?';
       const same=document.createElement('select');same.className='benefit-same-region';[['','Выберите'],['yes','Да'],['no','Нет, получали в другом месте']].forEach(([v,t])=>same.add(new Option(t,v)));same.value=payment.sameRegion||'';same.oninput=()=>{payment.sameRegion=same.value;payment.receiptsConfirmed=false;renderBenefitRows();render()};sameLabel.append(same);row.append(sameLabel);
       if(payment.sameRegion==='no'){
-        const label=document.createElement('label');label.textContent='Регион, в котором получали пособие';const select=document.createElement('select');select.add(new Option('Выберите регион',''));pmRegions(2026).forEach(r=>select.add(new Option(r.name,r.code)));select.className='benefit-region';select.value=payment.benefitRegion||'';select.oninput=()=>{payment.benefitRegion=select.value;payment.benefitAreas={};payment.receiptsConfirmed=false;renderBenefitRows();render()};label.append(select);row.append(label);
+        const label=document.createElement('label');label.textContent='Регион, в котором получали пособие';const select=document.createElement('select');select.add(new Option('Выберите регион',''));pmRegions(2026).forEach(r=>select.add(new Option(r.name,r.code)));select.className='benefit-region';select.value=payment.benefitRegion||'';select.oninput=()=>{payment.benefitRegion=select.value;payment.benefitAreas={};payment.receiptsConfirmed=false;renderBenefitRows();render()};label.append(select);row.append(label);searchableSelect(select,{label:'Регион, в котором получали пособие'});
       }
       const tierLabel=document.createElement('label');tierLabel.textContent='Какой размер пособия был назначен?';const tier=document.createElement('select');tier.className='benefit-tier';[['','Выберите'],['50','50%'],['75','75%'],['100','100%']].forEach(([v,t])=>tier.add(new Option(t,v)));tier.value=String(payment.tier||'');tier.oninput=()=>{payment.tier=tier.value;payment.receiptsConfirmed=false;renderBenefitRows();render()};tierLabel.append(tier);row.append(tierLabel);
       const note=document.createElement('p');note.className='hint';note.textContent='Сумма изменится с новым годом автоматически. Если менялся назначенный процент, добавьте отдельный период.';row.append(note);
@@ -508,9 +512,9 @@ function renderBenefitRows() {
       const months=Array.from({length:last-first+1},(_,i)=>monthString(first+i));const context={region:$('pm-region').value,area:$('pm-area').value};
       const code=payment.sameRegion==='yes'?context.region:payment.benefitRegion;
       for(const year of [...new Set(months.map(m=>Number(m.slice(0,4))))]){
-        const areas=pmAreas(year,code);const current=payment.benefitAreas?.[year]??(payment.sameRegion==='yes'?context.area:payment.benefitArea);
+        const areas=pmZones(year,code);const current=payment.benefitAreas?.[year]??(payment.sameRegion==='yes'?context.area:payment.benefitArea);
         if(areas.length&&pmFor(year,code,current).status!=='known'){
-          const label=document.createElement('label');label.textContent='Где получали пособие в '+year+' году?';const locality=document.createElement('select');locality.add(new Option('Выберите населённый пункт или район',''));areas.forEach(a=>locality.add(new Option(a,a)));locality.className='benefit-area';locality.value=payment.benefitAreas?.[year]||'';locality.oninput=()=>{payment.benefitAreas??={};payment.benefitAreas[year]=locality.value;payment.receiptsConfirmed=false;fillPreview();render()};label.append(locality);monthlyPreview.append(label);
+          const label=document.createElement('label');label.textContent='Где получали пособие в '+year+' году?';const locality=document.createElement('select');locality.add(new Option('Выберите населённый пункт или район',''));areas.forEach(zone=>{const option=new Option(zone.label,zone.value);option.dataset.search=zone.areas.join(' ');locality.add(option)});locality.className='benefit-area';locality.value=zoneValue(areas,payment.benefitAreas?.[year]||'');locality.oninput=()=>{payment.benefitAreas??={};payment.benefitAreas[year]=locality.value;payment.receiptsConfirmed=false;fillPreview();render()};label.append(locality);monthlyPreview.append(label);searchableSelect(locality,{label:'Зона получения пособия в '+year+' году',placeholder:'Введите город, район или выберите зону'});
         }
         const values=[...new Set(months.filter(m=>m.startsWith(String(year))).map(m=>unifiedReceiptSuggestion(payment,m,context)))];const line=document.createElement('p');line.className='hint';line.textContent=year+' год: '+(values.length===1&&values[0]!=null?values[0].toLocaleString('ru-RU')+' ₽ за обычный месяц':'нужно уточнить местность или суммы за этот год');monthlyPreview.append(line);
       }
@@ -901,6 +905,8 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
 ['capacity-decision','capacity-restored','applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','pregnancy-forecast-through','pregnancy-ended','large-family','grace-used','disability','support-car','support-motorcycle','support-machine','rural'].forEach(id=>$(id).addEventListener('input',render));
 $('applicant-capacity').addEventListener('input',()=>{$('capacity-dates').hidden=!['limited','incapable'].includes($('applicant-capacity').value);render()});
 renderIncomeForm();
+searchableSelect($('pm-region'),{label:'Регион проживания'});
+searchableSelect($('pm-area'),{label:'Зона прожиточного минимума',placeholder:'Введите город, район или выберите зону'});
 updatePmSelection();
 
 const originalPanels=[...document.querySelectorAll('main > .panel')];
@@ -999,7 +1005,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261007-31').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261007-32').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
@@ -1090,6 +1096,14 @@ function restoreDraft(data) {
     sourceEnabled.clear();for(const key of data.sources||[])sourceEnabled.add(key);
     updatePmSelection();
     for(const [id,value] of Object.entries(data.fixed))writeControl($(id),value);
+    const restoredYear=Number($('start').value.slice(0,4));
+    const zoneYear=restoredYear===2027&&pmFor(restoredYear,$('pm-region').value).status==='unknown'?2026:restoredYear;
+    $('pm-area').value=zoneValue(pmZones(zoneYear,$('pm-region').value),data.fixed['pm-area']?.value||'');
+    const previousContext={region:data.fixed['pm-region']?.value||'',area:data.fixed['pm-area']?.value||''};
+    const currentContext={region:$('pm-region').value,area:$('pm-area').value};
+    const sameZone=[2025,2026].every(year=>{const a=pmFor(year,currentContext.region,previousContext.area),b=pmFor(year,currentContext.region,currentContext.area);return a.status==='known'&&b.status==='known'&&a.person===b.person&&a.working===b.working&&a.child===b.child});
+    if(sameZone)for(const entry of benefitPayments)if(entry.confirmedContext===receiptContext(entry,previousContext))entry.confirmedContext=receiptContext(entry,currentContext);
+    syncSearchableSelect($('pm-region'));syncSearchableSelect($('pm-area'));
     alimonyAllocation.clear();for(const [key,value] of data.alimonyAllocation||[])alimonyAllocation.set(key,value);
     alimonyWageRecords.clear();for(const [key,value] of data.alimonyWageRecords||[])alimonyWageRecords.set(key,value);
     lastWageRegion=$('pm-region').value;
