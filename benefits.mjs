@@ -71,14 +71,15 @@ export function childBenefitIncome(payments, children, applicationChildIds, appl
 }
 
 // Only an explicit assumption can turn future receipts into a forecast amount.
-export function expandBenefitPayments(entries,applicationMonth,{knownThrough}={}) {
+export function expandBenefitPayments(entries,applicationMonth,{knownThrough,amountForMonth}={}) {
   const window=incomeWindow(applicationMonth),payments=[],missing=[];
   const valid=m=>/^\d{4}-(0[1-9]|1[0-2])$/.test(m||'');
   for(const entry of entries) {
     if(!valid(entry.from)||!valid(entry.to)||entry.from>entry.to) {missing.push('Укажите начало и конец выплаты пособия');continue;}
     for(const month of window)if(month>=entry.from&&month<=entry.to) {
       const future=Boolean(knownThrough&&month>knownThrough);
-      payments.push({...entry,month,amount:entry.amount===''||entry.amount==null?null:Number(entry.amount),futureUnconfirmed:future&&entry.projectFuture!==true,projected:future&&entry.projectFuture===true});
+      const value=amountForMonth?amountForMonth(entry,month):entry.amount;
+      payments.push({...entry,month,amount:value===''||value==null?null:Number(value),futureUnconfirmed:future&&entry.projectFuture!==true,projected:future&&entry.projectFuture===true});
     }
   }
   return {payments,missing};

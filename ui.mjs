@@ -1,26 +1,27 @@
-import {createGuidedFlow} from './guided-flow.mjs?v=20261007-28';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261007-28';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261007-28';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext} from './benefit-amounts.mjs?v=20261007-29';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261007-29';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261007-29';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261007-29';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261007-28';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261007-29';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20260930-16';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261007-29';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261007-28';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261007-29';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20260930-18';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261007-29';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261007-29';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -183,21 +184,23 @@ function wageRecordFor(year) {
 }
 function renderAlimonyWageYears() {
   const year=Number(($('start').value||currentMonth).slice(0,4));
-  wageFields.innerHTML='<p class="hint">Окончательные годовые данные Росстата подставляются после еженедельной сверки и подтверждения даты публикации. До этого их можно указать вручную; предварительные данные не подставляются. Для будущего года окно останется открытым до публикации. <a href="https://rosstat.gov.ru/labor_market_employment_salaries" target="_blank" rel="noopener">Раздел зарплат Росстата</a>.</p>';
+  wageFields.innerHTML='<p class="hint">Среднюю зарплату для расчёта алиментов подставляем сами по выбранному региону. Искать её и вводить вручную не нужно. На будущие месяцы расчёт уточнится после выхода новых официальных данных.</p><div class="wage-auto-summary"></div><details class="wage-manual"><summary>Проверить источник или уточнить данные</summary><p class="hint">Используем окончательные годовые значения Росстата, опубликованные СФР. Предварительные данные не заменяют окончательные.</p><a href="https://sfr.gov.ru/grazhdanam/semyam_s_detmi/edinoe_posobie/ocenka/" target="_blank" rel="noopener">Официальная таблица СФР</a></details>';
+
   for(const y of [year-2,year-1,year]) {
     const record=wageRecordFor(y)||{},row=document.createElement('div');row.className='form-row';row.dataset.year=String(y);
     row.innerHTML=`<strong>За ${y} год</strong><label>Средняя зарплата региона, ₽<input class="wage-amount" type="number" min="0"></label><label>Месяц публикации окончательных данных Росстата<input class="wage-published" type="month"></label><label class="check"><input class="wage-final" type="checkbox"> Это окончательные годовые данные</label>`;
     row.querySelector('.wage-amount').value=record.amount??'';
     row.querySelector('.wage-published').value=record.publishedMonth||'';
     row.querySelector('.wage-final').checked=record.final===true;
-    wageFields.append(row);
+    if(record.final&&record.amount){const line=document.createElement('p');line.className='hint';line.textContent=y+' год: '+record.amount.toLocaleString('ru-RU')+' ₽ — подставлено автоматически';wageFields.querySelector('.wage-auto-summary').append(line)}
+    wageFields.querySelector('.wage-manual').append(row);
   }
 }
 renderAlimonyWageYears();
 wageFields.addEventListener('input',e=>{const row=e.target.closest('.form-row');if(!row)return;const year=Number(row.dataset.year);alimonyWageRecords.set(year,{year,amount:row.querySelector('.wage-amount').value===''?null:Number(row.querySelector('.wage-amount').value),publishedMonth:row.querySelector('.wage-published').value,final:row.querySelector('.wage-final').checked});render()});
 benefitsSection.after(alimonySection);
 const maternitySection=document.createElement('section');
-maternitySection.innerHTML='<div class="section-heading"><h3>Пособие по беременности и родам (БиР)</h3><button id="add-maternity" type="button">+ Указать выплату</button></div><p class="hint">Вводите всю сумму разовой выплаты отдельно от зарплаты. Она распределяется по месяцам начисления, а не учитывается целиком в месяце поступления. Для обычного периода выставлено 5 месяцев; при продлении уточните срок по документу.</p><div id="maternity-payments"></div>';
+maternitySection.innerHTML='<div class="section-heading"><h3>Декретные — пособие по беременности и родам</h3><button id="add-maternity" type="button">+ Внести декретные</button></div><p class="hint">Вводите всю сумму разовой выплаты отдельно от зарплаты. Она распределяется по месяцам начисления, а не учитывается целиком в месяце поступления. Для обычного периода выставлено 5 месяцев; при продлении уточните срок по документу.</p><div id="maternity-payments"></div>';
 benefitsSection.after(maternitySection);
 const maternityPayments=[];
 const additionalEntries=[];
@@ -206,7 +209,7 @@ const sourceSection=document.createElement('section');
 sourceSection.className='source-picker';
 const sourceGroups=[
   ['Чаще всего',[['employment','Зарплата до декрета или сейчас, работа по договору'],['pension','Пенсия / больничный'],['unemploymentBenefit','Пособие по безработице'],['otherBenefit','Пособие по уходу по месту работы и другие выплаты'],['childBenefit','Единое пособие и пособие по уходу для неработающего'],['alimony','Алименты'],['deposit','Проценты по вкладам'],['lottery','Выигрыш в лотерею']]],
-  ['Другие поступления',[['childIncome','Доходы детей'],['maternity','Пособие по беременности и родам'],['selfEmployed','Самозанятость'],['business','ИП'],['scholarship','Стипендия'],['academicMedical','Выплата в медакадемическом отпуске'],['guardianReward','Вознаграждение приёмного родителя'],['successorPayment','Выплата правопреемнику'],['publicDuty','Компенсация за общественные обязанности'],['military','Денежное довольствие'],['rationCompensation','Компенсация вместо пайка'],['judgeAllowance','Содержание судьи в отставке'],['serviceSeverance','Выплата при увольнении со службы'],['rent','Аренда'],['propertySale','Продажа имущества'],['securities','Ценные бумаги / дивиденды'],['copyright','Авторские выплаты'],['foreignEarned','Заработок в иностранной валюте'],['foreignOther','Другой доход за пределами РФ']]]
+  ['Другие поступления',[['childIncome','Доходы детей'],['maternity','Декретные — разовая выплата за отпуск по беременности и родам'],['selfEmployed','Самозанятость'],['business','ИП'],['scholarship','Стипендия'],['academicMedical','Выплата в медакадемическом отпуске'],['guardianReward','Вознаграждение приёмного родителя'],['successorPayment','Выплата правопреемнику'],['publicDuty','Компенсация за общественные обязанности'],['military','Денежное довольствие'],['rationCompensation','Компенсация вместо пайка'],['judgeAllowance','Содержание судьи в отставке'],['serviceSeverance','Выплата при увольнении со службы'],['rent','Аренда'],['propertySale','Продажа имущества'],['securities','Ценные бумаги / дивиденды'],['copyright','Авторские выплаты'],['foreignEarned','Заработок в иностранной валюте'],['foreignOther','Другой доход за пределами РФ']]]
 ];
 sourceSection.innerHTML='<h3>Какие поступления были в семье?</h3><p class="hint">Отметьте все виды. Дальше откроются только нужные поля. Если ничего не было, отметьте это отдельно.</p>'+sourceGroups.map(([title,items],index)=>`${index?'<details><summary>Другие виды дохода</summary>':''}<fieldset><legend>${title}</legend><div class="source-grid">${items.map(([key,label])=>`<label class="check"><input type="checkbox" value="${key}"> ${label}</label>`).join('')}</div></fieldset>${index?'</details>':''}`).join('')+'<label class="check"><input id="no-income" type="checkbox"> Никаких поступлений из перечисленных не было</label>';
 const excludedIncomeInfo=document.createElement('details');
@@ -327,7 +330,7 @@ sourceSection.querySelectorAll('input[type="checkbox"]').forEach(box=>box.onchan
   childIncomeSection.hidden=!sourceEnabled.has('childIncome');
   benefitsSection.hidden=!sourceEnabled.has('childBenefit');
   maternitySection.hidden=!sourceEnabled.has('maternity');
-  if(box.checked&&box.value==='childBenefit'&&!benefitPayments.length){benefitPayments.push({childId:'',amount:'',from:'',to:''});renderBenefitRows()}
+  if(box.checked&&box.value==='childBenefit'&&!benefitPayments.length){benefitPayments.push({childId:'',amount:'',from:'',to:'',amountMode:'automatic'});renderBenefitRows()}
   if(box.checked&&box.value==='maternity'&&!maternityPayments.length){maternityPayments.push({personIndex:0,amount:null,startMonth:'',chargedMonths:5});renderMaternityRows()}
   if(box.checked&&box.value==='deposit'&&!$('deposits').children.length)addDeposit();
   if(box.checked&&box.value==='childIncome'&&!childIncomeEntries.length)$('add-child-income').click();
@@ -460,7 +463,7 @@ function renderBenefitRows() {
     pastSelect.value=payment.forPastPeriods===undefined?'':payment.forPastPeriods?'yes':'no';
     pastLabel.append(pastSelect);row.append(pastLabel);
     const togglePast=()=>{pastLabel.hidden=!['decree606','decree175','nonworkingCare'].includes(kindSelect.value)};
-    kindSelect.addEventListener('input',()=>{payment.kind=kindSelect.value;togglePast();render()});
+    kindSelect.addEventListener('input',()=>{payment.kind=kindSelect.value;renderBenefitRows();render()});
     pastSelect.addEventListener('input',()=>{payment.forPastPeriods=pastSelect.value===''?undefined:pastSelect.value==='yes';render()});
     togglePast();
     const regionalDetails=document.createElement('details');
@@ -476,11 +479,46 @@ function renderBenefitRows() {
     const toggleRegional=()=>{const child=childData().find(child=>child.id===select.value);regionalDetails.hidden=!child?.birthDate||ageAt(child.birthDate,applicationDateForMonth(monthString(monthIndex($('start').value||currentMonth)+11),1))<18;};
     select.addEventListener('input',()=>{payment.childId=select.value;toggleRegional();render()});toggleRegional();
     const childLabel=document.createElement('label');childLabel.textContent='Кому назначено пособие';childLabel.append(select);row.append(childLabel);
+    const automatic=(payment.kind||'unified')==='unified'&&payment.amountMode==='automatic';
+    if((payment.kind||'unified')==='unified'){
+      const modeLabel=document.createElement('label');modeLabel.textContent='Как указать сумму пособия?';
+      const mode=document.createElement('select');mode.className='benefit-amount-mode';mode.add(new Option('Подставить по региону и году','automatic'));mode.add(new Option('Ввести полученную сумму самостоятельно','manual'));mode.value=automatic?'automatic':'manual';
+      mode.oninput=()=>{payment.amountMode=mode.value;renderBenefitRows();render()};modeLabel.append(mode);row.append(modeLabel);
+    }
+    if(automatic){
+      const sameLabel=document.createElement('label');sameLabel.textContent='Пособие получали в том же регионе и населённом пункте, где подаёте сейчас?';
+      const same=document.createElement('select');same.className='benefit-same-region';[['','Выберите'],['yes','Да'],['no','Нет, получали в другом месте']].forEach(([v,t])=>same.add(new Option(t,v)));same.value=payment.sameRegion||'';same.oninput=()=>{payment.sameRegion=same.value;payment.receiptsConfirmed=false;renderBenefitRows();render()};sameLabel.append(same);row.append(sameLabel);
+      if(payment.sameRegion==='no'){
+        const label=document.createElement('label');label.textContent='Регион, в котором получали пособие';const select=document.createElement('select');select.add(new Option('Выберите регион',''));pmRegions(2026).forEach(r=>select.add(new Option(r.name,r.code)));select.value=payment.benefitRegion||'';select.oninput=()=>{payment.benefitRegion=select.value;payment.benefitAreas={};payment.receiptsConfirmed=false;renderBenefitRows();render()};label.append(select);row.append(label);
+      }
+      const tierLabel=document.createElement('label');tierLabel.textContent='Какой размер пособия был назначен?';const tier=document.createElement('select');tier.className='benefit-tier';[['','Выберите'],['50','50%'],['75','75%'],['100','100%']].forEach(([v,t])=>tier.add(new Option(t,v)));tier.value=String(payment.tier||'');tier.oninput=()=>{payment.tier=tier.value;payment.receiptsConfirmed=false;renderBenefitRows();render()};tierLabel.append(tier);row.append(tierLabel);
+      const note=document.createElement('p');note.className='hint';note.textContent='Сумма изменится с новым годом автоматически. Если менялся назначенный процент, добавьте отдельный период.';row.append(note);
+    }
+    const monthlyPreview=document.createElement('div');monthlyPreview.className='benefit-monthly-preview';
     for(const [key,label,type] of [['amount','Полученная сумма за каждый указанный месяц, ₽','number'],['from','С месяца получения','month'],['to','По месяц получения включительно','month']]) {
       const wrapper=document.createElement('label');wrapper.textContent=label;
-      const input=document.createElement('input');input.type=type;if(type==='number'){input.min='0';input.step='0.01';}input.value=payment[key]??'';
-      input.addEventListener('input',()=>{payment[key]=input.value;render()});wrapper.append(input);row.append(wrapper);
+      const input=document.createElement('input');input.type=type;input.className='benefit-'+key;if(type==='number'){input.min='0';input.step='0.01';}input.value=payment[key]??'';
+      wrapper.hidden=key==='amount'&&automatic;
+      input.addEventListener('input',()=>{payment[key]=input.value;if(automatic){payment.receiptsConfirmed=false;fillPreview()}render()});wrapper.append(input);row.append(wrapper);
     }
+    row.append(monthlyPreview);
+    function fillPreview(){
+      monthlyPreview.replaceChildren();if(!automatic||!/^\d{4}-\d{2}$/.test(payment.from||'')||!/^\d{4}-\d{2}$/.test(payment.to||'')||payment.from>payment.to)return;
+      const first=monthIndex(payment.from),last=monthIndex(payment.to);if(last-first>59){monthlyPreview.textContent='Укажите период не длиннее 5 лет.';return;}
+      const months=Array.from({length:last-first+1},(_,i)=>monthString(first+i));const context={region:$('pm-region').value,area:$('pm-area').value};
+      const code=payment.sameRegion==='yes'?context.region:payment.benefitRegion;
+      for(const year of [...new Set(months.map(m=>Number(m.slice(0,4))))]){
+        const areas=pmAreas(year,code);const current=payment.benefitAreas?.[year]??(payment.sameRegion==='yes'?context.area:payment.benefitArea);
+        if(areas.length&&pmFor(year,code,current).status!=='known'){
+          const label=document.createElement('label');label.textContent='Где получали пособие в '+year+' году?';const locality=document.createElement('select');locality.add(new Option('Выберите населённый пункт или район',''));areas.forEach(a=>locality.add(new Option(a,a)));locality.value=payment.benefitAreas?.[year]||'';locality.oninput=()=>{payment.benefitAreas??={};payment.benefitAreas[year]=locality.value;payment.receiptsConfirmed=false;fillPreview();render()};label.append(locality);monthlyPreview.append(label);
+        }
+        const values=[...new Set(months.filter(m=>m.startsWith(String(year))).map(m=>unifiedReceiptSuggestion(payment,m,context)))];const line=document.createElement('p');line.className='hint';line.textContent=year+' год: '+(values.length===1&&values[0]!=null?values[0].toLocaleString('ru-RU')+' ₽ за обычный месяц':'нужно уточнить местность или суммы за этот год');monthlyPreview.append(line);
+      }
+      const detail=document.createElement('details');detail.innerHTML='<summary>Проверить и изменить суммы по месяцам</summary><p class="hint">Это обычный размер пособия за месяц. Проверьте по поступлениям: в январе может прийти выплата за декабрь, а в декабре — сразу две. Доплаты, пропуски и изменения суммы укажите в месяце получения. Пустое поле означает, что сумму ещё нужно уточнить.</p>';
+      for(const month of months){const label=document.createElement('label');label.textContent=monthLabel(month)+' · ₽';const input=document.createElement('input');input.type='number';input.min='0';input.step='0.01';input.value=Object.hasOwn(payment.receiptOverrides||{},month)?payment.receiptOverrides[month]:unifiedReceiptSuggestion(payment,month,context)??'';input.dataset.receiptMonth=month;input.oninput=()=>{payment.receiptOverrides??={};payment.receiptOverrides[month]=input.value;render()};label.append(input);detail.append(label)}monthlyPreview.append(detail);
+      const check=document.createElement('label');check.className='check';const box=document.createElement('input');box.type='checkbox';box.className='benefit-receipts-confirmed';box.checked=payment.receiptsConfirmed===true&&payment.confirmedContext===receiptContext(payment,context);box.oninput=()=>{payment.receiptsConfirmed=box.checked;payment.confirmedContext=receiptContext(payment,context);render()};check.append(box,document.createTextNode(' Проверила: суммы соответствуют поступлениям в указанные месяцы'));monthlyPreview.append(check);
+    }
+    fillPreview();
     const forecastLabel=document.createElement('label');forecastLabel.className='check';
     const forecastInput=document.createElement('input');forecastInput.type='checkbox';forecastInput.className='benefit-project-future';forecastInput.checked=payment.projectFuture===true;
     forecastInput.addEventListener('input',()=>{payment.projectFuture=forecastInput.checked;render()});
@@ -490,7 +528,7 @@ function renderBenefitRows() {
   });
 }
 function benefitRowsForWindow(applicationMonth) {
-  return expandBenefitPayments(benefitPayments,applicationMonth,{knownThrough:currentMonth});
+  return expandBenefitPayments(benefitPayments,applicationMonth,{knownThrough:currentMonth,amountForMonth:(entry,month)=>receiptAmount(entry,month,{region:$('pm-region').value,area:$('pm-area').value})});
 }
 function addCar() {
   const row=document.createElement('div'); row.className='form-row';
@@ -853,13 +891,13 @@ function render() {
 }
 $('add').onclick=addReason;
 $('add-child').onclick=addChild; $('add-car').onclick=addCar;
-$('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:'',to:''});renderBenefitRows();render()};
+$('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:'',to:'',amountMode:'automatic'});renderBenefitRows();render()};
  $('add-property').onclick=addProperty; $('add-vehicle').onclick=addOtherVehicle; $('add-deposit').onclick=addDeposit;
  $('add-adult').onclick=()=>{if(incomePeople.length===1)incomePeople.push({label:'Супруг(а)',months:{},total:null,incomeType:'employment'});renderIncomeForm();render()};
  $('income-mode').addEventListener('input',()=>{renderIncomeForm();render()});
  $('start').addEventListener('input',()=>{renderIncomeForm();renderExtraRows();renderAlimonyWageYears();updatePmSelection()});
- $('pm-region').addEventListener('input',()=>{const code=$('pm-region').value;if(code!==lastWageRegion)alimonyWageRecords.clear();lastWageRegion=code;updatePmSelection();renderAlimonyWageYears()});
- $('pm-area').addEventListener('input',render);
+ $('pm-region').addEventListener('input',()=>{const code=$('pm-region').value;if(code!==lastWageRegion)alimonyWageRecords.clear();lastWageRegion=code;updatePmSelection();renderAlimonyWageYears();renderBenefitRows()});
+ $('pm-area').addEventListener('input',()=>{renderBenefitRows();render()});
 ['capacity-decision','capacity-restored','applicant-citizen','applicant-residence','residence-basis','address-proof','prior-measure','pregnancy-applying','pregnancy-registered','sole-guardian','day','weeks','pregnancy-forecast-through','pregnancy-ended','large-family','grace-used','disability','support-car','support-motorcycle','support-machine','rural'].forEach(id=>$(id).addEventListener('input',render));
 $('applicant-capacity').addEventListener('input',()=>{$('capacity-dates').hidden=!['limited','incapable'].includes($('applicant-capacity').value);render()});
 renderIncomeForm();
@@ -925,7 +963,7 @@ const stepReview=document.createElement('div');stepReview.id='step-review';stepR
 const periodNote=document.createElement('p');periodNote.id='income-period-note';periodNote.className='period-note';sourceSection.before(periodNote);
 const incomeIntro=originalPanels[5].querySelector('#income-mode').closest('label').nextElementSibling;
 if(incomeIntro?.classList.contains('hint'))incomeIntro.textContent='Отметьте, какие доходы были у вас и супруга в нужном периоде. Суммы зарплаты вводите до вычета налога. Пустое поле — сумма неизвестна, 0 — дохода действительно не было.';
-const leaveHelp=document.createElement('details');leaveHelp.className='leave-help';leaveHelp.innerHTML='<summary>Я в декрете — куда внести выплаты?</summary><p>Зарплату до ухода в декрет укажите в «Зарплата / ГПХ» и закончите период последним месяцем начисления.</p><button type="button" data-source="maternity">Пособие по беременности и родам — одной суммой</button><button type="button" data-source="childBenefit">Единое пособие или уход до 1,5 лет для неработающего</button><button type="button" data-source="otherBenefit">Ежемесячное пособие по уходу по месту работы</button><p class="hint">В разделе «Другие пособия» выберите основание выплаты по документу о назначении. Период ухода без зарплаты укажите на следующем шаге — помощник предложит месяцы.</p>';
+const leaveHelp=document.createElement('details');leaveHelp.className='leave-help';leaveHelp.innerHTML='<summary>Декретные и пособие по уходу: куда внести?</summary><p>Зарплату до ухода в декрет укажите в «Зарплата / ГПХ» и закончите период последним месяцем начисления.</p><button type="button" data-source="maternity">Пособие по беременности и родам — одной суммой</button><button type="button" data-source="childBenefit">Единое пособие или уход до 1,5 лет для неработающего</button><button type="button" data-source="otherBenefit">Ежемесячное пособие по уходу по месту работы</button><p class="hint">В разделе «Другие пособия» выберите основание выплаты по документу о назначении. Период ухода без зарплаты укажите на следующем шаге — помощник предложит месяцы.</p>';
 periodNote.after(leaveHelp);
 leaveHelp.querySelectorAll('button').forEach(button=>button.onclick=()=>{const box=sourceSection.querySelector(`input[value="${button.dataset.source}"]`);if(!box.checked){box.checked=true;box.dispatchEvent(new Event('change',{bubbles:true}))}if(button.dataset.source==='otherBenefit'){const entry=additionalEntries.find(entry=>entry.type==='otherBenefit'&&!entry.benefitKind);if(entry){entry.benefitKind='workingCare';renderExtraRows();render();}}const target=button.dataset.source==='maternity'?maternitySection:button.dataset.source==='childBenefit'?benefitsSection:extraSection;guidedFlow?.revealField(target);target.scrollIntoView({block:'start',behavior:'smooth'});target.querySelector('input,select')?.focus()});
 const careHelper=document.createElement('details');careHelper.id='care-helper';careHelper.className='leave-help';careHelper.innerHTML='<summary>Я ухаживаю за ребёнком до 3 лет</summary><p>Выберите ребёнка и проверьте месяцы, в которые вы действительно ухаживали за ним. Предлагаем прошедший период — его можно изменить.</p><label>За каким ребёнком?<select id="care-child"><option value="">Выберите ребёнка</option></select></label><label>Кто ухаживал?<select id="care-person"><option value="0">Вы</option><option value="1">Супруг(а)</option></select></label><label>Уход с месяца<input id="care-from" type="month"></label><label>По месяц включительно<input id="care-to" type="month"></label><button type="button" id="add-care-period">Добавить этот период ухода</button><p id="care-status" role="status" class="hint"></p>';
@@ -961,7 +999,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261007-29').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 

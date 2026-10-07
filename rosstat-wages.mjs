@@ -16,7 +16,9 @@ export function confirmedRegionalWage(table,year,regionCode,regionName) {
   if(!record || record.preliminary || record.final_confirmed!==true || !/^\d{4}-\d{2}$/.test(record.publication_month||''))
     return {status:'unknown',reason:'Годовая зарплата Росстата ещё не подтверждена как окончательная с датой публикации'};
   const name=ALIASES[String(regionCode)]||regionName;
-  const amount=record.regions?.[name];
+  const normalize=s=>s.toLowerCase().replace(/ё/g,'е').replace(/^г\.?\s*/,'').replace(/\s+/g,' ').trim();
+  const candidates=Object.entries(record.regions||{}).filter(([key])=>normalize(key)===normalize(name));
+  const amount=record.regions?.[name]??(candidates.length===1?candidates[0][1]:null);
   if(!Number.isFinite(amount)||amount<=0)return {status:'unknown',reason:'В годовой таблице Росстата не найден этот субъект'};
   return {status:'known',year,amount,publishedMonth:record.publication_month,final:true,source:record.source};
 }

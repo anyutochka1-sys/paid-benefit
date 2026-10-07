@@ -38,6 +38,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   const other=nodes.sourceSection.querySelector('details .source-grid');
   const common=new Set(['employment','childBenefit','otherBenefit','maternity','alimony','deposit']);
   nodes.sourceSection.querySelectorAll('input[type=checkbox]:not(#no-income)').forEach(box=>{(common.has(box.value)?primary:other).append(box.closest('label'))});
+  primary.prepend(primary.querySelector('input[value="maternity"]').closest('label'));
   nodes.sourceSection.querySelector('h3').textContent='Какие деньги поступали в семью?';
   nodes.sourceSection.querySelector('legend').textContent='Отметьте всё, что было в нужные месяцы';
   group(2,'income-sources','Какие доходы были у вашей семьи?',parents.income,[nodes.periodNote,nodes.sourceSection,nodes.leaveHelp]);
@@ -57,7 +58,9 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   group(5,'citizenship','Проверим основные условия',parents.conditions,[nodes.conditionsQuick,conditionDetails],{required:['#applicant-citizen','#applicant-residence','#applicant-capacity']});
   const conditionButton=nodes.conditionsQuick.querySelector('button'),confirmConditions=conditionButton.onclick;conditionButton.textContent='Да, всё верно';conditionButton.onclick=()=>{confirmConditions();if(!requiredMissing().length)advance();else conditionDetails.open=true;};
   group(5,'address','По какому адресу будете подавать?',parents.conditions,[field('residence-basis'),field('address-proof')],{required:['#residence-basis','#address-proof']});
-  group(5,'prior','Переходите с другой выплаты?',parents.conditions,[field('prior-measure'),nodes.priorSupportPanel,$('renewal-help')],{required:['#prior-measure']});
+  group(5,'prior','Получаете прежнее пособие?' ,parents.conditions,[field('prior-measure'),nodes.priorSupportPanel,$('renewal-help')],{required:['#prior-measure']});
+  const priorHint=document.createElement('p');priorHint.className='hint';priorHint.textContent='Если сейчас получаете единое пособие и хотите его продлить, выберите «Нет». Декретные, маткапитал и обычное пособие по уходу к этому вопросу не относятся.';groups.at(-1).el.querySelector('h3,h2')?.after(priorHint);if(!priorHint.parentElement)groups.at(-1).el.prepend(priorHint);
+  const priorExamples=document.createElement('details');priorExamples.innerHTML='<summary>Какие прежние пособия имеются в виду?</summary><p>Прежние выплаты на детей 3–7 или 8–17 лет, на первого или третьего ребёнка до 3 лет, либо прежнее пособие беременной. Вопрос нужен, если такая выплата ещё действует и вы заменяете её единым пособием. Тогда сравним размеры выплат.</p>';groups.at(-1).el.append(priorExamples);
   group(6,'result','Ваш предварительный результат',parents.result,[...parents.result.children]);
 
   // Retain uncommon controls and source explanations within the relevant question.
