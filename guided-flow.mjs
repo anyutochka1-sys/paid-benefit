@@ -80,7 +80,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     const skip=document.createElement('button');skip.type='button';skip.className='remove';skip.textContent='Продолжить, заполню позже';skip.onclick=advance;box.append(skip);box.scrollIntoView({block:'center',behavior:'smooth'});
   }
   function paint(){if(painting||!active)return;painting=true;showSection(active.section);
-    const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');(pregnancy.when()?pregnancy.el:['pregnant','both'].includes(goal.value)?finish.el:pregnancyMore).append(nodes.pregnancyPanel);
+    const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');pregnancyMore.hidden=['pregnant','both'].includes(goal.value);(pregnancy.when()?pregnancy.el:['pregnant','both'].includes(goal.value)?finish.el:pregnancyMore).append(nodes.pregnancyPanel);
     for(const item of [...groups,...childItems()])item.el.hidden=item.id!==active.id;
     // Preserve the inner hidden states of conditional fields.
     steps.forEach((step,i)=>step.panels.forEach(panel=>panel.hidden=i!==active.section||![...groups,...childItems()].some(item=>item.id===active.id&&panel.contains(item.el))));
