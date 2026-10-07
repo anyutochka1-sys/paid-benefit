@@ -164,3 +164,8 @@ test('maternity capital exclusions depend on federal purpose or documented regio
   assert.equal(additionalIncomeForApplication([{...base,matcapSource:'federal',matcapPurpose:'other'}],'2026-09').status,'unknown');
   assert.equal(additionalIncomeForApplication([{...base,matcapSource:'regional',matcapConfirmed:false}],'2026-09').status,'unknown');
 });
+
+test('working-parent childcare remains counted without qualifying as earnings',()=>{
+ const result=additionalIncomeForApplication([{personIndex:0,type:'otherBenefit',benefitKind:'workingCare',from:'2026-01',to:'2026-03',amount:15000}],'2026-09');
+ assert.equal(result.status,'known');assert.equal(result.amount,45000);assert.equal(result.byPerson.get(0)['2026-02'].qualifying,0);
+});

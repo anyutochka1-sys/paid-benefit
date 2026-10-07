@@ -28,7 +28,7 @@ export function includedFamily(people, applicationDate) {
     if (person.deathDate && person.deathDate<=applicationDate) { excluded.push({person,reason:'Ребёнок умер до даты заявления'}); continue; }
     if(person.familyStatus==='stateCare'&&person.role!=='ward') {excluded.push({person,reason:'Ребёнок на полном государственном обеспечении'});continue}
     if(['conscript','imprisoned','forcedTreatment','custody','missing','wanted'].includes(person.familyStatus)) {excluded.push({person,reason:'Ребёнок исключён по пункту 46'});continue}
-    if (!person.birthDate || person.married === undefined) { unanswered.push({person, reason:'Нужны дата рождения и семейное положение'}); continue; }
+    if (!person.birthDate || person.married === undefined && !(person.ordinaryMinor && ageAt(person.birthDate,applicationDate)<18)) { unanswered.push({person, reason:'Нужны дата рождения и семейное положение'}); continue; }
     const age=ageAt(person.birthDate, applicationDate);
     if (person.married) { excluded.push({person, reason:'Ребёнок состоит в браке'}); continue; }
     if (age < 18) { included.push(person); continue; }
@@ -51,7 +51,7 @@ export function childCanApply(person, applicationDate) {
     return {status:'unknown', reason:'Нужны дата рождения, гражданство и проживание ребёнка'};
   if (ageAt(person.birthDate, applicationDate) >= 17) return {status:'no', reason:'На дату обращения ребёнку исполнилось 17 лет'};
   if (!person.russianCitizen || !person.livesInRussia) return {status:'no', reason:'Требуются гражданство РФ и постоянное проживание в РФ'};
-  if(person.married===undefined)return {status:'unknown',reason:'Уточните семейное положение ребёнка'};
+  if(person.married===undefined&&!person.ordinaryMinor)return {status:'unknown',reason:'Уточните семейное положение ребёнка'};
   return {status:'yes'};
 }
 

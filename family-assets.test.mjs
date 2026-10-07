@@ -109,3 +109,14 @@ test('missing or unrecognized spouse status stays unresolved instead of being in
     assert.equal(family.excluded.length,0);
   }
 });
+
+ test('ordinary minor needs no marriage answer; adulthood and explicit minor marriage remain checked',()=>{
+ const child={role:'child',birthDate:'2008-10-20',ordinaryMinor:true,russianCitizen:true,livesInRussia:true};
+ assert.equal(includedFamily([child],'2026-10-19').included.length,1);
+ assert.equal(includedFamily([child],'2026-10-20').unanswered.length,1);
+ assert.equal(includedFamily([{...child,married:true}],'2026-10-19').excluded.length,1);
+ assert.equal(includedFamily([{...child,ordinaryMinor:false}],'2026-10-19').unanswered.length,1);
+ const baby={...child,birthDate:'2026-10-01'};
+ assert.equal(childCanApply(baby,'2026-10-07').status,'yes');
+ assert.equal(childCanApply({...baby,married:true},'2026-10-07').status,'no');
+});

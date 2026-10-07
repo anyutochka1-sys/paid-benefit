@@ -38,6 +38,7 @@ export function foreignRateDate(applicationMonth) {
 // conditional payment (for example some uses of maternity capital) must be
 // classified after its statutory purpose is known.
 export const OTHER_BENEFIT_KINDS = {
+  workingCare:{label:'Пособие по уходу до 1,5 лет, назначенное по месту работы',excluded:false},
   counted:{label:'Иное учитываемое пособие / компенсация',excluded:false},
   uncertain:{label:'Не уверена, учитывается ли эта выплата',excluded:false},
   employerBirthAid:{label:'Единовременная материальная помощь работодателя при рождении / усыновлении / опеке',excluded:false},
