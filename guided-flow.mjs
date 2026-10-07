@@ -18,7 +18,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     button.innerHTML=`<span class="choice-icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icons[value]}</svg></span><span><strong>${title}</strong><small>${detail}</small></span><span aria-hidden="true">›</span>`;
     button.onclick=()=>{goal.value=value;goal.dispatchEvent(new window.Event('input',{bubbles:true}));if(value==='pregnant'){$('pregnancy-applying').checked=true;$('pregnancy-applying').dispatchEvent(new window.Event('input',{bubbles:true}))}if(value==='baby'&&!$('children').children.length)addChild();render();goTo(nextAfter('goal'));};goalWrap.append(button);
   }
-  group(0,'goal','Что хотите рассчитать?',parents.basic,[goalWrap],{when:()=>!goal.value});
+  group(0,'goal','Что хотите рассчитать?',parents.basic,[goalWrap],{when:()=>!goal.value||active?.id==='goal'});
   group(0,'region','В каком регионе будете подавать?',parents.basic,[parents.basic.querySelector('.demo-pm')],{required:['#pm-region','#pm-area']});
   group(0,'family','Расскажите о вашей семье',parents.basic,[field('marital-status'),field('spouse-status')],{required:['#marital-status','#spouse-status']});
   const familyMore=document.createElement('details');familyMore.className='optional-details';familyMore.innerHTML='<summary>Многодетность или инвалидность в семье</summary>';familyMore.append(field('large-family'),field('disability'));groups.at(-1).el.append(familyMore);
@@ -29,6 +29,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   const childMore=document.createElement('div');childMore.className='children-more';
   const addMore=document.createElement('button');addMore.type='button';addMore.className='remove';addMore.textContent='+ Ещё один ребёнок';addMore.onclick=addChild;childMore.append(addMore);
   group(1,'children-finish','Все дети добавлены?',parents.children,[childMore,nodes.applicationChoice,$('newborn-explanation'),$('mother-pregnancy-benefit').closest('label'),nodes.pregnancyPanel],{when:()=>!!$('children').children.length});
+  const pregnancyMore=document.createElement('details');pregnancyMore.className='optional-details';pregnancyMore.innerHTML='<summary>Дополнительно: расчёт пособия по беременности</summary>';groups.at(-1).el.append(pregnancyMore);
   group(1,'pregnancy','Расскажите о беременности',parents.children,[],{when:()=>$('pregnancy-applying').checked&&!$('children').children.length,required:['#pregnancy-registered','#weeks']});
   // The same pregnancy controls move to the appropriate visible question.
 
@@ -45,7 +46,8 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   group(2,'alimony','Расскажите об алиментах',parents.income,[nodes.alimonySection],{when:()=>$('marital-status').value==='divorced'||sourceEnabled.has('alimony')});
   group(2,'extra-income','Уточним остальные поступления',parents.income,[nodes.extraSection,nodes.childIncomeSection,$('deposit-section')],{when:()=>[...sourceEnabled].some(key=>!['employment','maternity','childBenefit','alimony'].includes(key))});
 
-  group(3,'care','Почему не работали в нужные месяцы?',parents.reasons,[$('care-helper'),$('add'),$('reasons')]);
+  const careIntro=document.createElement('p');careIntro.className='hint';careIntro.textContent='Если да, укажите причину: например, уход за ребёнком, беременность или учёба. Если таких месяцев не было, продолжайте.';
+  group(3,'care','Были месяцы без заработка?',parents.reasons,[careIntro,$('care-helper'),$('add'),$('reasons')]);
   group(4,'assets','Что есть в собственности у семьи?',parents.property,[nodes.assetPicker]);
   group(4,'property','Уточним вашу недвижимость',parents.property,[$('properties'),nodes.propertyAdds,field('rural')],{when:()=>[...document.querySelectorAll('.asset-choice:checked')].some(box=>!['asset-car','asset-vehicle'].includes(box.id))});
   group(4,'vehicles','Уточним транспорт семьи',parents.cars,[$('add-car'),$('cars'),field('support-car')],{when:()=>$('asset-car').checked});
@@ -75,13 +77,13 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     const skip=document.createElement('button');skip.type='button';skip.className='remove';skip.textContent='Продолжить, заполню позже';skip.onclick=advance;box.append(skip);box.scrollIntoView({block:'center',behavior:'smooth'});
   }
   function paint(){if(painting||!active)return;painting=true;showSection(active.section);
-    const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');(pregnancy.when()?pregnancy.el:finish.el).append(nodes.pregnancyPanel);
+    const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');(pregnancy.when()?pregnancy.el:goal.value==='pregnant'?finish.el:pregnancyMore).append(nodes.pregnancyPanel);
     for(const item of [...groups,...childItems()])item.el.hidden=item.id!==active.id;
     // Preserve the inner hidden states of conditional fields.
     steps.forEach((step,i)=>step.panels.forEach(panel=>panel.hidden=i!==active.section||![...groups,...childItems()].some(item=>item.id===active.id&&panel.contains(item.el))));
     const list=screens(),index=list.findIndex(item=>item.id===active.id);const sectionItems=list.filter(item=>item.section===active.section);
     const counter=$('progress').querySelector('.step-counter');if(counter)counter.textContent=`${steps[active.section].title} · ${sectionItems.findIndex(item=>item.id===active.id)+1} из ${sectionItems.length}`;
-    const links=$('progress').querySelector('.step-links');if(links){const menu=document.createElement('details');menu.className='section-menu';menu.innerHTML='<summary>Перейти к другому разделу</summary>';menu.append(links);$('progress').append(menu)}
+    const links=$('progress').querySelector('.step-links');if(links){const menu=document.createElement('details');menu.className='section-menu';menu.innerHTML='<summary>Перейти к другому разделу</summary>';menu.append(links);const changeGoal=document.createElement('button');changeGoal.type='button';changeGoal.className='remove';changeGoal.textContent='Изменить мою ситуацию';changeGoal.onclick=()=>{goal.value='';goTo(groups.find(item=>item.id==='goal'))};menu.append(changeGoal);$('progress').append(menu)}
     const track=document.createElement('div');track.className='progress-track';track.setAttribute('aria-hidden','true');const fill=document.createElement('span');fill.style.width=((active.section+1)/steps.length*100)+'%';track.append(fill);$('progress').prepend(track);
     $('step-help').hidden=true;intro.hidden=active.id!=='goal';$('back').hidden=index===0;$('next').hidden=active.section===6||active.id==='goal';$('next').textContent=list[index+1]?.section===6?'Показать результат':'Продолжить';$('next').onclick=next;$('back').onclick=()=>goTo(list[Math.max(0,index-1)]);
     document.body.dataset.question=active.id;$('guided-question').value=active.id;painting=false;
