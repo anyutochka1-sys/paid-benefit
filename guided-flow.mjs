@@ -13,10 +13,10 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   const goalWrap=document.createElement('div');goalWrap.className='goal-choices';
   const goal=$('family-goal');goalWrap.append(goal);
   const icons={baby:'<circle cx="16" cy="16" r="10"/><path d="M12 15h.01M20 15h.01M12 20q4 4 8 0M16 6q5 1 1 5"/>',pregnant:'<path d="M16 26C3 18 2 10 9 7q5-2 7 3 2-5 7-3c7 3 6 11-7 19Z"/>',children:'<circle cx="11" cy="10" r="4"/><circle cx="23" cy="14" r="3"/><path d="M3 27v-6q0-6 8-6t8 6v6M20 21q8-3 9 6"/>'};
-  for(const [value,title,detail] of [['baby','Я недавно родила','Расчёт для малыша и семьи'],['pregnant','Я беременна','Расчёт пособия по беременности'],['children','Оформляю на детей','Первое назначение или продление']]) {
+  for(const [value,title,detail] of [['baby','Я недавно родила','Расчёт для малыша и семьи'],['pregnant','Я беременна','Расчёт пособия по беременности'],['both','Беременна и оформляю на детей','Одна анкета — два расчёта'],['children','Оформляю на детей','Первое назначение или продление']]) {
     const button=document.createElement('button');button.type='button';button.className='goal-choice';button.dataset.goal=value;
-    button.innerHTML=`<span class="choice-icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icons[value]}</svg></span><span><strong>${title}</strong><small>${detail}</small></span><span aria-hidden="true">›</span>`;
-    button.onclick=()=>{goal.value=value;goal.dispatchEvent(new window.Event('input',{bubbles:true}));if(value==='pregnant'){$('pregnancy-applying').checked=true;$('pregnancy-applying').dispatchEvent(new window.Event('input',{bubbles:true}))}if(value==='baby'&&!$('children').children.length)addChild();render();goTo(nextAfter('goal'));};goalWrap.append(button);
+    button.innerHTML=`<span class="choice-icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icons[value==='both'?'pregnant':value]}</svg></span><span><strong>${title}</strong><small>${detail}</small></span><span aria-hidden="true">›</span>`;
+    button.onclick=()=>{goal.value=value;goal.dispatchEvent(new window.Event('input',{bubbles:true}));if(['pregnant','both'].includes(value)){$('pregnancy-applying').checked=true;$('pregnancy-applying').dispatchEvent(new window.Event('input',{bubbles:true}))}if(['baby','both'].includes(value)&&!$('children').children.length)addChild();render();goTo(nextAfter('goal'));};goalWrap.append(button);
   }
   group(0,'goal','Что хотите рассчитать?',parents.basic,[goalWrap],{when:()=>!goal.value||active?.id==='goal'});
   group(0,'region','В каком регионе будете подавать?',parents.basic,[parents.basic.querySelector('.demo-pm')],{required:['#pm-region','#pm-area']});
@@ -28,9 +28,10 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   group(1,'children-list','Добавьте детей вашей семьи',parents.children,[$('add-child')],{when:()=>!$('children').children.length&&!$('pregnancy-applying').checked});
   const childMore=document.createElement('div');childMore.className='children-more';
   const addMore=document.createElement('button');addMore.type='button';addMore.className='remove';addMore.textContent='+ Ещё один ребёнок';addMore.onclick=addChild;childMore.append(addMore);
-  group(1,'children-finish','Все дети добавлены?',parents.children,[childMore,nodes.applicationChoice,$('newborn-explanation'),$('mother-pregnancy-benefit').closest('label'),nodes.pregnancyPanel],{when:()=>!!$('children').children.length});
+  group(1,'children-finish','Все дети добавлены?',parents.children,[childMore,nodes.applicationChoice,$('newborn-explanation'),$('mother-pregnancy-benefit').closest('label'),nodes.pregnancyPanel],{when:()=>!!$('children').children.length,required:['#pregnancy-registered','#weeks']});
   const pregnancyMore=document.createElement('details');pregnancyMore.className='optional-details';pregnancyMore.innerHTML='<summary>Дополнительно: расчёт пособия по беременности</summary>';groups.at(-1).el.append(pregnancyMore);
   group(1,'pregnancy','Расскажите о беременности',parents.children,[],{when:()=>$('pregnancy-applying').checked&&!$('children').children.length,required:['#pregnancy-registered','#weeks']});
+  const addPregnancyChildren=document.createElement('button');addPregnancyChildren.type='button';addPregnancyChildren.className='remove';addPregnancyChildren.textContent='Также оформить пособие на детей';addPregnancyChildren.onclick=()=>{goal.value='both';addChild();render()};groups.at(-1).el.append(addPregnancyChildren);
   // The same pregnancy controls move to the appropriate visible question.
 
   const primary=nodes.sourceSection.querySelector('.source-grid');
@@ -79,7 +80,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     const skip=document.createElement('button');skip.type='button';skip.className='remove';skip.textContent='Продолжить, заполню позже';skip.onclick=advance;box.append(skip);box.scrollIntoView({block:'center',behavior:'smooth'});
   }
   function paint(){if(painting||!active)return;painting=true;showSection(active.section);
-    const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');(pregnancy.when()?pregnancy.el:goal.value==='pregnant'?finish.el:pregnancyMore).append(nodes.pregnancyPanel);
+    const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');(pregnancy.when()?pregnancy.el:['pregnant','both'].includes(goal.value)?finish.el:pregnancyMore).append(nodes.pregnancyPanel);
     for(const item of [...groups,...childItems()])item.el.hidden=item.id!==active.id;
     // Preserve the inner hidden states of conditional fields.
     steps.forEach((step,i)=>step.panels.forEach(panel=>panel.hidden=i!==active.section||![...groups,...childItems()].some(item=>item.id===active.id&&panel.contains(item.el))));
