@@ -16,7 +16,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   for(const [value,title,detail] of [['baby','Я недавно родила','Расчёт для малыша и семьи'],['pregnant','Я беременна','Расчёт пособия по беременности'],['both','Беременна и оформляю на детей','Одна анкета — два расчёта'],['children','Оформляю на детей','Первое назначение или продление']]) {
     const button=document.createElement('button');button.type='button';button.className='goal-choice';button.dataset.goal=value;
     button.innerHTML=`<span class="choice-icon"><svg viewBox="0 0 32 32" aria-hidden="true">${icons[value==='both'?'pregnant':value]}</svg></span><span><strong>${title}</strong><small>${detail}</small></span><span aria-hidden="true">›</span>`;
-    button.onclick=()=>{goal.value=value;goal.dispatchEvent(new window.Event('input',{bubbles:true}));if(['pregnant','both'].includes(value)){$('pregnancy-applying').checked=true;$('pregnancy-applying').dispatchEvent(new window.Event('input',{bubbles:true}))}if(['baby','both'].includes(value)&&!$('children').children.length)addChild();render();goTo(nextAfter('goal'));};goalWrap.append(button);
+    button.onclick=()=>{goal.value=value;goal.dispatchEvent(new window.Event('input',{bubbles:true}));$('pregnancy-applying').checked=['pregnant','both'].includes(value);$('pregnancy-applying').dispatchEvent(new window.Event('input',{bubbles:true}));if(['baby','both'].includes(value)&&!$('children').children.length)addChild();render();goTo(nextAfter('goal'));};goalWrap.append(button);
   }
   group(0,'goal','Что хотите рассчитать?',parents.basic,[goalWrap],{when:()=>!goal.value||active?.id==='goal'});
   group(0,'region','В каком регионе будете подавать?',parents.basic,[parents.basic.querySelector('.demo-pm')],{required:['#pm-region','#pm-area']});
@@ -43,8 +43,8 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   nodes.sourceSection.querySelector('legend').textContent='Отметьте всё, что было в нужные месяцы';
   group(2,'income-sources','Какие доходы были у вашей семьи?',parents.income,[nodes.periodNote,nodes.sourceSection,nodes.leaveHelp]);
   group(2,'salary','Сколько начисляли вам и супругу?',parents.income,[field('income-mode'),$('income-people')],{when:()=>sourceEnabled.has('employment'),required:['.regular-amount','.regular-from','.regular-to']});
-  group(2,'maternity','Сколько получили декретных?',parents.income,[nodes.maternitySection],{when:()=>sourceEnabled.has('maternity')});
-  group(2,'benefits','Какие пособия получали на детей?',parents.income,[nodes.benefitsSection],{when:()=>sourceEnabled.has('childBenefit')});
+  group(2,'maternity','Сколько получили декретных?',parents.income,[nodes.maternitySection],{when:()=>sourceEnabled.has('maternity'),required:['.amount','.start','.months']});
+  group(2,'benefits','Какие пособия получали на детей?',parents.income,[nodes.benefitsSection],{when:()=>sourceEnabled.has('childBenefit'),required:['.benefit-child','.benefit-amount','.benefit-from','.benefit-to','.benefit-same-region','.benefit-region','.benefit-area','.benefit-tier','[data-receipt-month]']});
   group(2,'alimony','Расскажите об алиментах',parents.income,[nodes.alimonySection],{when:()=>$('marital-status').value==='divorced'||sourceEnabled.has('alimony')});
   group(2,'extra-income','Уточним остальные поступления',parents.income,[nodes.extraSection,nodes.childIncomeSection,$('deposit-section')],{when:()=>[...sourceEnabled].some(key=>!['employment','maternity','childBenefit','alimony'].includes(key))});
 
@@ -77,6 +77,16 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   function requiredMissing(){const issue=[];for(const selector of active.required||[])for(const el of active.el.querySelectorAll(selector)){if(!isVisibleField(el))continue;if(el.matches('.applicant-rights')&&el.closest('.form-row').querySelector('.child-role').value==='ward')continue;if(!el.value||['unknown'].includes(el.value)||!el.validity.valid)issue.push(el)}return issue}
   function advance(){const list=screens(),index=list.findIndex(item=>item.id===active.id);goTo(list[Math.min(index+1,list.length-1)])}
   function next(){const issue=requiredMissing();let message='';if(active.id==='income-sources'&&!sourceEnabled.size&&!$('no-income').checked)message='Отметьте поступления или подтвердите, что их не было.';if(active.id==='assets'&&!$('assets-none').checked&&!document.querySelector('.asset-choice:checked'))message='Отметьте собственность семьи или её отсутствие.';
+    if(active.id==='maternity'&&!$('maternity-payments').children.length)message='Добавьте выплату декретных или снимите её выбор в разделе доходов.';
+    if(active.id==='benefits'){
+      if(!$('benefits').children.length)message='Добавьте пособие или снимите его выбор в разделе доходов.';
+      for(const row of $('benefits').children){
+        const from=row.querySelector('.benefit-from'),to=row.querySelector('.benefit-to');
+        if(from?.value&&to?.value&&from.value>to.value){issue.push(to);message='Последний месяц получения не может быть раньше первого.';}
+        const confirmation=row.querySelector('.benefit-receipts-confirmed');
+        if(confirmation&&!confirmation.checked){issue.push(confirmation);message ||= 'Проверьте суммы по месяцам и подтвердите, что они совпадают с поступлениями.';}
+      }
+    }
     if(!issue.length&&!message){advance();return;}
     const box=$('step-review');box.replaceChildren();box.hidden=false;const heading=document.createElement('h3');heading.textContent='Осталось уточнить';box.append(heading);const text=document.createElement('p');text.textContent=message||'Ответьте на выделенные вопросы. Можно продолжить и вернуться позже.';box.append(text);
     issue.forEach(el=>{el.setAttribute('aria-invalid','true');el.classList.add('field-invalid');const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=el.closest('label')?.firstChild?.textContent?.trim()||'Заполните ответ';button.onclick=()=>{for(let parent=el.parentElement;parent&&parent!==active.el;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;el.focus();el.scrollIntoView({block:'center',behavior:'smooth'})};box.append(button)});
