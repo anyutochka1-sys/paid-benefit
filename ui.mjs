@@ -1,5 +1,5 @@
-import {forecastScenario} from './forecast-scenario.mjs?v=20261001-23';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261001-23';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261001-24';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261001-24';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
@@ -846,7 +846,7 @@ function render() {
   const forecastText=overview.estimated?` Из них ${overview.estimated} месяцев — сценарий 2027 года по вашим допущениям.${forecastBest?` При этих допущениях наибольший размер — ${forecastBest.tier}% (${monthLabel(forecastBest.date)}).`:''} Откройте месяц: использованные суммы ПМ и МРОТ указаны отдельно.`:'';
   const bestText=best?` Среди месяцев с сопоставимыми данными наибольший предварительный размер — <strong>${best.tier}%</strong> при подаче <strong>${monthLabel(best.date)}</strong>. Если размер одинаков, показан первый месяц.`:'';
   renderCompletionChecklist();
-  $('results').innerHTML=`<div class="result-overview"><h3>${best?'Лучший месяц по загруженным данным':forecastBest?'Предварительный сценарий на 2027 год':overview.blocked?'Есть препятствия для назначения':'Нужно уточнить данные'}</h3><p>${best?`Подача ${monthLabel(best.date)}: ${Number.isFinite(best.monthly)?best.monthly.toLocaleString('ru-RU')+' ₽ в месяц на отмеченных детей, ':''}предварительно ${best.tier}%.`:forecastBest?`По выбранным допущениям: ${monthLabel(forecastBest.date)}, предварительно ${forecastBest.tier}%. Это сценарий, а не расчёт по утверждённым суммам 2027 года.`:overview.blocked?`В ${overview.blocked} из 12 месяцев найдены препятствия по введённым сведениям. Причины — в подробностях месяца.`:'Заполните отмеченные ответы, чтобы получить расчёт. Остальные пояснения доступны внутри месяцев.'}</p><p class="hint">Подробности расчёта доступны ниже. При неполных данных сначала заполните отмеченные ответы.</p></div><p class="forecast-overview">Прогноз на 12 месяцев: <strong>${overview.blocked}</strong> с препятствием, <strong>${overview.clear}</strong> без выявленных препятствий по проверенным критериям, <strong>${overview.needs}</strong> требуют уточнения.${bestText}${forecastText} Оценка предварительная и зависит от полноты сведений и будущих доходов; откройте месяц для подробностей.</p>`+output.join('');
+  $('results').innerHTML=`<div class="result-overview"><h3>${best?'Лучший месяц по загруженным данным':forecastBest?'Предварительный сценарий на 2027 год':overview.blocked?'Есть препятствия для назначения':'Нужно уточнить данные'}</h3><p>${best?`Подача ${monthLabel(best.date)}: ${Number.isFinite(best.monthly)?best.monthly.toLocaleString('ru-RU')+' ₽ в месяц на отмеченных детей, ':''}предварительно ${best.tier}%.`:forecastBest?`По выбранным допущениям: ${monthLabel(forecastBest.date)}, предварительно ${forecastBest.tier}%. Это сценарий, а не расчёт по утверждённым суммам 2027 года.`:overview.blocked?`В ${overview.blocked} из 12 месяцев найдены препятствия по введённым сведениям. Причины — в подробностях месяца.`:'Заполните отмеченные ответы, чтобы получить расчёт. Остальные пояснения доступны внутри месяцев.'}</p><p class="hint">Подробности расчёта доступны ниже. При неполных данных сначала заполните отмеченные ответы.</p></div><details class="forecast-details"><summary>Сравнение 12 месяцев и условия прогноза</summary><p class="forecast-overview">Прогноз на 12 месяцев: <strong>${overview.blocked}</strong> с препятствием, <strong>${overview.clear}</strong> без выявленных препятствий по проверенным критериям, <strong>${overview.needs}</strong> требуют уточнения.${bestText}${forecastText} Оценка предварительная и зависит от полноты сведений и будущих доходов; откройте месяц для подробностей.</p></details>`+output.join('');
 }
 $('add').onclick=addReason;
 $('add-child').onclick=addChild; $('add-car').onclick=addCar;
@@ -915,6 +915,8 @@ const steps=[
 const anchor=document.querySelector('.wizard-actions');
 steps.flatMap(step=>step.panels).forEach(panel=>anchor.before(panel));
 originalPanels[6].id='result-panel';
+originalPanels[6].querySelector('h2').textContent='Ваш предварительный результат';
+originalPanels[6].querySelector('h2').nextElementSibling.textContent='Расчёт по вашим ответам. Решение о назначении принимает СФР.';
 for(const [i,step] of steps.entries())for(const panel of step.panels)panel.dataset.step=String(i);
 const stepReview=document.createElement('div');stepReview.id='step-review';stepReview.className='step-review';stepReview.hidden=true;stepReview.setAttribute('role','status');anchor.before(stepReview);
 const periodNote=document.createElement('p');periodNote.id='income-period-note';periodNote.className='period-note';sourceSection.before(periodNote);
