@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-41';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-41';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-41';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261008-41';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261008-41';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-41';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-42';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-42';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-42';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261008-42';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261008-42';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-42';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-41';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261008-41';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-42';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261008-42';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261008-41';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261008-42';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-41';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-42';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-41';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-42';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-41';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-42';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -389,6 +389,7 @@ function renderIncomeForm() {
     const section=document.createElement('section'); section.className='income-person';
     const title=document.createElement('h3'); title.textContent=index===0?'Ваша зарплата':'Зарплата супруга'; section.append(title);
     person.incomeType='employment';
+    const separate=document.createElement('p');separate.className='hint';separate.textContent=index===0?'Укажите только вашу зарплату. Доход супруга заполняется отдельно ниже.':'Укажите только зарплату супруга. Для проверки 8 МРОТ она учитывается отдельно от вашей.';if(incomePeople.length>1)section.append(separate);
     const typeHint=document.createElement('p');typeHint.className='hint';typeHint.textContent='Зарплата и вознаграждение по договору ГПХ, начислено до НДФЛ';section.append(typeHint);
     if(mode==='period') {
       const wrapper=document.createElement('div');wrapper.className='form-row';
@@ -399,7 +400,7 @@ function renderIncomeForm() {
       }
       wrapper.querySelector('.project-future').checked=person.projectFuture===true;
       wrapper.querySelector('.project-future').oninput=e=>{person.projectFuture=e.target.checked;render()};
-      const zero=document.createElement('button');zero.type='button';zero.className='remove salary-zero';zero.textContent='В этом периоде зарплаты не было — поставить 0';zero.onclick=()=>{person.regularAmount=0;wrapper.querySelector('.regular-amount').value='0';render()};
+      const zero=document.createElement('button');zero.type='button';zero.className='remove salary-zero';zero.textContent='В этом периоде зарплаты не было — поставить 0';zero.onclick=()=>{person.regularAmount=0;person.regularFrom ||= incomeWindow($('start').value||currentMonth)[0];person.regularTo ||= incomeWindow($('start').value||currentMonth).at(-1);for(const [selector,key] of [['.regular-amount','regularAmount'],['.regular-from','regularFrom'],['.regular-to','regularTo']])wrapper.querySelector(selector).value=person[key];render()};
       wrapper.append(zero);
       const periodHelp=document.createElement('p');periodHelp.className='hint';periodHelp.textContent='Укажите только месяцы с этой суммой. Если вы ушли в декрет и зарплата прекратилась, закончите период последним месяцем начисления зарплаты. Пособие по уходу укажите отдельно.';wrapper.append(periodHelp);
       section.append(wrapper);
@@ -846,6 +847,7 @@ function render() {
     // Future pregnancy conditions require an explicit continuation forecast.
     if($('pregnancy-applying').checked&&pregnancyState.status==='forecast')pregnancyText+=` ${pregnancyState.reason}.`;
     const adults=countedAdults.map(({person,index:j})=>{
+      const personalSupplemental=additionalIncomeForApplication(withOfficialRates(additionalEntries.filter(entry=>sourceEnabled.has(entry.type)&&entry.personIndex===j),month,cbrRateTable),month,mobilizedIndices);
       const income=Object.fromEntries(incomeWindow(month).map(m=>[m,[...(Number.isFinite(baseMonths(person,j)[m])?[{type:person.incomeType,amount:baseMonths(person,j)[m]}]:[]),...(supplemental.byPerson.get(j)?.[m]?.qualifying?[{type:'employment',amount:supplemental.byPerson.get(j)[m].qualifying}]:[])]]));
       const includedMinorWards=children.filter(c=>c.role==='ward'&&members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18);
       const spouseStatusUnknown=j===1&&members.unanswered.some(item=>item.person.role==='spouse');
@@ -856,11 +858,12 @@ function render() {
       if(j===0&&pregnancyState.status==='forecast')result.warnings.push(pregnancyState.reason+'.');
       const amountKnown=mobilizedIndices.includes(j)||!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person,j)[m])&&baseMonths(person,j)[m]>=0):month===start&&Number.isFinite(person.total)&&person.total>=0;
       const earned=!mobilizedIndices.includes(j)&&sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
-      return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&!spouseStatusUnknown&&person.incomeType!=='other'&&supplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
+      return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&!spouseStatusUnknown&&person.incomeType!=='other'&&personalSupplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
     });
     const needsMeansAssessment=!shortcutOnly||$('pregnancy-applying').checked;
     const newbornOnly=selected.length>0&&!needsMeansAssessment;
     const studentChecks=adultStudentChecks(children,members,sourceEnabled.has('childIncome')?childIncomeEntries:[],month,filingDate,yearRules.mrot);
+    const individualChecks=newbornOnly?[]:adults.map((adult,index)=>({label:index===0?'Вы':'Супруг(а)',text:adult.mobilizedReview?'Для проверки дохода при мобилизации нужны сведения по документам.':adult.exempt?`По введённым причинам требование минимального дохода не применяется. Засчитано месяцев: ${adult.creditedMonths}.`:`Доход для этого требования: ${adult.known?adult.earned.toLocaleString('ru-RU')+' ₽':'нужно уточнить'}. Минимум с учётом причин: ${Math.ceil(adult.minimum).toLocaleString('ru-RU')} ₽. ${adult.known?(adult.passed?'Дохода достаточно.':'Дохода недостаточно. Проверьте, внесены ли все ваши доходы и причины месяцев без заработка.'):'Заполните недостающие суммы и ответы по этому человеку.'}`}));
     const adultText=newbornOnly?(newbornReview?'Сначала уточните право на упрощённое назначение новорождённому. Если оно подтвердится, проверка минимального дохода не требуется':'При упрощённом назначении новорождённому проверка минимального дохода не требуется'):[...adults.map(a=>`${a.label}: ${a.mobilizedReview?'мобилизация по Указу № 647; минимум 8 МРОТ требует отдельной проверки':a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`),...studentChecks.map(check=>`Ребёнок ${children.findIndex(child=>child.id===check.childId)+1} (18–22 года): ${check.status==='yes'?check.reason:check.reason+'; индивидуальный порог 8 МРОТ пока не подтверждён'}`)].join('; ');
     if($('pregnancy-applying').checked) {
       const priorSupport=priorSupportFor(['applicant'],month,pregnancyMonthly,selected.length>0);priorSupportChecks.push(priorSupport);
@@ -937,7 +940,7 @@ function render() {
     const blockerReasons=[...(applicantCheck==='no'?['нет необходимого гражданства или проживания']:[]),...(rightsBlocked?['ограничения родительских прав']:[]),...(needsMeansAssessment&&adults.some(a=>a.known&&!a.passed)?['недостаточный доход с учётом указанных причин']:[]),...(needsMeansAssessment&&[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')?['имущество или проценты превышают допустимые условия']:[])];
     const actionHint=explicitBlockers?(blockerReasons.join('; ')||'Откройте месяц: указано условие, которое нужно проверить.') :!clear&&nextAnswers.length?'Уточните: '+nextAnswers.slice(0,3).join(', ')+'.':!clear?'Проверьте пояснения к условиям этого месяца.':'';
     const metric=amount!==null?`${amount.toLocaleString('ru-RU')} ₽ в месяц на отмеченных детей`:'';
-    output.push(resultCard(filingDate,incomeWindow(month),`${scenario.estimated?'Сценарий 2027: ':''}${shortStatus}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,resultSections,scenario.estimated?'unknown':explicitBlockers?'bad':clear?'ok':'unknown',false,metric,!clear&&!explicitBlockers&&answerActions.length?'Ниже указано, что дополнить. Нажмите на нужный ответ.':actionHint,answerActions));
+    output.push(resultCard(filingDate,incomeWindow(month),`${scenario.estimated?'Сценарий 2027: ':''}${shortStatus}${comparableTier!==null?` · предварительно ${comparableTier}%`:''}`,resultSections,scenario.estimated?'unknown':explicitBlockers?'bad':clear?'ok':'unknown',false,metric,!clear&&!explicitBlockers&&answerActions.length?'Ниже указано, что дополнить. Нажмите на нужный ответ.':actionHint,answerActions,individualChecks));
   }
   const best=candidates.reduce((current,item)=>!current||item.tier>current.tier?item:current,null);
   const forecastBest=forecastCandidates.reduce((current,item)=>!current||item.tier>current.tier?item:current,null);
@@ -1060,7 +1063,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261008-41').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261008-42').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 

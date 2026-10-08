@@ -47,3 +47,11 @@ test('month-specific answer buttons stay outside collapsed details and escape al
   assert.ok(rendered.includes('data-income-month=&quot;2026-11&quot;'));
   assert.ok(rendered.includes('ноябрь 2026 &lt;b&gt;'));
 });
+
+
+test('individual income checks are visible outside details and escaped',()=>{
+ const html=resultCard('2026-10-01',['2025-09','2026-08'],'Оценка',[],'unknown',false,'','',[],[{label:'Вы <b>',text:'360 000 ₽ — достаточно'},{label:'Супруг',text:'12 000 ₽ — недостаточно'}]);
+ assert.ok(html.includes('</details><section class="individual-income-checks">'));
+ assert.ok(html.includes('Вы &lt;b&gt;'));assert.ok(html.includes('Доход одного супруга не покрывает'));
+ assert.ok(html.includes('360 000 ₽ — достаточно'));assert.ok(html.includes('12 000 ₽ — недостаточно'));
+});

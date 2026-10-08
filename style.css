@@ -114,3 +114,5 @@ body:not([data-question=goal]):not([data-question=result]) footer { display:none
 .form-row .forecast-option,.forecast-option { display:block;grid-column:1/-1;line-height:1.5 }.forecast-option input { vertical-align:middle;margin-right:8px }.forecast-option .hint { display:block;margin-top:8px;font-weight:400 }
 
 .result-answers { padding:0 16px 16px;border-bottom:1px solid var(--line) }.result-answers p { font-weight:600 }.result-answers .review-link { display:block;width:100%;text-align:left;margin:8px 0;white-space:normal }.result-edit-context { padding:16px;background:#f4ead8;border-radius:12px;margin:16px 0 }.result-edit-context p { margin-top:0 }
+
+.individual-income-checks { margin:12px 0;padding:16px;border:1px solid var(--line);border-radius:12px;background:#f7faf5 }.individual-income-checks h3 { font-size:1rem;margin:0 0 8px }.individual-income-check { padding:10px 0;border-top:1px solid var(--line) }.individual-income-check p { margin:6px 0;line-height:1.5;font-size:.9rem }.individual-income-checks > .hint { margin:0 0 10px }

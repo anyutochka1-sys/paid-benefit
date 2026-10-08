@@ -90,4 +90,19 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  for(const selector of targets){section(d,7);const button=[...d.querySelectorAll('[data-answer-target]')].find(button=>button.dataset.answerTarget===selector);assert.ok(button,selector);button.click();const field=d.querySelector(selector);assert.ok(visible(field),'recovery target visible '+selector);assert.notEqual(d.body.dataset.question,'result','recovery left result '+selector);}
  dom.window.close();paths++;
 }
+// Individual earnings never cross between spouses; one incomplete recipient does not obscure the other.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'#marital-status','married');set(w,'#spouse-status','ordinary');set(w,'input[value="employment"]',true,'change');
+ for(const [index,amount] of [[1,'30000'],[2,'0']]){const q=`#income-people .income-person:nth-child(${index}) `;set(w,q+'.regular-amount',amount);set(w,q+'.regular-from','2025-09');set(w,q+'.regular-to','2026-08');}
+ set(w,'input[value="selfEmployed"]',true,'change');const q='#extra-entries [data-income-source="selfEmployed"] ';set(w,q+'.person','1');section(d,7);
+ const checks=()=>[...d.querySelectorAll('[data-result-month="2026-10"] .individual-income-check')];
+ assert.equal(checks().length,2);assert.ok(visible(checks()[0]));assert.match(checks()[0].textContent,/360.000.*Дохода достаточно/);assert.match(checks()[1].textContent,/нужно уточнить/);paths++;
+ set(w,q+'.amount','1000');set(w,q+'.from','2025-09');set(w,q+'.to','2026-08');assert.match(checks()[1].textContent,/12.000.*Дохода недостаточно/);assert.match(checks()[0].textContent,/360.000.*Дохода достаточно/);paths++;
+ set(w,q+'.person','0');assert.match(checks()[0].textContent,/372.000.*Дохода достаточно/);assert.match(checks()[1].textContent,/0 ₽.*Дохода недостаточно/);paths++;
+ set(w,q+'.person','1');set(w,q+'.amount','30000');assert.match(checks()[1].textContent,/360.000.*Дохода достаточно/);paths++;
+ set(w,'input[value="selfEmployed"]',false,'change');set(w,'input[value="otherBenefit"]',true,'change');const b='#extra-entries [data-income-source="otherBenefit"] ';set(w,b+'.person','1');set(w,b+'.benefit-kind','counted');set(w,b+'.amount','50000');set(w,b+'.from','2025-09');set(w,b+'.to','2026-08');assert.match(checks()[1].textContent,/0 ₽.*Дохода недостаточно/);paths++;
+ // An explicitly absent salary fills missing period controls too.
+ set(w,'#income-people .income-person:nth-child(2) .regular-from','');set(w,'#income-people .income-person:nth-child(2) .regular-to','');d.querySelector('#income-people .income-person:nth-child(2) .salary-zero').click();assert.equal(d.querySelector('#income-people .income-person:nth-child(2) .regular-from').value,'2025-09');assert.equal(d.querySelector('#income-people .income-person:nth-child(2) .regular-to').value,'2026-08');paths++;
+ dom.window.close();
+}
 console.log(`PASS ${paths} UI paths: every source, direct and next navigation, deselection, three salary modes, draft restoration, mixed order, no-income and existing result targets`);
