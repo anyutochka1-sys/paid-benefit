@@ -13,11 +13,12 @@ export function dateLabel(value) {
   if(!match)return String(value??'');
   return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z'));
 }
-export function resultCard(date,window,label,detail,tone,open,metric='',actionHint='') {
+export function resultCard(date,window,label,detail,tone,open,metric='',actionHint='',actions=[]) {
   const readable=value=>String(value??'').replace(/\b\d{4}-(?:0[1-9]|1[0-2])-\d{2}\b/g,dateLabel).replace(/\b\d{4}-(?:0[1-9]|1[0-2])\b/g,value=>monthLabel(value));
   const detailHtml=Array.isArray(detail)?detail.filter(block=>block.text?.trim()).map(block=>`<section class="result-section"><h3>${escapeText(block.title)}</h3><p>${escapeText(readable(block.text))}</p></section>`).join(''):escapeText(readable(detail));
   const safeTone=['bad','ok','unknown'].includes(tone)?tone:'unknown';
-  return `<details class="result"${open?' open':''}><summary><span class="result-date">${escapeText(monthLabel(date,true))}<small>Подача: ${escapeText(dateLabel(date))}</small><small>Доходы: ${escapeText(monthLabel(window[0]))} — ${escapeText(monthLabel(window.at(-1)))}</small></span>${metric?`<strong class="result-amount">${escapeText(metric)}</strong>`:''}<span class="${safeTone}">${escapeText(label)}${actionHint?`<small class="result-next">${escapeText(actionHint)}</small>`:''}</span></summary><div class="result-detail">${detailHtml}</div></details>`;
+  const actionHtml=actions.length?`<div class="result-answers"><p>Что дополнить для ${escapeText(monthLabel(date))}:</p>${actions.map(action=>`<button type="button" class="review-link" data-answer-target="${escapeText(action.selector)}" data-application-month="${escapeText(String(date).slice(0,7))}">${escapeText(readable(action.label))}</button>`).join('')}</div>`:'';
+  return `<div class="result-month" data-result-month="${escapeText(String(date).slice(0,7))}"><details class="result"${open?' open':''}><summary><span class="result-date">${escapeText(monthLabel(date,true))}<small>Подача: ${escapeText(dateLabel(date))}</small><small>Доходы: ${escapeText(monthLabel(window[0]))} — ${escapeText(monthLabel(window.at(-1)))}</small></span>${metric?`<strong class="result-amount">${escapeText(metric)}</strong>`:''}<span class="${safeTone}">${escapeText(label)}${actionHint?`<small class="result-next">${escapeText(actionHint)}</small>`:''}</span></summary><div class="result-detail">${detailHtml}</div></details>${actionHtml}</div>`;
 }
 export function childLabel(child,index) {
   const name=child.name?.trim();

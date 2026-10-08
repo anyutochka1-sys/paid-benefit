@@ -35,3 +35,15 @@ test('result dates and income windows use readable Russian months',()=>{
   const rendered=resultCard('2026-10-01',['2025-09','2026-08'],'Оценка',[{title:'Срок',text:'С 2026-10 по 2027-03-31'}],'unknown',false);
   assert.ok(rendered.includes('Октябрь 2026'));assert.ok(rendered.includes('сентябрь 2025 — август 2026'));assert.ok(rendered.includes('31 марта 2027'));assert.equal(rendered.includes('2026-10-01'),false);
 });
+
+
+test('month-specific answer buttons stay outside collapsed details and escape all values',()=>{
+  const rendered=resultCard('2027-01-01',['2025-12','2026-11'],'Нужно уточнить ответы',[],'unknown',false,'','Уточните доходы',[
+    {label:'Зарплата: ноябрь 2026 <b>',selector:'#income-people [data-income-month="2026-11"]'}
+  ]);
+  assert.ok(rendered.includes('data-result-month="2027-01"'));
+  assert.ok(rendered.includes('</details><div class="result-answers">'));
+  assert.ok(rendered.includes('data-application-month="2027-01"'));
+  assert.ok(rendered.includes('data-income-month=&quot;2026-11&quot;'));
+  assert.ok(rendered.includes('ноябрь 2026 &lt;b&gt;'));
+});

@@ -43,7 +43,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   nodes.sourceSection.querySelector('legend').textContent='Отметьте всё, что было в нужные месяцы';
   group(2,'income-sources','Какие доходы были у вашей семьи?',parents.income,[nodes.periodNote,nodes.sourceSection,nodes.leaveHelp]);
   group(2,'salary','Сколько начисляли вам и супругу?',parents.income,[field('income-mode'),$('income-people')],{when:()=>sourceEnabled.has('employment'),required:['.regular-amount','.regular-from','.regular-to']});
-  group(2,'maternity','Сколько получили декретных?',parents.income,[nodes.maternitySection],{when:()=>sourceEnabled.has('maternity'),required:['.amount','.start','.months']});
+  group(2,'maternity','Сколько получили по беременности и родам (БиР)?',parents.income,[nodes.maternitySection],{when:()=>sourceEnabled.has('maternity'),required:['.amount','.start','.months']});
   group(2,'benefits','Какие пособия получали на детей?',parents.income,[nodes.benefitsSection],{when:()=>sourceEnabled.has('childBenefit'),required:['.benefit-child','.benefit-amount','.benefit-from','.benefit-to','.benefit-same-region','.benefit-region','.benefit-area','.benefit-tier','[data-receipt-month]']});
   group(2,'alimony','Расскажите об алиментах',parents.income,[nodes.alimonySection],{when:()=>$('marital-status').value==='divorced'||sourceEnabled.has('alimony')});
   group(2,'extra-income','Введите суммы по остальным выбранным доходам',parents.income,[nodes.extraSection,nodes.childIncomeSection,$('deposit-section')],{when:()=>[...sourceEnabled].some(key=>!['employment','maternity','childBenefit','alimony'].includes(key))});
@@ -58,9 +58,11 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   group(5,'citizenship','Проверим основные условия',parents.conditions,[nodes.conditionsQuick,conditionDetails],{required:['#applicant-citizen','#applicant-residence','#applicant-capacity']});
   const conditionButton=nodes.conditionsQuick.querySelector('button'),confirmConditions=conditionButton.onclick;conditionButton.textContent='Да, всё верно';conditionButton.onclick=()=>{confirmConditions();if(!requiredMissing().length)advance();else conditionDetails.open=true;};
   group(5,'address','По какому адресу будете подавать?',parents.conditions,[field('residence-basis'),field('address-proof')],{required:['#residence-basis','#address-proof']});
-  group(5,'prior','Получаете прежнее пособие?' ,parents.conditions,[field('prior-measure'),nodes.priorSupportPanel,$('renewal-help')],{required:['#prior-measure']});
-  const priorHint=document.createElement('p');priorHint.className='hint';priorHint.textContent='Если сейчас получаете единое пособие и хотите его продлить, выберите «Нет». Декретные, маткапитал и обычное пособие по уходу к этому вопросу не относятся.';groups.at(-1).el.querySelector('h3,h2')?.after(priorHint);if(!priorHint.parentElement)groups.at(-1).el.prepend(priorHint);
-  const priorExamples=document.createElement('details');priorExamples.innerHTML='<summary>Какие прежние пособия имеются в виду?</summary><p>Прежние выплаты на детей 3–7 или 8–17 лет, на первого или третьего ребёнка до 3 лет, либо прежнее пособие беременной. Вопрос нужен, если такая выплата ещё действует и вы заменяете её единым пособием. Тогда сравним размеры выплат.</p>';groups.at(-1).el.append(priorExamples);
+  const legacy=document.createElement('details');legacy.className='optional-details';legacy.innerHTML='<summary>Переход со старой выплаты на единое пособие</summary><p>Этот раздел нужен только если вы получаете выплату из прежней системы и заменяете её единым пособием. Сравним старую и новую ежемесячные суммы. При обычном продлении единого пособия заполнять этот раздел не нужно: сведения о действующем едином пособии укажите в карточке ребёнка.</p>';
+  legacy.append(field('prior-measure'),nodes.priorSupportPanel);
+  const priorSelect=legacy.querySelector('#prior-measure');if(!priorSelect.value)priorSelect.value='no';
+  legacy.open=['yes','unknown'].includes(priorSelect.value);
+  group(5,'prior','Продление и особые условия',parents.conditions,[$('renewal-help'),legacy]);
   group(6,'result','Ваш предварительный результат',parents.result,[...parents.result.children]);
 
   // Retain uncommon controls and source explanations within the relevant question.
