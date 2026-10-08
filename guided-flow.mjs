@@ -1,3 +1,4 @@
+import {incomeWindow} from './engine.mjs';
 // A presentation layer over the existing controls; their draft keys and models stay intact.
 export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents,nodes,currentSection,addChild}) {
   const document=parents.basic.ownerDocument,window=document.defaultView;
@@ -42,18 +43,34 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   nodes.sourceSection.querySelector('h3').textContent='Какие деньги поступали в семью?';
   nodes.sourceSection.querySelector('legend').textContent='Отметьте всё, что было в нужные месяцы';
   group(2,'income-sources','Какие доходы были у вашей семьи?',parents.income,[nodes.periodNote,nodes.sourceSection,nodes.leaveHelp]);
-  group(2,'salary','Сколько начисляли вам и супругу?',parents.income,[field('income-mode'),$('income-people')],{when:()=>sourceEnabled.has('employment'),required:['.regular-amount','.regular-from','.regular-to']});
+  group(2,'salary','Сколько начисляли вам и супругу?',parents.income,[field('income-mode'),$('income-people')],{when:()=>sourceEnabled.has('employment'),required:['.regular-amount','.regular-from','.regular-to','.total-amount','[data-income-month]']});
   group(2,'maternity','Сколько получили по беременности и родам (БиР)?',parents.income,[nodes.maternitySection],{when:()=>sourceEnabled.has('maternity'),required:['.amount','.start','.months']});
   group(2,'benefits','Какие пособия получали на детей?',parents.income,[nodes.benefitsSection],{when:()=>sourceEnabled.has('childBenefit'),required:['.benefit-child','.benefit-amount','.benefit-from','.benefit-to','.benefit-same-region','.benefit-region','.benefit-area','.benefit-tier','[data-receipt-month]']});
-  group(2,'alimony','Расскажите об алиментах',parents.income,[nodes.alimonySection],{when:()=>$('marital-status').value==='divorced'||sourceEnabled.has('alimony')});
-  group(2,'extra-income','Введите суммы по остальным выбранным доходам',parents.income,[nodes.extraSection,nodes.childIncomeSection,$('deposit-section')],{when:()=>[...sourceEnabled].some(key=>!['employment','maternity','childBenefit','alimony'].includes(key))});
+  group(2,'alimony','Расскажите об алиментах',parents.income,[nodes.alimonySection],{when:()=>$('marital-status').value==='divorced'||sourceEnabled.has('alimony'),required:['#alimony-monthly','#alimony-from','#alimony-to','#alimony-kind','#divorce-month']});
+  group(2,'extra-income','Введите суммы по остальным выбранным доходам',parents.income,[nodes.extraSection,nodes.childIncomeSection,$('deposit-section')],{when:()=>[...sourceEnabled].some(key=>!['employment','maternity','childBenefit','alimony'].includes(key)),required:['#deposits .tax-year','#deposits .interest','#extra-entries .amount','#extra-entries .from','#extra-entries .to','#extra-entries .tax-year','#extra-entries .benefit-kind','#extra-entries .business-basis','#extra-entries .business-expenses','#extra-entries .currency','#extra-entries .rate-date','#extra-entries .rate','#child-income-entries .child','#child-income-entries .amount','#child-income-entries .from','#child-income-entries .to']});
 
+  const alimonyPrerequisite=document.createElement('div');alimonyPrerequisite.className='hint';
+  const familyButton=document.createElement('button');familyButton.type='button';familyButton.className='review-link';familyButton.textContent='Указать семейное положение для ввода алиментов';familyButton.onclick=()=>goTo(groups.find(item=>item.id==='family'));alimonyPrerequisite.append(familyButton);groups.find(item=>item.id==='alimony').el.append(alimonyPrerequisite);
+  const selectedIncome=document.createElement('div');selectedIncome.className='selected-income';
+  groups.find(item=>item.id==='income-sources').el.append(selectedIncome);
+  function paintIncomeChoices(){
+    alimonyPrerequisite.hidden=!!$('marital-status').value;selectedIncome.replaceChildren();
+    if(!sourceEnabled.size)return;
+    const title=document.createElement('h3');title.textContent='Выбрано — заполните суммы';selectedIncome.append(title);
+    const targets={employment:'salary',maternity:'maternity',childBenefit:'benefits',alimony:'alimony'};
+    for(const key of sourceEnabled){
+      const box=[...nodes.sourceSection.querySelectorAll('input')].find(el=>el.value===key);
+      const button=document.createElement('button');button.type='button';button.className='review-link';button.dataset.incomeTarget=key;
+      button.textContent='Заполнить: '+(box?.closest('label')?.textContent.trim()||key);
+      button.onclick=()=>{goTo(groups.find(item=>item.id===(targets[key]||'extra-income')));const target=key==='employment'?$('income-people'):key==='maternity'?$('maternity-payments'):key==='childBenefit'?$('benefits'):key==='deposit'?$('deposits'):key==='childIncome'?$('child-income-entries'):key==='alimony'?nodes.alimonySection:[...$('extra-entries').children].find(row=>row.dataset.incomeSource===key);target?.scrollIntoView({block:'center',behavior:'smooth'});target?.querySelector('input:not([type=checkbox]),select')?.focus();};selectedIncome.append(button);
+    }
+  }
   const careIntro=document.createElement('p');careIntro.className='hint';careIntro.textContent='Если да, укажите причину: например, уход за ребёнком, беременность или учёба. Если таких месяцев не было, продолжайте.';
-  group(3,'care','Были месяцы без заработка?',parents.reasons,[careIntro,$('care-helper'),$('add'),$('reasons')]);
+  group(3,'care','Были месяцы без заработка?',parents.reasons,[careIntro,$('care-helper'),$('add'),$('reasons')],{required:['.from','.to']});
   group(4,'assets','Что есть в собственности у семьи?',parents.property,[nodes.assetPicker]);
-  group(4,'property','Уточним вашу недвижимость',parents.property,[$('properties'),nodes.propertyAdds,field('rural')],{when:()=>[...document.querySelectorAll('.asset-choice:checked')].some(box=>!['asset-car','asset-vehicle'].includes(box.id))});
-  group(4,'vehicles','Уточним транспорт семьи',parents.cars,[$('add-car'),$('cars'),field('support-car')],{when:()=>$('asset-car').checked});
-  group(4,'other-vehicles','Расскажите об остальном транспорте',parents.property,[$('vehicle-fields')],{when:()=>$('asset-vehicle').checked});
+  group(4,'property','Уточним вашу недвижимость',parents.property,[$('properties'),nodes.propertyAdds,field('rural')],{when:()=>[...document.querySelectorAll('.asset-choice:checked')].some(box=>!['asset-car','asset-vehicle'].includes(box.id)),required:['#properties .share','#properties .area','#properties .hectares']});
+  group(4,'vehicles','Уточним транспорт семьи',parents.cars,[$('add-car'),$('cars'),field('support-car')],{when:()=>$('asset-car').checked,required:['#cars .year','#cars .hp']});
+  group(4,'other-vehicles','Расскажите об остальном транспорте',parents.property,[$('vehicle-fields')],{when:()=>$('asset-vehicle').checked,required:['#other-vehicles .year']});
   const conditionDetails=document.createElement('details');conditionDetails.className='optional-details';conditionDetails.innerHTML='<summary>Есть отличия или хочу проверить ответы</summary>';conditionDetails.append(field('applicant-citizen'),field('applicant-residence'),field('applicant-capacity'),$('capacity-dates'));
   group(5,'citizenship','Проверим основные условия',parents.conditions,[nodes.conditionsQuick,conditionDetails],{required:['#applicant-citizen','#applicant-residence','#applicant-capacity']});
   const conditionButton=nodes.conditionsQuick.querySelector('button'),confirmConditions=conditionButton.onclick;conditionButton.textContent='Да, всё верно';conditionButton.onclick=()=>{confirmConditions();if(!requiredMissing().length)advance();else conditionDetails.open=true;};
@@ -76,9 +93,11 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   function screens(){const list=groups.filter(item=>item.when());const where=list.findIndex(item=>item.id==='children-finish');if(where>=0)list.splice(where,0,...childItems());return list}
   function nextAfter(id){const list=screens();const index=list.findIndex(item=>item.id===id);return list[Math.max(0,index+1)]}
   function isVisibleField(el){if(!el||el.disabled)return false;for(let node=el;node&&node!==active.el.parentElement;node=node.parentElement)if(node.hidden)return false;return true}
-  function requiredMissing(){const issue=[];for(const selector of active.required||[])for(const el of active.el.querySelectorAll(selector)){if(!isVisibleField(el))continue;if(el.matches('.applicant-rights')&&el.closest('.form-row').querySelector('.child-role').value==='ward')continue;if(!el.value||['unknown'].includes(el.value)||!el.validity.valid)issue.push(el)}return issue}
+  function requiredMissing(){const issue=[],salaryMonths=new Set($('start').value?incomeWindow($('start').value):[]);for(const selector of active.required||[])for(const el of active.el.querySelectorAll(selector)){if(!isVisibleField(el))continue;if(el.dataset.incomeMonth&&salaryMonths.size&&!salaryMonths.has(el.dataset.incomeMonth))continue;if(el.matches('.applicant-rights')&&el.closest('.form-row').querySelector('.child-role').value==='ward')continue;if(!el.value||['unknown'].includes(el.value)||!el.validity.valid)issue.push(el)}return issue}
   function advance(){const list=screens(),index=list.findIndex(item=>item.id===active.id);goTo(list[Math.min(index+1,list.length-1)])}
   function next(){const issue=requiredMissing();let message='';if(active.id==='income-sources'&&!sourceEnabled.size&&!$('no-income').checked)message='Отметьте поступления или подтвердите, что их не было.';if(active.id==='assets'&&!$('assets-none').checked&&!document.querySelector('.asset-choice:checked'))message='Отметьте собственность семьи или её отсутствие.';
+    if(active.id==='alimony'&&!$('marital-status').value){message='Сначала укажите семейное положение: от него зависят вопросы об алиментах.';}
+    if(active.id==='salary'&&$('income-mode').value==='period'){for(const row of $('income-people').querySelectorAll('.form-row')){const from=row.querySelector('.regular-from'),to=row.querySelector('.regular-to');if(from.value&&to.value&&from.value>to.value){issue.push(to);message='Последний месяц зарплаты не может быть раньше первого.';}}}
     if(active.id==='maternity'&&!$('maternity-payments').children.length)message='Добавьте выплату декретных или снимите её выбор в разделе доходов.';
     if(active.id==='benefits'){
       if(!$('benefits').children.length)message='Добавьте пособие или снимите его выбор в разделе доходов.';
@@ -94,7 +113,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     issue.forEach(el=>{el.setAttribute('aria-invalid','true');el.classList.add('field-invalid');const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=el.closest('label')?.firstChild?.textContent?.trim()||'Заполните ответ';button.onclick=()=>{for(let parent=el.parentElement;parent&&parent!==active.el;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;el.focus();el.scrollIntoView({block:'center',behavior:'smooth'})};box.append(button)});
     const skip=document.createElement('button');skip.type='button';skip.className='remove';skip.textContent='Продолжить, заполню позже';skip.onclick=advance;box.append(skip);box.scrollIntoView({block:'center',behavior:'smooth'});
   }
-  function paint(){if(painting||!active)return;painting=true;showSection(active.section);
+  function paint(){if(painting||!active)return;painting=true;showSection(active.section);paintIncomeChoices();
     const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');pregnancyMore.hidden=['pregnant','both'].includes(goal.value);(pregnancy.when()?pregnancy.el:['pregnant','both'].includes(goal.value)?finish.el:pregnancyMore).append(nodes.pregnancyPanel);
     for(const item of [...groups,...childItems()])item.el.hidden=item.id!==active.id;
     // Preserve the inner hidden states of conditional fields.
