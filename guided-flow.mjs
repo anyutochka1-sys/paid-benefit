@@ -35,7 +35,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   // The same pregnancy controls move to the appropriate visible question.
 
   const primary=nodes.sourceSection.querySelector('.source-grid');
-  const other=nodes.sourceSection.querySelector('details .source-grid');
+  const other=nodes.sourceSection.querySelectorAll('.source-grid')[1];
   const common=new Set(['employment','childBenefit','otherBenefit','maternity','alimony','deposit']);
   nodes.sourceSection.querySelectorAll('input[type=checkbox]:not(#no-income)').forEach(box=>{(common.has(box.value)?primary:other).append(box.closest('label'))});
   primary.prepend(primary.querySelector('input[value="maternity"]').closest('label'));
@@ -46,7 +46,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   group(2,'maternity','Сколько получили декретных?',parents.income,[nodes.maternitySection],{when:()=>sourceEnabled.has('maternity'),required:['.amount','.start','.months']});
   group(2,'benefits','Какие пособия получали на детей?',parents.income,[nodes.benefitsSection],{when:()=>sourceEnabled.has('childBenefit'),required:['.benefit-child','.benefit-amount','.benefit-from','.benefit-to','.benefit-same-region','.benefit-region','.benefit-area','.benefit-tier','[data-receipt-month]']});
   group(2,'alimony','Расскажите об алиментах',parents.income,[nodes.alimonySection],{when:()=>$('marital-status').value==='divorced'||sourceEnabled.has('alimony')});
-  group(2,'extra-income','Уточним остальные поступления',parents.income,[nodes.extraSection,nodes.childIncomeSection,$('deposit-section')],{when:()=>[...sourceEnabled].some(key=>!['employment','maternity','childBenefit','alimony'].includes(key))});
+  group(2,'extra-income','Введите суммы по остальным выбранным доходам',parents.income,[nodes.extraSection,nodes.childIncomeSection,$('deposit-section')],{when:()=>[...sourceEnabled].some(key=>!['employment','maternity','childBenefit','alimony'].includes(key))});
 
   const careIntro=document.createElement('p');careIntro.className='hint';careIntro.textContent='Если да, укажите причину: например, уход за ребёнком, беременность или учёба. Если таких месяцев не было, продолжайте.';
   group(3,'care','Были месяцы без заработка?',parents.reasons,[careIntro,$('care-helper'),$('add'),$('reasons')]);
@@ -101,7 +101,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     const counter=$('progress').querySelector('.step-counter');if(counter)counter.textContent=`${steps[active.section].title} · ${sectionItems.findIndex(item=>item.id===active.id)+1} из ${sectionItems.length}`;
     const links=$('progress').querySelector('.step-links');if(links){const menu=document.createElement('details');menu.className='section-menu';menu.innerHTML='<summary>Перейти к другому разделу</summary>';menu.append(links);const changeGoal=document.createElement('button');changeGoal.type='button';changeGoal.className='remove';changeGoal.textContent='Изменить мою ситуацию';changeGoal.onclick=()=>{goal.value='';goTo(groups.find(item=>item.id==='goal'))};menu.append(changeGoal);$('progress').append(menu)}
     const track=document.createElement('div');track.className='progress-track';track.setAttribute('aria-hidden','true');const fill=document.createElement('span');fill.style.width=((active.section+1)/steps.length*100)+'%';track.append(fill);$('progress').prepend(track);
-    $('step-help').hidden=true;intro.hidden=active.id!=='goal';$('back').hidden=index===0;$('next').hidden=active.section===6||active.id==='goal';$('next').textContent=list[index+1]?.section===6?'Показать результат':'Продолжить';$('next').onclick=next;$('back').onclick=()=>goTo(list[Math.max(0,index-1)]);
+    $('step-help').hidden=true;intro.hidden=active.id!=='goal';$('back').hidden=index===0;$('next').hidden=active.section===6||active.id==='goal';$('next').textContent=active.id==='income-sources'&&sourceEnabled.size?'Далее: суммы доходов':list[index+1]?.section===6?'Показать результат':'Продолжить';$('next').onclick=next;$('back').onclick=()=>goTo(list[Math.max(0,index-1)]);
     document.body.dataset.question=active.id;$('guided-question').value=active.id;painting=false;
   }
   function goTo(item){if(!item)return;active=item;paint();window.scrollTo({top:0,behavior:'smooth'})}

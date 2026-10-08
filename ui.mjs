@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-33';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-33';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext} from './benefit-amounts.mjs?v=20261008-33';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261008-33';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261008-33';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-33';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-35';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-35';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext} from './benefit-amounts.mjs?v=20261008-35';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261008-35';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261008-35';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-35';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-33';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-35';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-33';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-35';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-33';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-35';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-33';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-35';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-33';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-35';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -215,7 +215,7 @@ const sourceGroups=[
   ['Чаще всего',[['employment','Зарплата до декрета или сейчас, работа по договору'],['pension','Пенсия / больничный'],['unemploymentBenefit','Пособие по безработице'],['otherBenefit','Пособие по уходу по месту работы и другие выплаты'],['childBenefit','Единое пособие и пособие по уходу для неработающего'],['alimony','Алименты'],['deposit','Проценты по вкладам'],['lottery','Выигрыш в лотерею']]],
   ['Другие поступления',[['childIncome','Доходы детей'],['maternity','Декретные — разовая выплата за отпуск по беременности и родам'],['selfEmployed','Самозанятость'],['business','ИП'],['scholarship','Стипендия'],['academicMedical','Выплата в медакадемическом отпуске'],['guardianReward','Вознаграждение приёмного родителя'],['successorPayment','Выплата правопреемнику'],['publicDuty','Компенсация за общественные обязанности'],['military','Денежное довольствие'],['rationCompensation','Компенсация вместо пайка'],['judgeAllowance','Содержание судьи в отставке'],['serviceSeverance','Выплата при увольнении со службы'],['rent','Аренда'],['propertySale','Продажа имущества'],['securities','Ценные бумаги / дивиденды'],['copyright','Авторские выплаты'],['foreignEarned','Заработок в иностранной валюте'],['foreignOther','Другой доход за пределами РФ']]]
 ];
-sourceSection.innerHTML='<h3>Какие поступления были в семье?</h3><p class="hint">Отметьте все виды. Дальше откроются только нужные поля. Если ничего не было, отметьте это отдельно.</p>'+sourceGroups.map(([title,items],index)=>`${index?'<details><summary>Другие виды дохода</summary>':''}<fieldset><legend>${title}</legend><div class="source-grid">${items.map(([key,label])=>`<label class="check"><input type="checkbox" value="${key}"> ${label}</label>`).join('')}</div></fieldset>${index?'</details>':''}`).join('')+'<label class="check"><input id="no-income" type="checkbox"> Никаких поступлений из перечисленных не было</label>';
+sourceSection.innerHTML='<h3>Какие поступления были в семье?</h3><p class="hint">Сначала отметьте все виды дохода, которые были у семьи в расчётном периоде. Затем нажмите «Далее: суммы доходов» и заполните суммы и месяцы по каждому выбранному виду. Если поступлений не было, отметьте это ниже.</p>'+sourceGroups.map(([title,items])=>`<fieldset><legend>${title}</legend><div class="source-grid">${items.map(([key,label])=>`<label class="check"><input type="checkbox" value="${key}"> ${label}</label>`).join('')}</div></fieldset>`).join('')+'<label class="check"><input id="no-income" type="checkbox"> Никаких поступлений из перечисленных не было</label>';
 const excludedIncomeInfo=document.createElement('details');
 excludedIncomeInfo.innerHTML='<summary>Что не нужно вносить в доход?</summary><p class="hint">Если выплата точно подпадает под одно из исключений ниже, её сумму вводить не нужно. Если сомневаетесь в основании выплаты, отметьте «Другие пособия» и выберите «Не уверена» — результат останется открытым.</p><ul><li><strong>Маткапитал:</strong> номинал сертификата и перевод средств на погашение ипотеки, оплату жилья или учёбы не вводите как зарплату либо пособие: это распоряжение сертификатом, а не полученный заработок. Не вводите ежемесячную выплату из капитала на ребёнка до 3 лет и средства регионального маткапитала. Пункт 53 отдельно перечисляет федеральные средства на адаптацию ребёнка с инвалидностью, строительство или реконструкцию ИЖС и реконструкцию дома блокированной застройки. Если деньги поступили вам на счёт по другой схеме и вы не уверены в основании, уточните решение СФР.</li><li><strong>Детские выплаты:</strong> прежнее единое пособие на ребёнка из нового заявления; отдельные прежние выплаты за прошлые периоды на того же ребёнка; пособия и алименты на ребёнка вне состава семьи или достигшего 18 лет, с учётом возможного регионального правила до 23 лет. Такие поступления указывайте в специальных разделах для детей и алиментов, чтобы калькулятор проверил условия сам.</li><li><strong>Целевая помощь:</strong> социальный контракт; подтверждённые целевые средства на покупку недвижимости, транспорта или техники, израсходованные на эту цель; помощь при ЧС или теракте и на лечение ребёнка; целевые гранты и субсидии ИП. Если грант уже включён в выручку ИП, укажите его только в разделе ИП для вычета без повтора.</li><li><strong>Мобилизованный член семьи:</strong> если подтверждён призыв по Указу № 647, отметьте это ниже в раскрывающемся вопросе. Его личные заработок и другие доходы за расчётный период вводить не нужно; денежное довольствие военнослужащего по контракту сюда не относится.</li><li><strong>Другие исключения:</strong> возврат НДФЛ по вычету, пособие на погребение, выплата по уходу за ребёнком с инвалидностью, государственные поощрения родителей, установленные Правилами страховые возмещения и расходы на реабилитацию, компенсация средств реабилитации, питания ребёнка с ОВЗ дома и целевые средства на ремонт дома семьи погибшего кормильца.</li></ul><details><summary>Редкие исключения и условия</summary><ul><li>Доплата единого пособия беременной за прошлые периоды; отдельные прежние детские выплаты по Указам № 606 и № 175 и пособие по уходу для неработающего — за прошлые периоды на ребёнка из заявления; прежняя выплата на первого ребёнка из заявления и старое пособие 8–17 лет.</li><li>Доходы в виде процентов по номинальному счёту ребёнка под опекой; выплаты и алименты на умершего, объявленного умершим или признанного безвестно отсутствующим ребёнка.</li><li>Ежемесячная помощь жителям определённых территорий Курской области в связи с утратой имущества первой необходимости; единовременное возмещение вреда жизни и здоровью военнослужащим, участникам добровольческих формирований и сотрудникам перечисленных служб либо их семьям в связи с боевыми действиями.</li><li>Компенсация изготовления и установки надгробного памятника; ежегодная компенсация содержания и ветеринарного обслуживания собаки-проводника; целевые федеральные средства на ремонт дома семьи погибшего кормильца.</li></ul><p class="hint">Основание, получателя и период каждой такой выплаты сверяйте по решению о назначении. Перечень меняется при изменении Правил.</p></details><p class="hint">У помощи работодателя при рождении исключается только подтверждённая необлагаемая часть — её укажите в «Других пособиях». Полный перечень и условия: <a href="https://www.consultant.ru/document/cons_doc_LAW_434753/0f3a9ac1b53968ba1a801a920535924bcfcab577/" target="_blank" rel="noopener">пункт 53 Правил № 2330</a>.</p>';
 sourceSection.append(excludedIncomeInfo);
@@ -226,7 +226,7 @@ mobilizationSection.innerHTML='<summary>Если член семьи призв�
 sourceSection.after(mobilizationSection);
 mobilizationSection.querySelectorAll('input').forEach(input=>input.addEventListener('input',render));
 const extraSection=document.createElement('section');
-extraSection.innerHTML='<div class="section-heading"><h3>Другие доходы</h3><label>Повторить вид<select id="extra-add-type"></select></label><button id="add-extra" type="button">+ Ещё период</button></div><p class="hint">Добавляйте каждый учитываемый вид отдельно. Ежемесячную сумму укажите для месяцев поступления, а годовую для ИП, аренды, продажи имущества, ценных бумаг и авторских выплат — за налоговый год. Продажу недвижимости вводите по налоговой базе. Исключённые выплаты из списка выше вводить не нужно. Если вид выплаты неясен, выберите «Не уверена» — калькулятор не выдаст уверенный вывод. Материальную помощь работодателя при рождении укажите отдельно: исключается только подтверждённая необлагаемая часть. Пенсия по потере кормильца, если её получает учитываемый член семьи, относится к пенсиям.</p><div id="extra-entries"></div>';
+extraSection.innerHTML='<div class="section-heading"><h3>Другие доходы</h3><label>Повторить вид<select id="extra-add-type"></select></label><button id="add-extra" type="button">+ Ещё период</button></div><p class="hint">Поля для отмеченных видов уже добавлены ниже. Заполните сумму и период по каждому виду. Кнопка «Ещё период» нужна, если по тому же виду были разные суммы или получатели. Ежемесячную сумму укажите для месяцев поступления, а годовую для ИП, аренды, продажи имущества, ценных бумаг и авторских выплат — за налоговый год. Продажу недвижимости вводите по налоговой базе. Исключённые выплаты из списка выше вводить не нужно. Если вид выплаты неясен, выберите «Не уверена» — калькулятор не выдаст уверенный вывод. Материальную помощь работодателя при рождении укажите отдельно: исключается только подтверждённая необлагаемая часть. Пенсия по потере кормильца, если её получает учитываемый член семьи, относится к пенсиям.</p><div id="extra-entries"></div>';
 maternitySection.after(extraSection);
 const childIncomeEntries=[];
 const childIncomeSection=document.createElement('section');
@@ -392,7 +392,7 @@ function renderIncomeForm() {
     const typeHint=document.createElement('p');typeHint.className='hint';typeHint.textContent='Зарплата и вознаграждение по договору ГПХ, начислено до НДФЛ';section.append(typeHint);
     if(mode==='period') {
       const wrapper=document.createElement('div');wrapper.className='form-row';
-      wrapper.innerHTML='<label>Одинаковая сумма за месяц, ₽<input class="regular-amount" type="number" min="0" step="0.01"></label><label>С месяца<input class="regular-from" type="month"></label><label>По месяц включительно<input class="regular-to" type="month"></label><label class="check"><input class="project-future" type="checkbox"> Предполагаю такую же зарплату в будущие месяцы указанного периода</label>';
+      wrapper.innerHTML='<label>Одинаковая сумма за месяц, ₽<input class="regular-amount" type="number" min="0" step="0.01"></label><label>С месяца<input class="regular-from" type="month"></label><label>По месяц включительно<input class="regular-to" type="month"></label><label class="check forecast-option"><input class="project-future" type="checkbox"> Учитывать такую же зарплату в будущие месяцы указанного периода<span class="hint">Для примерного расчёта следующих месяцев подачи: калькулятор добавит ожидаемую зарплату за будущие месяцы этого периода. Отметьте, если ожидаете ту же сумму. Если заработок закончится или изменится, уточните сумму и период. Уже полученные доходы эта отметка не меняет.</span></label>';
       for(const [selector,key] of [['.regular-amount','regularAmount'],['.regular-from','regularFrom'],['.regular-to','regularTo']]) {
         const input=wrapper.querySelector(selector);input.value=person[key]??'';
         input.oninput=()=>{person[key]=key==='regularAmount'?(input.value===''?null:Number(input.value)):input.value;render()};
@@ -523,10 +523,10 @@ function renderBenefitRows() {
       const check=document.createElement('label');check.className='check';const box=document.createElement('input');box.type='checkbox';box.className='benefit-receipts-confirmed';box.checked=payment.receiptsConfirmed===true&&payment.confirmedContext===receiptContext(payment,context);box.oninput=()=>{payment.receiptsConfirmed=box.checked;payment.confirmedContext=receiptContext(payment,context);render()};check.append(box,document.createTextNode(' Проверила: суммы соответствуют поступлениям в указанные месяцы'));monthlyPreview.append(check);
     }
     fillPreview();
-    const forecastLabel=document.createElement('label');forecastLabel.className='check';forecastLabel.hidden=!payment.to||payment.to<=currentMonth;
+    const forecastLabel=document.createElement('label');forecastLabel.className='check forecast-option';forecastLabel.hidden=!payment.to||payment.to<=currentMonth;
     const forecastInput=document.createElement('input');forecastInput.type='checkbox';forecastInput.className='benefit-project-future';forecastInput.checked=payment.projectFuture===true;
     forecastInput.addEventListener('input',()=>{payment.projectFuture=forecastInput.checked;render()});
-    forecastLabel.append(forecastInput,document.createTextNode(automatic?' Ожидаю получать пособие в будущие месяцы этого периода по указанному проценту':' Предполагаю такую же сумму пособия в будущие месяцы указанного периода'));row.append(forecastLabel);
+    forecastLabel.append(forecastInput,document.createTextNode(automatic?' Ожидаю получать пособие в будущие месяцы этого периода по указанному проценту':' Предполагаю такую же сумму пособия в будущие месяцы указанного периода'));const forecastHelp=document.createElement('span');forecastHelp.className='hint';forecastHelp.textContent='Для примерного расчёта следующих месяцев подачи: калькулятор учтёт ожидаемые поступления за будущие месяцы указанного периода. Отметьте, если планируете получать это пособие дальше. В автоматическом режиме используем выбранный процент пособия, при ручном вводе — указанную сумму. Уже полученные выплаты эта отметка не меняет.';forecastLabel.append(forecastHelp);row.append(forecastLabel);
     const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='Убрать';remove.onclick=()=>{benefitPayments.splice(index,1);renderBenefitRows();render()};row.append(remove);
     $('benefits').append(row);
   });
@@ -1005,7 +1005,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261008-33').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261008-35').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
