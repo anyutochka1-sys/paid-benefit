@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-39';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-39';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-39';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261008-39';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261008-39';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-39';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-40';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-40';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-40';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261008-40';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261008-40';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-40';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-39';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-40';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261008-40';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-39';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261008-40';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-39';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-40';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-39';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-40';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-39';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-40';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -334,7 +334,7 @@ sourceSection.querySelectorAll('input[type="checkbox"]').forEach(box=>box.onchan
   childIncomeSection.hidden=!sourceEnabled.has('childIncome');
   benefitsSection.hidden=!sourceEnabled.has('childBenefit');
   maternitySection.hidden=!sourceEnabled.has('maternity');
-  if(box.checked&&box.value==='childBenefit'&&!benefitPayments.length){benefitPayments.push({childId:'',amount:'',from:'',to:'',amountMode:'automatic'});renderBenefitRows()}
+  if(box.checked&&box.value==='childBenefit'&&!benefitPayments.length){benefitPayments.push({childId:'',amount:'',from:'',to:'',amountMode:'automatic',periodBasis:'award'});renderBenefitRows()}
   if(box.checked&&box.value==='maternity'&&!maternityPayments.length){maternityPayments.push({personIndex:0,amount:null,startMonth:'',chargedMonths:5});renderMaternityRows()}
   if(box.checked&&box.value==='deposit'&&!$('deposits').children.length)addDeposit();
   if(box.checked&&box.value==='childIncome'&&!childIncomeEntries.length)$('add-child-income').click();
@@ -453,6 +453,8 @@ function renderBenefitRows() {
   $('benefits').replaceChildren();
   benefitPayments.forEach((payment,index)=>{
     const row=document.createElement('div');row.className='form-row';
+    const linkedChild=childData().find(child=>child.id===payment.childId);
+    if(payment.periodBasis==='award'&&payment.endFromChild)payment.to=linkedChild?.awardEnd?.slice(0,7)||'';
     const kindSelect=document.createElement('select');
     const oldKind=!['unified','nonworkingCare'].includes(payment.kind||'unified');
     const historicalLabel=document.createElement('label');historicalLabel.className='check';const historical=document.createElement('input');historical.type='checkbox';historical.checked=payment.historical??oldKind;
@@ -481,7 +483,7 @@ function renderBenefitRows() {
     childOptions.forEach(c=>select.add(new Option(c.label,c.id)));
     select.value=payment.childId;
     const toggleRegional=()=>{const child=childData().find(child=>child.id===select.value);regionalDetails.hidden=!child?.birthDate||ageAt(child.birthDate,applicationDateForMonth(monthString(monthIndex($('start').value||currentMonth)+11),1))<18;};
-    select.addEventListener('input',()=>{payment.childId=select.value;toggleRegional();render()});toggleRegional();
+    select.addEventListener('input',()=>{payment.childId=select.value;const child=childData().find(child=>child.id===select.value);if(payment.periodBasis==='award'&&(!payment.to||payment.endFromChild)){payment.endFromChild=Boolean(child?.awardEnd);payment.to=child?.awardEnd?.slice(0,7)||'';payment.receiptsConfirmed=false}toggleRegional();renderBenefitRows();render()});toggleRegional();
     select.className='benefit-child';const childLabel=document.createElement('label');childLabel.textContent='Кому назначено пособие';childLabel.append(select);row.append(childLabel);
     const automatic=(payment.kind||'unified')==='unified'&&payment.amountMode==='automatic';
     if((payment.kind||'unified')==='unified'){
@@ -496,20 +498,24 @@ function renderBenefitRows() {
         const label=document.createElement('label');label.textContent='Регион, в котором получали пособие';const select=document.createElement('select');select.add(new Option('Выберите регион',''));pmRegions(2026).forEach(r=>select.add(new Option(r.name,r.code)));select.className='benefit-region';select.value=payment.benefitRegion||'';select.oninput=()=>{payment.benefitRegion=select.value;payment.benefitAreas={};payment.receiptsConfirmed=false;renderBenefitRows();render()};label.append(select);row.append(label);searchableSelect(select,{label:'Регион, в котором получали пособие'});
       }
       const tierLabel=document.createElement('label');tierLabel.textContent='Какой размер пособия был назначен?';const tier=document.createElement('select');tier.className='benefit-tier';[['','Выберите'],['50','50%'],['75','75%'],['100','100%']].forEach(([v,t])=>tier.add(new Option(t,v)));tier.value=String(payment.tier||'');tier.oninput=()=>{payment.tier=tier.value;payment.receiptsConfirmed=false;renderBenefitRows();render()};tierLabel.append(tier);row.append(tierLabel);
-      const note=document.createElement('p');note.className='hint';note.textContent='Период ниже — месяцы, когда деньги поступили. По обычному графику единое пособие приходит за предыдущий месяц: в январе — за декабрь по прежней сумме, с февраля — за январь по новой. При смене назначенного процента добавьте отдельный период.';row.append(note);
+      const note=document.createElement('p');note.className='hint';note.textContent='Выберите, вводите ли вы период назначения или фактические поступления. Период назначения сдвигаем на месяц автоматически. После последнего поступления доход от этого пособия — 0; новое назначение не предполагаем. По обычному графику единое пособие приходит за предыдущий месяц: в январе — за декабрь по прежней сумме, с февраля — за январь по новой. При смене назначенного процента добавьте отдельный период.';row.append(note);
+    }
+    if((payment.kind||'unified')==='unified'){
+      const basisLabel=document.createElement('label');basisLabel.textContent='Какие месяцы указываете?';const basis=document.createElement('select');basis.className='benefit-period-basis';basis.add(new Option('Период, на который назначено пособие','award'));basis.add(new Option('Месяцы фактического поступления — ручное уточнение','receipt'));basis.value=payment.periodBasis||'receipt';basis.oninput=()=>{payment.periodBasis=basis.value;payment.endFromChild=false;payment.receiptsConfirmed=false;renderBenefitRows();render()};basisLabel.append(basis);row.append(basisLabel);
     }
     const monthlyPreview=document.createElement('div');monthlyPreview.className='benefit-monthly-preview';monthlyPreview.style.gridColumn='1 / -1';
     for(const [key,label,type] of [['amount','Полученная сумма за каждый указанный месяц, ₽','number'],['from','С месяца получения','month'],['to','По месяц получения включительно','month']]) {
-      const wrapper=document.createElement('label');wrapper.textContent=label;
-      const input=document.createElement('input');input.type=type;input.className='benefit-'+key;if(type==='number'){input.min='0';input.step='0.01';}input.value=payment[key]??'';
+      const wrapper=document.createElement('label');wrapper.textContent=key==='from'&&payment.periodBasis==='award'?'Назначено с месяца':key==='to'&&payment.periodBasis==='award'?'Назначено по месяц включительно'+(payment.endFromChild?' — из карточки ребёнка':''):label;
+      const input=document.createElement('input');input.type=type;input.className='benefit-'+key;if(type==='number'){input.min='0';input.step='0.01';}input.value=payment[key]??'';if(key==='to'&&payment.endFromChild&&payment.periodBasis==='award')input.readOnly=true;
       wrapper.hidden=key==='amount'&&automatic;
-      input.addEventListener('input',()=>{payment[key]=input.value;if(automatic){payment.receiptsConfirmed=false;fillPreview()}const forecast=row.querySelector('.benefit-project-future');if(forecast)forecast.closest('label').hidden=!payment.to||payment.to<=currentMonth;render()});wrapper.append(input);row.append(wrapper);
+      input.addEventListener('input',()=>{payment[key]=input.value;if(automatic){payment.receiptsConfirmed=false;fillPreview()}const forecast=row.querySelector('.benefit-project-future');if(forecast)forecast.closest('label').hidden=payment.periodBasis==='award'||!payment.to||payment.to<=currentMonth;render()});wrapper.append(input);row.append(wrapper);
     }
-    row.append(monthlyPreview);
+    row.append(monthlyPreview);const schedule=document.createElement('p');schedule.className='hint';schedule.style.gridColumn='1 / -1';const updateSchedule=()=>{const range=benefitReceiptRange(payment);schedule.textContent=payment.periodBasis==='award'&&range?'Обычные поступления: '+monthLabel(range.from)+' — '+monthLabel(range.to)+'. После '+monthLabel(range.to)+' по этому назначению — 0. Продление автоматически не добавляем.':''};row.append(schedule);
     function fillPreview(){
-      monthlyPreview.replaceChildren();if(!automatic||!/^\d{4}-\d{2}$/.test(payment.from||'')||!/^\d{4}-\d{2}$/.test(payment.to||'')||payment.from>payment.to)return;
-      const first=monthIndex(payment.from),last=monthIndex(payment.to);if(last-first>59){monthlyPreview.textContent='Укажите период не длиннее 5 лет.';return;}
-      const months=Array.from({length:last-first+1},(_,i)=>monthString(first+i));const context={region:$('pm-region').value,area:$('pm-area').value};
+      updateSchedule();monthlyPreview.replaceChildren();if(!automatic||!/^\d{4}-\d{2}$/.test(payment.from||'')||!/^\d{4}-\d{2}$/.test(payment.to||'')||payment.from>payment.to)return;
+      const range=benefitReceiptRange(payment);if(!range)return;
+      const first=monthIndex(range.from),last=monthIndex(range.to);if(last-first>59){monthlyPreview.textContent='Укажите период не длиннее 5 лет.';return;}
+      const months=[...new Set([...Array.from({length:last-first+1},(_,i)=>monthString(first+i)),...Object.keys(payment.receiptOverrides||{})])].sort();const context={region:$('pm-region').value,area:$('pm-area').value};
       const code=payment.sameRegion==='yes'?context.region:payment.benefitRegion;
       for(const year of [...new Set(months.map(m=>Number(benefitMonthForReceipt(m).slice(0,4))))]){
         const areas=pmZones(year,code);const current=payment.benefitAreas?.[year]??(payment.sameRegion==='yes'?context.area:payment.benefitArea);
@@ -526,7 +532,7 @@ function renderBenefitRows() {
       const check=document.createElement('label');check.className='check';const box=document.createElement('input');box.type='checkbox';box.className='benefit-receipts-confirmed';box.checked=payment.receiptsConfirmed===true&&payment.confirmedContext===receiptContext(payment,context);box.oninput=()=>{payment.receiptsConfirmed=box.checked;payment.confirmedContext=receiptContext(payment,context);render()};check.append(box,document.createTextNode(' Проверила: суммы соответствуют поступлениям в указанные месяцы'));monthlyPreview.append(check);
     }
     fillPreview();
-    const forecastLabel=document.createElement('label');forecastLabel.className='check forecast-option';forecastLabel.hidden=!payment.to||payment.to<=currentMonth;
+    const forecastLabel=document.createElement('label');forecastLabel.className='check forecast-option';forecastLabel.hidden=payment.periodBasis==='award'||!payment.to||payment.to<=currentMonth;
     const forecastInput=document.createElement('input');forecastInput.type='checkbox';forecastInput.className='benefit-project-future';forecastInput.checked=payment.projectFuture===true;
     forecastInput.addEventListener('input',()=>{payment.projectFuture=forecastInput.checked;render()});
     forecastLabel.append(forecastInput,document.createTextNode(automatic?' Ожидаю получать пособие в будущие месяцы этого периода по указанному проценту':' Предполагаю такую же сумму пособия в будущие месяцы указанного периода'));const forecastHelp=document.createElement('span');forecastHelp.className='hint';forecastHelp.textContent='Для примерного расчёта следующих месяцев подачи: калькулятор учтёт ожидаемые поступления за будущие месяцы указанного периода. Отметьте, если планируете получать это пособие дальше. В автоматическом режиме используем выбранный процент пособия, при ручном вводе — указанную сумму. Уже полученные выплаты эта отметка не меняет.';forecastLabel.append(forecastHelp);row.append(forecastLabel);
@@ -934,7 +940,7 @@ function render() {
 }
 $('add').onclick=addReason;
 $('add-child').onclick=addChild; $('add-car').onclick=addCar;
-$('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:'',to:'',amountMode:'automatic'});renderBenefitRows();render()};
+$('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:'',to:'',amountMode:'automatic',periodBasis:'award'});renderBenefitRows();render()};
  $('add-property').onclick=addProperty; $('add-vehicle').onclick=addOtherVehicle; $('add-deposit').onclick=addDeposit;
  $('add-adult').onclick=()=>{if(incomePeople.length===1)incomePeople.push({label:'Супруг(а)',months:{},total:null,incomeType:'employment'});renderIncomeForm();render()};
  $('income-mode').addEventListener('input',()=>{renderIncomeForm();render()});
@@ -1044,7 +1050,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261008-39').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261008-40').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 

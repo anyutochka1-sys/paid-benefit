@@ -62,3 +62,10 @@ test('negative income and inconsistent family counts cannot produce a benefit ti
     assert.equal(childTier({...common,...overrides}).status,'unknown');
   assert.equal(childTier(common).status,'estimate');
 });
+
+
+test('salary ended before future months contributes zero without asking to continue the income',()=>{
+  const months=regularIncomeMonths({regularAmount:25000,regularFrom:'2025-01',regularTo:'2026-05'},'2027-01',{knownThrough:'2026-10'});
+  assert.equal(months['2026-05'],25000);assert.equal(months['2026-06'],0);assert.equal(months['2026-11'],0);
+  const total=incomeForMonth([{label:'Заявитель',mode:'monthly',months}],'2027-01');assert.deepEqual(total.missing,[]);
+});

@@ -20,7 +20,7 @@ export function unifiedReceiptSuggestion(entry,month,{region,area}={}) {
 }
 
 export function receiptContext(entry,context) {
-  return JSON.stringify(['previous-benefit-month-v1',entry.sameRegion,entry.sameRegion==='yes'?context.region:entry.benefitRegion,entry.sameRegion==='yes'?context.area:entry.benefitArea,entry.benefitAreas||{},entry.tier,entry.from,entry.to]);
+  return JSON.stringify(['previous-benefit-month-v1',entry.sameRegion,entry.sameRegion==='yes'?context.region:entry.benefitRegion,entry.sameRegion==='yes'?context.area:entry.benefitArea,entry.benefitAreas||{},entry.tier,entry.from,entry.to,entry.periodBasis||'receipt']);
 }
 
 export function receiptAmount(entry,month,context) {

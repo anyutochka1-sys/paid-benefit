@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {childBenefitIncome,expandBenefitPayments} from './benefits.mjs';
+import {childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs';
 
 const children=[{id:'a',birthDate:'2020-03-01'},{id:'b',birthDate:'2023-04-01'}];
 const payments=Array.from({length:12},(_,i)=>({childId:'a',month:`${i<5?'2025':'2026'}-${String(i<5?i+8:i-4).padStart(2,'0')}`,amount:19243}));
@@ -112,4 +112,21 @@ test('known sibling amount remains countable alongside an unknown excluded amoun
 test('negative amounts remain invalid even on an excluded benefit',()=>{
   const paid=[{childId:'a',kind:'unified',month:'2026-07',amount:-1}];
   assert.equal(childBenefitIncome(paid,children,['a'],'2026-09').total,null);
+});
+
+
+test('award May 2025 through May 2026 gives receipts June 2025 through June 2026 and zero thereafter',()=>{
+  const entry={childId:'a',kind:'unified',periodBasis:'award',from:'2025-05',to:'2026-05',amount:20000};
+  assert.deepEqual(benefitReceiptRange(entry),{from:'2025-06',to:'2026-06'});
+  const last=expandBenefitPayments([entry],'2026-08',{knownThrough:'2026-04'});
+  assert.equal(last.payments.at(-1).month,'2026-06');assert.equal(last.payments.some(p=>p.month==='2026-07'),false);
+  assert.equal(last.payments.at(-1).futureUnconfirmed,false);
+  assert.deepEqual(expandBenefitPayments([entry],'2027-08',{knownThrough:'2026-10'}),{payments:[],missing:[]});
+});
+test('assignment receipt shift crosses year and preserves exceptional actual receipt months',()=>{
+  const row={childId:'a',kind:'unified',periodBasis:'award',from:'2025-12',to:'2025-12',amount:20000,receiptOverrides:{'2025-12':20000,'2026-01':0}};
+  assert.deepEqual(benefitReceiptRange(row),{from:'2026-01',to:'2026-01'});
+  const expanded=expandBenefitPayments([row],'2026-03',{amountForMonth:(e,m)=>Object.hasOwn(e.receiptOverrides,m)?e.receiptOverrides[m]:e.amount});
+  assert.deepEqual(expanded.payments.map(p=>[p.month,p.amount]),[['2025-12',20000],['2026-01',0]]);
+  assert.deepEqual(benefitReceiptRange({...row,periodBasis:undefined}),{from:'2025-12',to:'2025-12'});
 });

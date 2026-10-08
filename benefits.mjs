@@ -1,4 +1,4 @@
-import {incomeWindow} from './engine.mjs';
+import {incomeWindow,monthIndex,monthString} from './engine.mjs';
 import {ageAt} from './family-assets.mjs';
 
 // Decree 2330 p. 53(b, g, e, zh, z, k): the historical benefit type and
@@ -70,16 +70,23 @@ export function childBenefitIncome(payments, children, applicationChildIds, appl
   return {total:missing.length?null:total,included,excluded,missing};
 }
 
+export function benefitReceiptRange(entry) {
+  const valid=m=>/^\d{4}-(0[1-9]|1[0-2])$/.test(m||'');
+  if(!valid(entry.from)||!valid(entry.to)||entry.from>entry.to)return null;
+  const shift=entry.periodBasis==='award'?1:0;
+  return {from:monthString(monthIndex(entry.from)+shift),to:monthString(monthIndex(entry.to)+shift)};
+}
+
 // Only an explicit assumption can turn future receipts into a forecast amount.
 export function expandBenefitPayments(entries,applicationMonth,{knownThrough,amountForMonth}={}) {
   const window=incomeWindow(applicationMonth),payments=[],missing=[];
   const valid=m=>/^\d{4}-(0[1-9]|1[0-2])$/.test(m||'');
   for(const entry of entries) {
-    if(!valid(entry.from)||!valid(entry.to)||entry.from>entry.to) {missing.push('Укажите начало и конец выплаты пособия');continue;}
-    for(const month of window)if(month>=entry.from&&month<=entry.to) {
+    const range=benefitReceiptRange(entry);if(!range) {missing.push('Укажите начало и конец периода пособия');continue;}
+    for(const month of window)if(month>=range.from&&month<=range.to||Object.hasOwn(entry.receiptOverrides||{},month)) {
       const future=Boolean(knownThrough&&month>knownThrough);
       const value=amountForMonth?amountForMonth(entry,month):entry.amount;
-      payments.push({...entry,month,amount:value===''||value==null?null:Number(value),futureUnconfirmed:future&&entry.projectFuture!==true,projected:future&&entry.projectFuture===true});
+      payments.push({...entry,month,amount:value===''||value==null?null:Number(value),futureUnconfirmed:future&&entry.projectFuture!==true&&!(entry.periodBasis==='award'&&month>=range.from&&month<=range.to),projected:future&&(entry.projectFuture===true||entry.periodBasis==='award')});
     }
   }
   return {payments,missing};
