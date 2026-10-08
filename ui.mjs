@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-38';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-38';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-38';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261008-38';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261008-38';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-38';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-39';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-39';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-39';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261008-39';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261008-39';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-39';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-38';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-39';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-38';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-39';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-38';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-39';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-38';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-39';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-38';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-39';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -885,6 +885,7 @@ function render() {
     const amount=clear&&scenarioAmounts.length&&scenarioAmounts.every(Number.isFinite)?scenarioAmounts.reduce((sum,value)=>sum+value,0):null;
     const answerActions=[];
     const addAnswer=(label,selector)=>{if(selector&&!answerActions.some(a=>a.selector===selector))answerActions.push({label,selector})};
+    if(pm.status!=='known')addAnswer('Выберите регион и территорию для расчёта прожиточного минимума',$('pm-region').value?'#pm-area':'#pm-region');
     if(!sourceComplete)addAnswer('Отметьте виды доходов или их отсутствие','#no-income');
     if(!children.length&&!$('pregnancy-applying').checked)addAnswer('Добавьте детей, на которых проверяем пособие','#add-child');
     if(incomeResult.missing.length&&sourceEnabled.has('employment'))countedAdults.forEach(({person,index})=>{
@@ -900,7 +901,7 @@ function render() {
     if(supplemental.status!=='known')addAnswer('Другие выбранные доходы: '+supplemental.issues.join('; '),'#extra-entries');
     if(childEarnings.status!=='known')addAnswer('Доходы детей: '+childEarnings.issues.join('; '),'#child-income-entries');
     if(alimony.status!=='known')addAnswer('Алименты: '+alimony.reason,!maritalStatus?'#marital-status':maritalStatus==='divorced'?'#alimony-kind':'#alimony-received');
-    if(depositIncome.status!=='known'||depositCheck.status==='unknown')addAnswer(`Вклады: укажите проценты за ${year-1} год и данные счетов`,'#deposits');
+    if(sourceEnabled.has('deposit')&&(depositIncome.status!=='known'||depositCheck.status==='unknown'))addAnswer(`Вклады: укажите проценты за ${year-1} год и данные счетов`,'#deposits');
     if(applicantCheck==='unknown')addAnswer('Уточните гражданство и проживание заявителя','#applicant-citizen');
     if(capacity.status==='unknown')addAnswer('Ответьте, было ли решение суда о дееспособности','#applicant-capacity');
     if(addressReview)addAnswer('Уточните адрес подачи и его подтверждение','#residence-basis');
@@ -915,7 +916,7 @@ function render() {
       if(applicationSelection.review||newbornReview||awardNeedsReview.has(child.id))addAnswer(`${childLabel(child,index)}: проверьте действующее единое пособие, дату окончания и выбор заявления`,row+'.award-recipient');
     });
     if($('pregnancy-applying').checked&&pregnancyState.status==='unknown')addAnswer('Беременность: '+pregnancyState.reason,'#pregnancy-forecast-through');
-    if(adults.some(a=>!a.known&&!a.exempt)&&!incomeResult.missing.length)addAnswer('Уточните причины месяцев без заработка и подтверждение условий','#reasons');
+    if(sourceComplete&&adults.some(a=>!a.known&&!a.exempt)&&!incomeResult.missing.length)addAnswer('Уточните причины месяцев без заработка и подтверждение условий','#reasons');
     const nextAnswers=[...(!sourceComplete?['виды доходов']:[]),...(applicantCheck==='unknown'?['гражданство и проживание']:[]),...(capacity.status==='unknown'?['решение суда о дееспособности']:[]),...(addressReview?['адрес подачи']:[]),...(priorMeasureReview?['прежние выплаты']:[]),...(rightsUnknown?['родительские права']:[]),...(assetOwnerReview?['имущество и владельцев']:[])];
     const blockerReasons=[...(applicantCheck==='no'?['нет необходимого гражданства или проживания']:[]),...(rightsBlocked?['ограничения родительских прав']:[]),...(needsMeansAssessment&&adults.some(a=>a.known&&!a.passed)?['недостаточный доход с учётом указанных причин']:[]),...(needsMeansAssessment&&[carCheck,propertyCheck,otherCheck,depositCheck].some(c=>c.status==='no')?['имущество или проценты превышают допустимые условия']:[])];
     const actionHint=explicitBlockers?(blockerReasons.join('; ')||'Откройте месяц: указано условие, которое нужно проверить.') :!clear&&nextAnswers.length?'Уточните: '+nextAnswers.slice(0,3).join(', ')+'.':!clear?'Проверьте пояснения к условиям этого месяца.':'';
@@ -1043,7 +1044,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261008-38').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261008-39').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
