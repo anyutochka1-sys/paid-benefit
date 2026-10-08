@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-37';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-37';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-37';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261008-37';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261008-37';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-37';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-38';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-38';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-38';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261008-38';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261008-38';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-38';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-37';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-38';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-37';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-38';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-37';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-38';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-37';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-38';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-37';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-38';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -886,6 +886,7 @@ function render() {
     const answerActions=[];
     const addAnswer=(label,selector)=>{if(selector&&!answerActions.some(a=>a.selector===selector))answerActions.push({label,selector})};
     if(!sourceComplete)addAnswer('Отметьте виды доходов или их отсутствие','#no-income');
+    if(!children.length&&!$('pregnancy-applying').checked)addAnswer('Добавьте детей, на которых проверяем пособие','#add-child');
     if(incomeResult.missing.length&&sourceEnabled.has('employment'))countedAdults.forEach(({person,index})=>{
       const missing=incomeWindow(month).filter(m=>!Number.isFinite(baseMonths(person,index)[m])||baseMonths(person,index)[m]<0);
       const prefix=`#income-people .income-person:nth-child(${index+1}) `;
@@ -1024,6 +1025,7 @@ const capacityLabel=$('applicant-capacity').closest('label');capacityLabel.close
 let currentStep=0;
 function showStep(index) {
   currentStep=Math.max(0,Math.min(steps.length-1,index));
+  const requestedStep=currentStep;
   document.body.classList.toggle('inside-wizard',currentStep>0);
   const stepReview=$('step-review');if(stepReview){stepReview.hidden=true;stepReview.replaceChildren()}
   steps.forEach((step,i)=>step.panels.forEach(panel=>panel.hidden=i!==currentStep||(panel===originalPanels[3]&&!$('asset-car').checked)));
@@ -1035,13 +1037,13 @@ function showStep(index) {
   $('back').hidden=currentStep===0; $('next').hidden=currentStep===steps.length-1;
   $('next').textContent=currentStep===steps.length-2?'Показать результат':'Далее: '+steps[currentStep+1]?.title;
   if(currentStep===steps.length-1)render();
-  if(guidedFlow&&!guidedFlow.painting)guidedFlow.selectSection(currentStep);
+  if(guidedFlow&&!guidedFlow.painting)guidedFlow.selectSection(requestedStep);
   if(!guidedFlow?.painting)window.scrollTo({top:0,behavior:'smooth'});
 }
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261008-37').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261008-38').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
