@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261007-32';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261007-32';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext} from './benefit-amounts.mjs?v=20261007-32';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261007-32';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261007-32';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261007-32';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-33';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-33';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext} from './benefit-amounts.mjs?v=20261008-33';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261008-33';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261008-33';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-33';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261007-32';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-33';
 import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20260930-13';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261007-32';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments} from './benefits.mjs?v=20261008-33';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261007-32';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-33';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261007-32';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-33';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261007-32';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-33';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -70,10 +70,10 @@ function updatePmSelection() {
   region.replaceChildren(new Option('Выберите регион',''));
   pmRegions(year).forEach(r=>region.add(new Option(r.name,r.code)));
   if([...region.options].some(o=>o.value===oldRegion))region.value=oldRegion;
-  area.replaceChildren(new Option('Выберите зону',''));
+  area.replaceChildren(new Option('Выберите территорию или группу',''));
   const areaYear=year===2027&&pmFor(year,region.value,oldArea).reason?.includes('ещё не загружены')?2026:year;
   const zones=pmZones(areaYear,region.value);
-  zones.forEach(zone=>{const option=new Option(zone.label,zone.value);option.dataset.search=zone.areas.join(' ');area.add(option)});
+  zones.forEach(zone=>{const option=new Option(zone.label,zone.value);option.dataset.search=zone.areas.join(' ');option.dataset.composition=zone.composition;option.dataset.source=zone.source;option.dataset.act=zone.act;area.add(option)});
   area.value=zoneValue(zones,oldArea);
   syncSearchableSelect(region);syncSearchableSelect(area);
   area.closest('label').hidden=area.options.length===1;
@@ -514,7 +514,7 @@ function renderBenefitRows() {
       for(const year of [...new Set(months.map(m=>Number(m.slice(0,4))))]){
         const areas=pmZones(year,code);const current=payment.benefitAreas?.[year]??(payment.sameRegion==='yes'?context.area:payment.benefitArea);
         if(areas.length&&pmFor(year,code,current).status!=='known'){
-          const label=document.createElement('label');label.textContent='Где получали пособие в '+year+' году?';const locality=document.createElement('select');locality.add(new Option('Выберите населённый пункт или район',''));areas.forEach(zone=>{const option=new Option(zone.label,zone.value);option.dataset.search=zone.areas.join(' ');locality.add(option)});locality.className='benefit-area';locality.value=zoneValue(areas,payment.benefitAreas?.[year]||'');locality.oninput=()=>{payment.benefitAreas??={};payment.benefitAreas[year]=locality.value;payment.receiptsConfirmed=false;fillPreview();render()};label.append(locality);monthlyPreview.append(label);searchableSelect(locality,{label:'Зона получения пособия в '+year+' году',placeholder:'Введите город, район или выберите зону'});
+          const label=document.createElement('label');label.textContent='Где получали пособие в '+year+' году?';const locality=document.createElement('select');locality.add(new Option('Выберите населённый пункт или район',''));areas.forEach(zone=>{const option=new Option(zone.label,zone.value);option.dataset.search=zone.areas.join(' ');option.dataset.composition=zone.composition;option.dataset.source=zone.source;option.dataset.act=zone.act;locality.add(option)});locality.className='benefit-area';locality.value=zoneValue(areas,payment.benefitAreas?.[year]||'');locality.oninput=()=>{payment.benefitAreas??={};payment.benefitAreas[year]=locality.value;payment.receiptsConfirmed=false;fillPreview();render()};label.append(locality);monthlyPreview.append(label);searchableSelect(locality,{label:'Территория получения пособия в '+year+' году',placeholder:'Введите город, район или название группы'});
         }
         const values=[...new Set(months.filter(m=>m.startsWith(String(year))).map(m=>unifiedReceiptSuggestion(payment,m,context)))];const line=document.createElement('p');line.className='hint';line.textContent=year+' год: '+(values.length===1&&values[0]!=null?values[0].toLocaleString('ru-RU')+' ₽ за обычный месяц':'нужно уточнить местность или суммы за этот год');monthlyPreview.append(line);
       }
@@ -906,7 +906,7 @@ $('add-benefit').onclick=()=>{benefitPayments.push({childId:'',amount:'',from:''
 $('applicant-capacity').addEventListener('input',()=>{$('capacity-dates').hidden=!['limited','incapable'].includes($('applicant-capacity').value);render()});
 renderIncomeForm();
 searchableSelect($('pm-region'),{label:'Регион проживания'});
-searchableSelect($('pm-area'),{label:'Зона прожиточного минимума',placeholder:'Введите город, район или выберите зону'});
+searchableSelect($('pm-area'),{label:'Территория или группа территорий',placeholder:'Введите город, район или название группы'});
 updatePmSelection();
 
 const originalPanels=[...document.querySelectorAll('main > .panel')];
@@ -1005,7 +1005,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261007-32').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261008-33').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
