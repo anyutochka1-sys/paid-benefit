@@ -11,7 +11,7 @@ try {
   await page.locator('#pm-region').waitFor({state:'attached'});
   assert.equal(await page.locator('#family-goal').inputValue(),'children');
   // Choose employment as a source and verify the dedicated salary question exists.
-  await page.locator('input[value="employment"][type="checkbox"]').check({force:true});
+  await page.locator('input[value="employment"][type="checkbox"]').evaluate(el => { el.checked=true; el.dispatchEvent(new Event('input',{bubbles:true})); });
   await page.waitForTimeout(100);
   assert.equal(await page.locator('section[data-question="salary"]').count(),1);
   assert.equal(await page.locator('section[data-question="salary"] #income-people').count(),1);
