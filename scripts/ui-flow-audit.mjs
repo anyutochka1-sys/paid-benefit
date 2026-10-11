@@ -172,4 +172,26 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  set(w,second+' .benefit-amount-mode','automatic');set(w,second+' .benefit-same-region','yes');set(w,second+' .benefit-tier','100');recover('.benefit-receipts-confirmed');set(w,second+' .benefit-receipts-confirmed',true);section(d,7);assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;
  section(d,3);d.querySelector(`[data-income-target="childBenefit"]`).click();set(w,second+' [data-receipt-month="2025-09"]','');recover('[data-receipt-month="2025-09"]');set(w,second+' [data-receipt-month="2025-09"]','19000');d.querySelector('#result-edit-context button').click();assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;dom.window.close();
 }
+// Reloading a result correction keeps its exact field and forecast month.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'input[value="maternity"]',true,'change');
+ set(w,'#maternity-payments .amount','250000');set(w,'#maternity-payments .start','2026-01');d.getElementById('add-maternity').click();section(d,7);
+ const target='#maternity-payments [data-maternity-index="1"] .amount';
+ d.querySelector(`[data-result-month="2027-01"] [data-answer-target='${target}']`).click();set(w,'#save-draft',true,'change');w.dispatchEvent(new w.Event('pagehide'));
+ const raw=w.localStorage.getItem('anna-benefit-draft-v1');const restored=await boot(raw),rw=restored.window,rd=rw.document;
+ assert.equal(rd.body.dataset.question,'maternity');assert.equal(rd.activeElement,rd.querySelector(target));assert.ok(visible(rd.activeElement));assert.match(rd.querySelector('#result-edit-context').textContent,/январь 2027/);assert.equal(rd.querySelector('#maternity-payments .amount').value,'250000');paths++;
+ set(rw,target,'100000');set(rw,'#maternity-payments [data-maternity-index="1"] .start','2026-03');rd.querySelector('#result-edit-context button').click();assert.ok(rd.querySelector('[data-result-month="2027-01"] details').open);rw.dispatchEvent(new rw.Event('pagehide'));
+ const returned=await boot(rw.localStorage.getItem('anna-benefit-draft-v1'));assert.equal(returned.window.document.body.dataset.question,'result');assert.ok(!returned.window.document.querySelector('#result-edit-context'));assert.equal(returned.window.document.querySelector(target).value,'100000');paths++;returned.window.close();restored.window.close();
+ section(d,2);w.dispatchEvent(new w.Event('pagehide'));const elsewhere=await boot(w.localStorage.getItem('anna-benefit-draft-v1'));assert.equal(elsewhere.window.document.body.dataset.question,d.body.dataset.question);assert.ok(!elsewhere.window.document.querySelector('#result-edit-context'));paths++;elsewhere.window.close();
+ for(const mutate of [data=>delete data.resultEdit,data=>data.resultEdit.selector='[',data=>data.maternityPayments.pop(),data=>data.resultEdit.month='2035-01']){
+  const data=JSON.parse(raw);mutate(data);const legacy=await boot(JSON.stringify(data));assert.equal(legacy.window.document.querySelector('#maternity-payments .amount').value,'250000');assert.ok(!legacy.window.document.querySelector('#result-edit-context'));paths++;legacy.window.close();
+ }
+ dom.window.close();
+}
+// A saved spouse correction does not invent reasons or switch the recipient.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'#marital-status','married');set(w,'#spouse-status','ordinary');set(w,'input[value="employment"]',true,'change');d.getElementById('add-child').click();set(w,'#children .birth','2024-01-10');section(d,7);
+ d.querySelectorAll('[data-result-month="2027-01"] .individual-income-check')[1].querySelector('[data-answer-target="#reason-person"]').click();set(w,'#save-draft',true,'change');w.dispatchEvent(new w.Event('pagehide'));
+ const restored=await boot(w.localStorage.getItem('anna-benefit-draft-v1')),rd=restored.window.document;assert.equal(rd.querySelector('#reason-person').value,'1');assert.equal(rd.querySelector('#care-person').value,'1');assert.equal(rd.querySelectorAll('.reason').length,0);assert.match(rd.querySelector('#result-edit-context').textContent,/для супруга.*январь 2027/);assert.ok(visible(rd.activeElement));rd.getElementById('add').click();assert.equal(rd.querySelector('.reason .person').value,'1');paths++;restored.window.close();dom.window.close();
+}
 console.log(`PASS ${paths} UI paths: every source, direct and next navigation, deselection, three salary modes, draft restoration, mixed order, no-income and existing result targets`);
