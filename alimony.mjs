@@ -1,5 +1,14 @@
 import {incomeWindow,monthIndex} from './engine.mjs';
 
+// Validate an explicitly reported monthly receipt before it becomes a month map.
+export function alimonyReceiptIssue({amount,from,to}) {
+  if(amount===''||amount===null||!Number.isFinite(Number(amount))||Number(amount)<0)return {field:'amount',reason:'Укажите фактически поступавшую сумму алиментов за месяц: 0 или больше'};
+  if(!from)return {field:'from',reason:'Укажите первый месяц фактического поступления алиментов'};
+  if(!to)return {field:'to',reason:'Укажите последний месяц фактического поступления алиментов'};
+  if(from>to)return {field:'to',reason:'Последний месяц поступления алиментов не может быть раньше первого'};
+  return null;
+}
+
 // Decree 2330 p. 49(1): previous year's FINAL Rosstat figure begins to apply
 // on the first day of the month after publication. Until then use year - 2.
 export function applicableRosstatWage(records, applicationMonth) {

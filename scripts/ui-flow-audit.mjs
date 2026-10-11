@@ -130,4 +130,27 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  }
  dom.window.close();
 }
+// Alimony recovery must preserve the payer and reject a reversed receipt period.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'#marital-status','never');set(w,'input[value="alimony"]',true,'change');
+ for(let i=1;i<=2;i++){d.getElementById('add-child').click();set(w,`#children .form-row:nth-child(${i}) .birth`,'2024-01-10');set(w,`#children .form-row:nth-child(${i}) .citizen`,'yes');}
+ set(w,'#alimony-received','yes');
+ const recover=selector=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] .result-answers [data-answer-target="${selector}"]`);assert.ok(button,'alimony missing '+selector);button.click();assert.ok(visible(d.querySelector(selector)));assert.equal(d.activeElement,d.querySelector(selector));paths++;};
+ recover('#alimony-monthly');set(w,'#alimony-monthly','-1');recover('#alimony-monthly');set(w,'#alimony-monthly','10000');recover('#alimony-from');set(w,'#alimony-from','2026-08');recover('#alimony-to');set(w,'#alimony-to','2025-09');recover('#alimony-to');assert.match(d.querySelector('#result-edit-context').textContent,/октябрь 2026/);set(w,'#alimony-from','2025-09');set(w,'#alimony-to','2026-08');section(d,7);assert.equal(d.querySelector('[data-result-month="2026-10"] .result-answers [data-answer-target="#alimony-to"]'),null);paths++;
+ section(d,3);d.querySelector('.add-obligation').click();
+ // Pick the second child's labelled control; this removes that child from the first payer.
+ d.querySelectorAll('#alimony-obligations .obligation-children input')[1].click();
+ set(w,'#alimony-obligations .kind','court');recover('#alimony-obligations .obligation-rows > .form-row:nth-child(1) .monthly');set(w,'#alimony-obligations .monthly','5000');recover('#alimony-obligations .obligation-rows > .form-row:nth-child(1) .from');set(w,'#alimony-obligations .from','2025-09');recover('#alimony-obligations .obligation-rows > .form-row:nth-child(1) .to');
+ dom.window.close();
+}
+// A complete first additional receipt must not capture an edit for the second receipt.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'input[value="pension"]',true,'change');
+ set(w,'#extra-entries .amount','1000');set(w,'#extra-entries .from','2025-09');set(w,'#extra-entries .to','2026-08');d.getElementById('add-extra').click();
+ const prefix='#extra-entries [data-extra-index="1"]';
+ for(const [field,value] of [['.amount','2000'],['.from','2025-09'],['.to','2026-08']]){
+  section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${prefix} ${field}']`);assert.ok(button,'second entry '+field);button.click();assert.equal(d.activeElement,d.querySelector(prefix+' '+field));assert.ok(visible(d.activeElement));set(w,prefix+' '+field,value);paths++;
+ }
+ section(d,7);assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${prefix}']`),null);dom.window.close();paths++;
+}
 console.log(`PASS ${paths} UI paths: every source, direct and next navigation, deselection, three salary modes, draft restoration, mixed order, no-income and existing result targets`);

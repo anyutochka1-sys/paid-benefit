@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261011-44';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261011-44';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261011-44';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261011-44';
-import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261011-44';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261011-44';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261011-45';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261011-45';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261011-45';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261011-45';
+import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261011-45';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261011-45';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261011-44';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261011-44';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261011-45';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261011-45';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261011-44';
-import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261011-45';
+import {alimonyForApplication,allocatedAlimonyIncome,alimonyReceiptIssue} from './alimony.mjs?v=20261011-45';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261011-44';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261011-45';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261011-44';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261011-45';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261011-44';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261011-45';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -114,7 +114,7 @@ alimonySection.querySelector('#alimony-kind').closest('label').after(documentHel
 const primaryChildChoices=document.createElement('div');primaryChildChoices.className='alimony-children';mainPayerSummary.after(primaryChildChoices);
 const alimonyAllocation=new Map();
 const extraAlimonyObligations=[];
-const extraObligationsPanel=document.createElement('div');
+const extraObligationsPanel=document.createElement('div');extraObligationsPanel.id='alimony-obligations';
 extraObligationsPanel.innerHTML='<div class="section-heading"><h4>Алименты от другого родителя</h4><button type="button" class="add-obligation">+ Добавить другого плательщика</button></div><p class="hint">Если алименты платят разные родители, добавьте каждого отдельно. Выбранные здесь дети автоматически исключаются из суммы первого плательщика. Несколько документов на одного плательщика требуют отдельной проверки.</p><div class="obligation-rows"></div>';
 alimonySection.querySelector('#alimony-fields').append(extraObligationsPanel);
 function primaryAlimonyControl(id) {return [...document.querySelectorAll('#children .form-row')].find(row=>row.dataset.childId===id)?.querySelector('.alimony-applies')}
@@ -264,7 +264,7 @@ function renderExtraRows() {
   if([...typeSelect.options].some(option=>option.value===previous))typeSelect.value=previous;
   $('extra-entries').replaceChildren();
   additionalEntries.forEach((entry,index)=>{
-    const row=document.createElement('div');row.className='form-row';row.dataset.incomeSource=entry.type;
+    const row=document.createElement('div');row.className='form-row';row.dataset.incomeSource=entry.type;row.dataset.extraIndex=String(index);
     if(!sourceEnabled.has(entry.type))return;
     row.innerHTML=`<label>Кто получил<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><strong>${ADDITIONAL_TYPES[entry.type].label}</strong><label class="benefit-kind-field">Какое именно пособие?<select class="benefit-kind"><option value="">Выберите вид</option></select></label><label>${entry.type==='securities'?'Доход до расходов':['foreignEarned','foreignOther'].includes(entry.type)?'Сумма за месяц в указанной валюте':'Сумма, ₽'}<input class="amount" type="number" min="0" step="any"></label><label class="expenses-field">Расходы по операциям, ₽<input class="expenses" type="number" min="0"></label><label class="tax-field">Налоговый год<input class="tax-year" type="number" min="2024" max="2030"></label><label class="from-field">С какого месяца<input class="from" type="month"></label><label class="to-field">По какой месяц включительно<input class="to" type="month"></label><label class="birth-aid-field">Выплачено в течение первого года после рождения / усыновления / установления опеки?<select class="first-year"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label class="tax-free-field">Какая часть не облагалась НДФЛ, ₽<input class="tax-free" type="number" min="0"></label><div class="foreign-field"><label>Буквенный код валюты (например, RUB или USD)<input class="currency" maxlength="3" placeholder="USD"></label><label>Дата курса ЦБ<input class="rate-date" type="date"></label><label>Курс ЦБ: рублей за 1 единицу валюты<input class="rate" type="number" min="0" step="any"></label><p class="hint foreign-rate-hint"></p></div><button class="remove" type="button">Убрать</button>`;
     const businessFields=document.createElement('div');businessFields.className='business-fields';
@@ -736,33 +736,45 @@ function render() {
         Object.assign(alimony,allocatedAlimonyIncome(courtAmounts,Object.fromEntries(alimonyAllocation),recipients,alimonyChildren.map(c=>c.id),month));
       } else {alimony.status='unknown';alimony.reason=ambiguousAlimonyRecipient?'Уточните региональное правило для алиментов на ребёнка 18–22 лет':'Для неоформленных алиментов или соглашения нужны отдельные обязательства по детям; общую сумму нельзя делить автоматически'}
     }
-    if(receiving && (!alimonyFrom || !alimonyTo || alimonyMonthly==='')) {alimony.status='unknown';alimony.reason='Уточните фактически поступившие алименты и период'}
+    const receiptIssue=receiving?alimonyReceiptIssue({amount:alimonyMonthly,from:alimonyFrom,to:alimonyTo}):null;
+    const uncertainParent=alimonyChildren.find(child=>soleParentStatus([child])==='unknown');
+    let alimonyAnswerTarget='#alimony-fields';
+    if(!maritalStatus)alimonyAnswerTarget='#marital-status';
+    else if(receiptIssue)alimonyAnswerTarget={amount:'#alimony-monthly',from:'#alimony-from',to:'#alimony-to'}[receiptIssue.field];
+    else if(!alimonyChildren.length)alimonyAnswerTarget='#children';
+    else if(maritalStatus==='divorced'&&!['court','court-order','bailiffs'].includes($('alimony-kind').value)) {
+      if(uncertainParent)alimonyAnswerTarget=`#children .form-row:nth-child(${children.indexOf(uncertainParent)+1}) .second-parent-status`;
+      else if(secondParent==='mixed')alimonyAnswerTarget='#alimony-obligations';
+      else if(secondParent!=='sole')alimonyAnswerTarget=!$('alimony-kind').value?'#alimony-kind':!$('divorce-month').value?'#divorce-month':$('alimony-kind').value==='notary'&&($('notary-amount').value===''||Number($('notary-amount').value)<0)?'#notary-amount':'#alimony-wage-fields';
+    }
     if(alimonyChildren.length && maritalStatus==='divorced' && !['court','court-order','bailiffs'].includes($('alimony-kind').value) && !['sole','other'].includes(secondParent)) {alimony.status='unknown';alimony.reason=secondParent==='mixed'?'У детей разные вторые родители: укажите отдельные алиментные обязательства; общий расчёт сейчас недоступен':'Уточните статус второго родителя у детей, указанных в алиментном обязательстве'}
+    if(receiptIssue) {alimony.status='unknown';alimony.reason=receiptIssue.reason}
     if(sourceEnabled.has('alimony')&&extraAlimonyObligations.length) {
       const used=new Set(children.filter(c=>c.alimonyApplies).map(c=>c.id));
       const amounts=[];let issue='';
       for(const [index,item] of extraAlimonyObligations.entries()) {
+        const obligationTarget=`#alimony-obligations .obligation-rows > .form-row:nth-child(${index+1})`;
         const group=item.childIds.map(id=>children.find(c=>c.id===id));
         if(!item.distinctPayer || !item.childIds.length || group.some(c=>!c) || group.some(c=>used.has(c.id)) || new Set(item.childIds).size!==item.childIds.length) {
-          issue=`Обязательство ${index+2}: подтвердите отдельного плательщика и укажите детей без повторов`;break;
+          issue=`Обязательство ${index+2}: подтвердите отдельного плательщика и укажите детей без повторов`;alimonyAnswerTarget=obligationTarget+(item.childIds.length?' .distinct-payer':' .obligation-children');break;
         }
         group.forEach(c=>used.add(c.id));
         const eligible=group.filter(c=>members.included.some(p=>p.id===c.id)&&c.birthDate&&ageAt(c.birthDate,filingDate)<18);
         const uncertain=group.some(c=>!c.birthDate || members.unanswered.some(p=>p.person.id===c.id)
           || c.birthDate&&ageAt(c.birthDate,filingDate)>=18&&ageAt(c.birthDate,filingDate)<23&&members.included.some(p=>p.id===c.id));
         if(uncertain || eligible.length && eligible.length!==group.length) {
-          issue=`Обязательство ${index+2}: уточните детей вне состава семьи и региональное правило до 23 лет`;break;
+          issue=`Обязательство ${index+2}: уточните детей вне состава семьи и региональное правило до 23 лет`;alimonyAnswerTarget=obligationTarget+' .obligation-children';break;
         }
         if(!eligible.length) {amounts.push(0);continue}
         const monthly=item.monthly===''&&item.arrangement==='notary'?0:item.monthly===''?NaN:Number(item.monthly);
         const notary=item.notaryMonthly===''?NaN:Number(item.notaryMonthly);
         if(!item.arrangement || !Number.isFinite(monthly) || monthly<0 || item.from!==''&&item.to==='' || item.to!==''&&item.from==='' || item.from&&item.to&&item.from>item.to
           || monthly>0&&(!item.from||!item.to) || item.arrangement==='notary'&&maritalStatus==='divorced'&&(!Number.isFinite(notary)||notary<0)) {
-          issue=`Обязательство ${index+2}: уточните основание, сумму и месяцы поступления`;break;
+          issue=`Обязательство ${index+2}: уточните основание, сумму и месяцы поступления`;alimonyAnswerTarget=obligationTarget+(!item.arrangement?' .kind':!Number.isFinite(monthly)||monthly<0?' .monthly':!item.from&&(monthly>0||item.to)?' .from':(item.from||monthly>0)&&!item.to||item.from&&item.to&&item.from>item.to?' .to':' .notary');break;
         }
         const groupSecondParent=soleParentStatus(eligible.map(c=>c.role==='ward'?{...c,secondParentStatus:'blank'}:c));
         if(maritalStatus==='divorced'&&!['court','court-order','bailiffs'].includes(item.arrangement)&&!['sole','other'].includes(groupSecondParent)) {
-          issue=`Обязательство ${index+2}: уточните второго родителя детей этого обязательства`;break;
+          issue=`Обязательство ${index+2}: уточните второго родителя детей этого обязательства`;alimonyAnswerTarget=`#children .form-row:nth-child(${children.indexOf(eligible.find(child=>soleParentStatus([child])==='unknown')||eligible[0])+1}) .second-parent-status`;break;
         }
         const byMonth=Object.fromEntries(incomeWindow(month).map(m=>[m,item.from&&item.to&&m>=item.from&&m<=item.to?monthly:0]));
         const result=alimonyForApplication({maritalStatus,singleParent:maritalStatus==='divorced'&&groupSecondParent==='sole',arrangement:item.arrangement,
@@ -770,7 +782,7 @@ function render() {
           declaredMonthly:item.arrangement==='notary'&&maritalStatus==='divorced'?notary:monthly,
           declaredByMonth:item.arrangement==='informal'&&item.from&&item.to?byMonth:undefined,
           receivedByMonth:byMonth,wageRecords:[year-2,year-1].map(wageRecordFor).filter(Boolean)},month);
-        if(result.status!=='known') {issue=`Обязательство ${index+2}: ${result.reason}`;break}
+        if(result.status!=='known') {issue=`Обязательство ${index+2}: ${result.reason}`;alimonyAnswerTarget=!$('divorce-month').value?'#divorce-month':'#alimony-wage-fields';break}
         amounts.push(result.amount);
       }
       if(issue) {alimony.status='unknown';alimony.reason=issue}
@@ -914,9 +926,15 @@ function render() {
     });
     if(monthBenefitMissing.size)addAnswer('Пособия на детей: '+[...monthBenefitMissing].join('; '),'#benefits');
     if(maternityIncome.status!=='known')addAnswer('БиР: укажите полную сумму, месяц начала отпуска и число месяцев начисления','#maternity-payments');
-    if(supplemental.status!=='known')addAnswer('Другие выбранные доходы: '+supplemental.issues.join('; '),'#extra-entries');
+    if(supplemental.status!=='known')additionalEntries.forEach((entry,index)=>{
+      if(!sourceEnabled.has(entry.type))return;
+      const entryCheck=additionalIncomeForApplication(withOfficialRates([entry],month,cbrRateTable),month,mobilizedIndices);if(entryCheck.status==='known')return;
+      const annual=ADDITIONAL_TYPES[entry.type].period==='annual';
+      const field=!Number.isFinite(entry.amount)||entry.amount<0?'.amount':entry.type==='otherBenefit'&&(!entry.benefitKind||entry.benefitKind==='uncertain')?'.benefit-kind':entry.type==='business'&&!entry.businessBasis?'.business-basis':entry.type==='securities'&&(!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount)?'.expenses':annual&&!Number.isInteger(entry.taxYear)?'.tax-year':!annual&&!entry.from?'.from':!annual&&(!entry.to||entry.from>entry.to)?'.to':'';
+      addAnswer(`${ADDITIONAL_TYPES[entry.type].label}, строка ${index+1}: ${entryCheck.issues.join('; ')}`,`#extra-entries [data-extra-index="${index}"]${field?' '+field:''}`);
+    });
     if(childEarnings.status!=='known')addAnswer('Доходы детей: '+childEarnings.issues.join('; '),'#child-income-entries');
-    if(alimony.status!=='known')addAnswer('Алименты: '+alimony.reason,!maritalStatus?'#marital-status':maritalStatus==='divorced'?'#alimony-kind':'#alimony-received');
+    if(alimony.status!=='known')addAnswer('Алименты: '+alimony.reason,alimonyAnswerTarget);
     if(sourceEnabled.has('deposit')&&(depositIncome.status!=='known'||depositCheck.status==='unknown'))addAnswer(`Вклады: укажите проценты за ${year-1} год и данные счетов`,'#deposits');
     if(applicantCheck==='unknown')addAnswer($('applicant-citizen').value?'Уточните, проживает ли заявитель в России':'Уточните гражданство заявителя',$('applicant-citizen').value?'#applicant-residence':'#applicant-citizen');
     if(capacity.status==='unknown')addAnswer('Ответьте, было ли решение суда о дееспособности','#applicant-capacity');
@@ -1067,7 +1085,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261011-44').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261011-45').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 

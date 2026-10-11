@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {alimonyForApplication,allocatedAlimonyIncome,applicableRosstatWage} from './alimony.mjs';
+import {alimonyForApplication,allocatedAlimonyIncome,applicableRosstatWage,alimonyReceiptIssue} from './alimony.mjs';
 
 test('new final Rosstat year applies only from month after official publication',()=>{
   const wageRecords=[
@@ -65,4 +65,14 @@ test('separate informal and notarized obligations each use their own regional fl
   assert.equal(notarized.amount,270000);
   assert.equal(oneAgreementForTwo.amount,360000);
   assert.equal(informal.amount+notarized.amount,540000);
+});
+
+test('reported receipts require a nonnegative amount and an ordered period',()=>{
+ const base={amount:'10000',from:'2025-09',to:'2026-08'};
+ for(const amount of ['',null,undefined,'-1',NaN,Infinity])assert.equal(alimonyReceiptIssue({...base,amount}).field,'amount');
+ assert.equal(alimonyReceiptIssue({...base,from:''}).field,'from');
+ assert.equal(alimonyReceiptIssue({...base,to:''}).field,'to');
+ assert.equal(alimonyReceiptIssue({...base,from:'2026-09'}).field,'to');
+ assert.equal(alimonyReceiptIssue({...base,amount:'0'}),null);
+ assert.equal(alimonyReceiptIssue({...base,to:base.from}),null);
 });
