@@ -153,4 +153,23 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  }
  section(d,7);assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${prefix}']`),null);dom.window.close();paths++;
 }
+// Recovery for a second maternity payment must never focus the completed first payment.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'input[value="maternity"]',true,'change');
+ set(w,'#maternity-payments .amount','250000');set(w,'#maternity-payments .start','2026-01');d.getElementById('add-maternity').click();const prefix='#maternity-payments [data-maternity-index="1"]';
+ const recover=field=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${prefix} ${field}']`);assert.ok(button,'second maternity '+field);button.click();assert.equal(d.activeElement,d.querySelector(prefix+' '+field));assert.ok(visible(d.activeElement));paths++;};
+ recover('.amount');set(w,prefix+' .amount','100000');recover('.start');set(w,prefix+' .start','2026-03');set(w,prefix+' .months','2.5');recover('.months');set(w,prefix+' .months','5');d.querySelector('#result-edit-context button').click();assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${prefix}']`),null);paths++;dom.window.close();
+}
+// Each child's benefit has its own period, recipient and manual amount recovery.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'input[value="childBenefit"]',true,'change');
+ for(let i=1;i<=2;i++){d.getElementById('add-child').click();set(w,`#children .form-row:nth-child(${i}) .birth`,'2024-01-10');set(w,`#children .form-row:nth-child(${i}) .citizen`,'yes');}
+ set(w,'#children .form-row:nth-child(2) .applying',false,'change');
+ const first='#benefits [data-benefit-index="0"]',second='#benefits [data-benefit-index="1"]';
+ set(w,first+' .benefit-amount-mode','manual');set(w,first+' .benefit-child',d.querySelector('#children .form-row').dataset.childId);set(w,first+' .benefit-from','2025-08');set(w,first+' .benefit-to','2026-07');set(w,first+' .benefit-amount','1000');d.getElementById('add-benefit').click();set(w,second+' .benefit-amount-mode','manual');
+ const recover=field=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${second} ${field}']`);assert.ok(button,'second benefit '+field);button.click();assert.equal(d.activeElement,d.querySelector(second+' '+field));assert.ok(visible(d.activeElement));paths++;};
+ recover('.benefit-from');set(w,second+' .benefit-from','2025-08');recover('.benefit-to');set(w,second+' .benefit-to','2025-07');recover('.benefit-to');set(w,second+' .benefit-to','2026-07');recover('.benefit-child');set(w,second+' .benefit-child',d.querySelector('#children .form-row:nth-child(2)').dataset.childId);recover('.benefit-amount');set(w,second+' .benefit-amount','2000');d.querySelector('#result-edit-context button').click();assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;
+ set(w,second+' .benefit-amount-mode','automatic');set(w,second+' .benefit-same-region','yes');set(w,second+' .benefit-tier','100');recover('.benefit-receipts-confirmed');set(w,second+' .benefit-receipts-confirmed',true);section(d,7);assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;
+ section(d,3);d.querySelector(`[data-income-target="childBenefit"]`).click();set(w,second+' [data-receipt-month="2025-09"]','');recover('[data-receipt-month="2025-09"]');set(w,second+' [data-receipt-month="2025-09"]','19000');d.querySelector('#result-edit-context button').click();assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;dom.window.close();
+}
 console.log(`PASS ${paths} UI paths: every source, direct and next navigation, deselection, three salary modes, draft restoration, mixed order, no-income and existing result targets`);

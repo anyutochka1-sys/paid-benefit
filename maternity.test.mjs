@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {maternityIncomeForApplication} from './maternity.mjs';
+import {maternityIncomeForApplication,maternityPaymentIssue} from './maternity.mjs';
 
 const ordinary=[{personIndex:0,amount:250000,startMonth:'2026-01',chargedMonths:5}];
 test('one-time maternity payment is divided across five charged months',()=>{
@@ -22,4 +22,15 @@ test('confirmed mobilized adult income is omitted while the other adult remains'
   const result=maternityIncomeForApplication(payments,'2026-07',[1]);
   assert.equal(result.amount,250000);
   assert.equal(result.included.length,1);
+});
+
+test('maternity recovery identifies the exact invalid field instead of treating malformed dates as zero income',()=>{
+ const base=ordinary[0];
+ for(const amount of [null,NaN,-1,Infinity])assert.equal(maternityPaymentIssue({...base,amount}).field,'amount');
+ for(const startMonth of ['', '2026-13','not-a-month']){
+  assert.equal(maternityPaymentIssue({...base,startMonth}).field,'start');
+  assert.equal(maternityIncomeForApplication([{...base,startMonth}],'2026-07').status,'unknown');
+ }
+ for(const chargedMonths of [null,0,13,2.5])assert.equal(maternityPaymentIssue({...base,chargedMonths}).field,'months');
+ assert.equal(maternityPaymentIssue({...base,amount:0}),null);
 });
