@@ -118,4 +118,16 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  set(w,'#income-mode','monthly');d.querySelector('.income-person:nth-child(2) details').open=false;section(d,7);checks()[1].querySelector('[data-answer-target*="income-people"]').click();assert.equal(d.querySelector('.income-person:nth-child(2) details').open,true);assert.ok(visible(d.activeElement));paths++;
  set(w,'#save-draft',true,'change');w.dispatchEvent(new w.Event('pagehide'));const restored=await boot(w.localStorage.getItem('anna-benefit-draft-v1'));const rd=restored.window.document;assert.equal(rd.querySelector('.reason .person').value,'0');assert.equal(rd.querySelector('.reason .type').value,'careUnderThree');restored.window.close();dom.window.close();paths++;
 }
+// Recovery must focus the unanswered field, including an invalid 2027 assumption.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'#marital-status','never');set(w,'#applicant-citizen','yes');set(w,'#residence-basis','temporary');section(d,7);
+ for(const selector of ['#applicant-residence','#address-proof']){
+  const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target="${selector}"]`);assert.ok(button,'missing answer '+selector);button.click();assert.equal(d.activeElement,d.querySelector(selector));assert.ok(visible(d.activeElement));section(d,7);paths++;
+ }
+ for(const [field,value] of [['#forecast-mrot-growth',''],['#forecast-pm-growth','']]){
+  set(w,'#forecast-pm-growth','0');set(w,'#forecast-mrot-growth','0');set(w,field,value);section(d,7);
+  const button=d.querySelector(`[data-result-month="2027-01"] [data-answer-target="${field}"]`);assert.ok(button,'invalid forecast '+field);assert.match(button.textContent,/Можно поставить 0/);button.click();assert.equal(d.activeElement,d.querySelector(field));assert.ok(visible(d.activeElement));set(w,field,'0');d.querySelector('#result-edit-context button').click();assert.equal(d.body.dataset.question,'result');assert.equal(d.querySelector(`[data-result-month="2027-01"] [data-answer-target="${field}"]`),null);paths++;
+ }
+ dom.window.close();
+}
 console.log(`PASS ${paths} UI paths: every source, direct and next navigation, deselection, three salary modes, draft restoration, mixed order, no-income and existing result targets`);
