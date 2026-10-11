@@ -55,3 +55,9 @@ test('individual income checks are visible outside details and escaped',()=>{
  assert.ok(html.includes('Вы &lt;b&gt;'));assert.ok(html.includes('Доход одного супруга не покрывает'));
  assert.ok(html.includes('360 000 ₽ — достаточно'));assert.ok(html.includes('12 000 ₽ — недостаточно'));
 });
+
+
+test('individual edit buttons retain recipient and filing month outside collapsed details',()=>{
+ const html=resultCard('2026-10-01',[],'Оценка',[],'unknown',false,'','',[],[{label:'Супруг',text:'Уточните',actions:[{label:'Причины <b>',selector:'#reason-person',personIndex:1}]}]);
+ assert.ok(html.includes('data-person-index="1"'));assert.ok(html.includes('data-application-month="2026-10"'));assert.ok(html.includes('Причины &lt;b&gt;'));assert.ok(html.indexOf('data-person-index')>html.indexOf('</details>'));
+});

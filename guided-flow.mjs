@@ -66,7 +66,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     }
   }
   const careIntro=document.createElement('p');careIntro.className='hint';careIntro.textContent='Если да, укажите причину: например, уход за ребёнком, беременность или учёба. Если таких месяцев не было, продолжайте.';
-  group(3,'care','Были месяцы без заработка?',parents.reasons,[careIntro,$('care-helper'),$('add'),$('reasons')],{required:['.from','.to']});
+  group(3,'care','Были месяцы без заработка?',parents.reasons,[careIntro,$('care-helper'),field('reason-person'),$('add'),$('reasons')],{required:['.from','.to']});
   group(4,'assets','Что есть в собственности у семьи?',parents.property,[nodes.assetPicker]);
   group(4,'property','Уточним вашу недвижимость',parents.property,[$('properties'),nodes.propertyAdds,field('rural')],{when:()=>[...document.querySelectorAll('.asset-choice:checked')].some(box=>!['asset-car','asset-vehicle'].includes(box.id)),required:['#properties .share','#properties .area','#properties .hectares']});
   group(4,'vehicles','Уточним транспорт семьи',parents.cars,[$('add-car'),$('cars'),field('support-car')],{when:()=>$('asset-car').checked,required:['#cars .year','#cars .hp']});

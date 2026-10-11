@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261008-42';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261008-42';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261008-42';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261008-42';
-import {forecastScenario} from './forecast-scenario.mjs?v=20261008-42';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261008-42';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261011-43';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261011-43';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261011-43';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261011-43';
+import {forecastScenario} from './forecast-scenario.mjs?v=20261011-43';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261011-43';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261008-42';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261008-42';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261011-43';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261011-43';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261008-42';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261011-43';
 import {alimonyForApplication,allocatedAlimonyIncome} from './alimony.mjs';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
 import {maternityIncomeForApplication} from './maternity.mjs';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261008-42';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261011-43';
 import {childIncomeForApplication} from './child-income.mjs';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261008-42';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261011-43';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261008-42';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261011-43';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -424,9 +424,10 @@ function renderIncomeForm() {
   });
   $('add-adult').disabled=incomePeople.length>1;
 }
-function addReason() {
+function addReason(personIndex=0) {
   const row = document.createElement('div'); row.className='reason';
   row.innerHTML=`<label>У кого была причина<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><label>Причина<select class="type">${types.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="check"><input class="registered" type="checkbox"> Состоял(а) на учёте в ЦЗН</label><label class="care-relationship" hidden>За кем ухаживали?<select><option value="">Уточните родство и основание</option><option value="eligible">За членом семьи заявителя из предусмотренных законом категорий; подтвержу документами</option><option value="ineligible">За другим человеком</option></select><small>С 21.07.2026 для ухода за взрослым нужен член семьи из категорий ч. 2 ст. 10 закона № 400-ФЗ. <a href="https://sfr.gov.ru/branches/orel/news~2026/07/21/283040" target="_blank" rel="noopener">Пояснение СФР</a>.</small></label><p class="hint period-review" role="status"></p><p class="hint service-help">Для службы и лишения свободы включите в даты не более трёх месяцев после окончания. Основание и период должны подтверждаться документами.</p><button class="remove" type="button">Убрать</button>`;
+  row.querySelector('.person').value=personIndex===1&&$('marital-status').value==='married'?'1':'0';
   row.querySelector('.remove').onclick=()=>{row.remove();render()};
   row.querySelector('.type').onchange=()=>{row.querySelector('.check').hidden=row.querySelector('.type').value!=='unemployment';row.querySelector('.care-relationship').hidden=row.querySelector('.type').value!=='careDisabledAdult';row.querySelector('.service-help').hidden=!['military','incarceration'].includes(row.querySelector('.type').value);render()};
   row.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
@@ -863,7 +864,7 @@ function render() {
     const needsMeansAssessment=!shortcutOnly||$('pregnancy-applying').checked;
     const newbornOnly=selected.length>0&&!needsMeansAssessment;
     const studentChecks=adultStudentChecks(children,members,sourceEnabled.has('childIncome')?childIncomeEntries:[],month,filingDate,yearRules.mrot);
-    const individualChecks=newbornOnly?[]:adults.map((adult,index)=>({label:index===0?'Вы':'Супруг(а)',text:adult.mobilizedReview?'Для проверки дохода при мобилизации нужны сведения по документам.':adult.exempt?`По введённым причинам требование минимального дохода не применяется. Засчитано месяцев: ${adult.creditedMonths}.`:`Доход для этого требования: ${adult.known?adult.earned.toLocaleString('ru-RU')+' ₽':'нужно уточнить'}. Минимум с учётом причин: ${Math.ceil(adult.minimum).toLocaleString('ru-RU')} ₽. ${adult.known?(adult.passed?'Дохода достаточно.':'Дохода недостаточно. Проверьте, внесены ли все ваши доходы и причины месяцев без заработка.'):'Заполните недостающие суммы и ответы по этому человеку.'}`}));
+    const individualChecks=newbornOnly?[]:adults.map((adult,index)=>({label:index===0?'Вы':'Супруг(а)',actions:[{label:'Проверить доходы',selector:sourceEnabled.has('employment')?`#income-people .income-person:nth-child(${countedAdults[index].index+1})`:'#no-income',personIndex:countedAdults[index].index},...(!adult.exempt&&(!adult.known||!adult.passed)?[{label:'Указать причины месяцев без заработка',selector:'#reason-person',personIndex:countedAdults[index].index}]:[])],text:adult.mobilizedReview?'Для проверки дохода при мобилизации нужны сведения по документам.':adult.exempt?`По введённым причинам требование минимального дохода не применяется. Засчитано месяцев: ${adult.creditedMonths}.`:`Доход для этого требования: ${adult.known?adult.earned.toLocaleString('ru-RU')+' ₽':'нужно уточнить'}. Минимум с учётом причин: ${Math.ceil(adult.minimum).toLocaleString('ru-RU')} ₽. ${adult.known?(adult.passed?'Дохода достаточно.':'Дохода недостаточно. Проверьте, внесены ли все ваши доходы и причины месяцев без заработка.'):'Заполните недостающие суммы и ответы по этому человеку.'}`}));
     const adultText=newbornOnly?(newbornReview?'Сначала уточните право на упрощённое назначение новорождённому. Если оно подтвердится, проверка минимального дохода не требуется':'При упрощённом назначении новорождённому проверка минимального дохода не требуется'):[...adults.map(a=>`${a.label}: ${a.mobilizedReview?'мобилизация по Указу № 647; минимум 8 МРОТ требует отдельной проверки':a.exempt?'порог не применяется':`засчитано причин ${a.creditedMonths} мес., нужно ${Math.ceil(a.minimum).toLocaleString('ru-RU')} ₽, ${a.known?`введено для этого требования ${a.earned.toLocaleString('ru-RU')} ₽ (${a.passed?'достаточно':'недостаточно'})`:'данных о подходящем доходе пока недостаточно'}`}`),...studentChecks.map(check=>`Ребёнок ${children.findIndex(child=>child.id===check.childId)+1} (18–22 года): ${check.status==='yes'?check.reason:check.reason+'; индивидуальный порог 8 МРОТ пока не подтверждён'}`)].join('; ');
     if($('pregnancy-applying').checked) {
       const priorSupport=priorSupportFor(['applicant'],month,pregnancyMonthly,selected.length>0);priorSupportChecks.push(priorSupport);
@@ -948,7 +949,7 @@ function render() {
   const bestText=best?` Среди месяцев с сопоставимыми данными наибольший предварительный размер — <strong>${best.tier}%</strong> при подаче <strong>${monthLabel(best.date)}</strong>. Если размер одинаков, показан первый месяц.`:'';
   renderCompletionChecklist([...pendingAnswers.values()]);
   $('results').innerHTML=`<div class="result-overview"><h3>${best?'Лучший месяц по загруженным данным':forecastBest?'Предварительный сценарий на 2027 год':overview.blocked?'Есть препятствия для назначения':'Нужно уточнить данные'}</h3><p>${best?`Подача ${monthLabel(best.date)}: ${Number.isFinite(best.monthly)?best.monthly.toLocaleString('ru-RU')+' ₽ в месяц на отмеченных детей, ':''}предварительно ${best.tier}%.`:forecastBest?`По выбранным допущениям: ${monthLabel(forecastBest.date)}, предварительно ${forecastBest.tier}%. Это сценарий, а не расчёт по утверждённым суммам 2027 года.`:overview.blocked?`В ${overview.blocked} из 12 месяцев найдены препятствия по введённым сведениям. Причины — в подробностях месяца.`:'Заполните отмеченные ответы, чтобы получить расчёт. Остальные пояснения доступны внутри месяцев.'}</p><p class="hint">Подробности расчёта доступны ниже. При неполных данных сначала заполните отмеченные ответы.</p></div><details class="forecast-details"><summary>Сравнение 12 месяцев и условия прогноза</summary><p class="forecast-overview">Прогноз на 12 месяцев: <strong>${overview.blocked}</strong> с препятствием, <strong>${overview.clear}</strong> без выявленных препятствий по проверенным критериям, <strong>${overview.needs}</strong> требуют уточнения.${bestText}${forecastText} Оценка предварительная и зависит от полноты сведений и будущих доходов; откройте месяц для подробностей.</p></details>`+output.join('');
-  $('results').querySelectorAll('[data-answer-target]').forEach(button=>button.onclick=()=>openResultAnswer(button.dataset.answerTarget,button.dataset.applicationMonth));
+  $('results').querySelectorAll('[data-answer-target]').forEach(button=>button.onclick=()=>openResultAnswer(button.dataset.answerTarget,button.dataset.applicationMonth,button.dataset.personIndex===undefined?undefined:Number(button.dataset.personIndex)));
   guidedFlow?.refresh();
 }
 $('add').onclick=addReason;
@@ -1029,6 +1030,7 @@ const incomeIntro=originalPanels[5].querySelector('#income-mode').closest('label
 if(incomeIntro?.classList.contains('hint'))incomeIntro.textContent='Отметьте, какие доходы были у вас и супруга в нужном периоде. Суммы зарплаты вводите до вычета налога. Пустое поле — сумма неизвестна, 0 — дохода действительно не было.';
 const leaveHelp=document.createElement('div');leaveHelp.className='leave-help';leaveHelp.innerHTML='<h3>Куда внести пособие по беременности и родам?</h3><p>Отметьте выше «Пособие по беременности и родам (БиР) — разовая выплата». Нажмите «Далее: суммы доходов»: откроется отдельный шаг, где нужно указать всю сумму БиР, месяц начала отпуска и число месяцев начисления.</p><p class="hint">Зарплату до декрета и ежемесячное пособие по уходу отмечайте отдельно. Зарплатный период закончите последним месяцем начисления зарплаты.</p>';
 periodNote.after(leaveHelp);
+const reasonRecipient=document.createElement('label');reasonRecipient.innerHTML='Для кого хотите добавить причину?<select id="reason-person"><option value="0">Для вас</option><option value="1">Для супруга</option></select>';$('add').before(reasonRecipient);$('add').onclick=()=>addReason(Number($('reason-person').value));
 const careHelper=document.createElement('details');careHelper.id='care-helper';careHelper.className='leave-help';careHelper.innerHTML='<summary>Я ухаживаю за ребёнком до 3 лет</summary><p>Выберите ребёнка и проверьте месяцы, в которые вы действительно ухаживали за ним. Предлагаем прошедший период — его можно изменить.</p><label>За каким ребёнком?<select id="care-child"><option value="">Выберите ребёнка</option></select></label><label>Кто ухаживал?<select id="care-person"><option value="0">Вы</option><option value="1">Супруг(а)</option></select></label><label>Уход с месяца<input id="care-from" type="month"></label><label>По месяц включительно<input id="care-to" type="month"></label><button type="button" id="add-care-period">Добавить этот период ухода</button><p id="care-status" role="status" class="hint"></p>';
 $('reasons').before(careHelper);
 const proposeCarePeriod=()=>{const child=childData().find(child=>child.id===$('care-child').value);if(!child?.birthDate)return;const months=incomeWindow($('start').value||currentMonth);const birthMonth=child.birthDate.slice(0,7);$('care-from').value=birthMonth>months[0]?birthMonth:months[0];const thirdBirthday=String(Number(birthMonth.slice(0,4))+3)+birthMonth.slice(4);$('care-to').value=currentMonth<thirdBirthday?currentMonth:monthString(monthIndex(thirdBirthday)-1);$('care-status').textContent='Проверьте предложенные даты. Если ухаживали только часть периода, исправьте их.';};
@@ -1063,7 +1065,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261008-42').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261011-43').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
@@ -1078,6 +1080,7 @@ function updateRelevantFields() {
     const carPanel=$('cars').closest('.panel');if(carPanel.dataset.step)carPanel.hidden=!$('asset-car').checked||!$('progress').querySelector('[aria-current]')?.textContent.startsWith('5.');
   }
 
+  if($('reason-person')){$('reason-person').options[1].disabled=$('marital-status').value!=='married';if($('marital-status').value!=='married')$('reason-person').value='0';}
   if($('care-child')){const select=$('care-child');const current=select.value;const choices=childData().filter(child=>child.birthDate&&child.birthDate<=applicationDateForMonth(currentMonth,31)&&monthString(monthIndex(child.birthDate.slice(0,7))+36)>=incomeWindow($('start').value||currentMonth)[0]);const key=JSON.stringify(choices.map(child=>[child.id,child.name]));if(select.dataset.options!==key){select.replaceChildren(new Option('Выберите ребёнка',''));choices.forEach((child,i)=>select.add(new Option(child.name||`Ребёнок ${i+1}`,child.id)));select.value=current;select.dataset.options=key;}$('care-helper').hidden=!choices.length;$('care-person').options[1].disabled=$('marital-status').value!=='married';}
   for(const row of $('reasons').children)row.querySelector('.service-help').hidden=!['military','incarceration'].includes(row.querySelector('.type').value);
   document.querySelectorAll('[aria-invalid="true"]').forEach(el=>{if(el.value&&el.validity.valid){el.removeAttribute('aria-invalid');el.classList.remove('field-invalid')}});
@@ -1203,14 +1206,15 @@ try {const raw=localStorage.getItem(draftKey);if(raw){restoreDraft(JSON.parse(ra
 catch {$('draft-status').textContent='Не удалось восстановить черновик. Заполните анкету заново.'}
 updateRelevantFields();
 
-function openResultAnswer(selector,month) {
+function openResultAnswer(selector,month,personIndex) {
+  if([0,1].includes(personIndex)&&$('reason-person')){$('reason-person').value=String(personIndex);$('care-person').value=String(personIndex);}
   const field=document.querySelector(selector);if(!field)return;
   guidedFlow?.revealField(field);
   for(let parent=field.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;
   let banner=$('result-edit-context');if(!banner){banner=document.createElement('div');banner.id='result-edit-context';banner.className='result-edit-context';$('progress').after(banner)}
-  banner.replaceChildren();const text=document.createElement('p');text.textContent=`Дополните ответы для подачи в ${monthLabel(month)}. После изменения вернитесь к результату — прогноз пересчитается.`;banner.append(text);
+  banner.replaceChildren();const text=document.createElement('p');text.textContent=`Дополните ответы${[0,1].includes(personIndex)?(personIndex===0?' для вас':' для супруга'):''}. Месяц подачи: ${monthLabel(month)}. После изменения вернитесь к результату — прогноз пересчитается.`;banner.append(text);
   const back=document.createElement('button');back.type='button';back.textContent='Вернуться к результату';back.onclick=()=>{banner.hidden=true;guidedFlow?.selectSection(6);const card=$('results').querySelector(`[data-result-month="${month}"] details`);if(card){card.open=true;card.scrollIntoView({block:'center',behavior:'smooth'})}};banner.append(back);banner.hidden=false;
-  field.scrollIntoView({block:'center',behavior:'smooth'});(field.matches('input,select,button')?field:field.querySelector('input,select,button'))?.focus();
+  const focusTarget=field.matches('input,select,button')?field:field.querySelector('input,select,button');for(let parent=focusTarget?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;field.scrollIntoView({block:'center',behavior:'smooth'});focusTarget?.focus();
 }
 
 function renderCompletionChecklist(pending=[]) {

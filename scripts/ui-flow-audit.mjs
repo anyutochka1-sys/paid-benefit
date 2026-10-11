@@ -79,7 +79,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
   else for(const el of person.querySelectorAll('[data-income-month]'))if(el.dataset.incomeMonth>='2025-09'&&el.dataset.incomeMonth<='2026-08')put(el,'25000');
  }
  next();assert.equal(d.body.dataset.question,'care');next();assert.equal(d.body.dataset.question,'assets');set(w,'#assets-none',true);next();assert.equal(d.body.dataset.question,'citizenship');d.querySelector('section[data-question="citizenship"] .quick-confirm button').click();assert.equal(d.body.dataset.question,'address');set(w,'#residence-basis','permanent');next();assert.equal(d.body.dataset.question,'prior');next();assert.equal(d.body.dataset.question,'result');
- assert.equal(d.querySelector('[data-result-month="2026-10"] [data-answer-target*="income-people"]'),null,'filled first salary no missing '+mode);
+ assert.equal(d.querySelector('[data-result-month="2026-10"] .result-answers [data-answer-target*="income-people"]'),null,'filled first salary no missing '+mode);
  for(const button of d.querySelectorAll('[data-answer-target]'))assert.ok(d.querySelector(button.dataset.answerTarget),'complete flow existing selector');dom.window.close();paths++;
 }
 // Exercise every recovery link in a combined incomplete form, including collapsed fields.
@@ -104,5 +104,18 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  // An explicitly absent salary fills missing period controls too.
  set(w,'#income-people .income-person:nth-child(2) .regular-from','');set(w,'#income-people .income-person:nth-child(2) .regular-to','');d.querySelector('#income-people .income-person:nth-child(2) .salary-zero').click();assert.equal(d.querySelector('#income-people .income-person:nth-child(2) .regular-from').value,'2025-09');assert.equal(d.querySelector('#income-people .income-person:nth-child(2) .regular-to').value,'2026-08');paths++;
  dom.window.close();
+}
+// Reasons selected from a person's result are assigned only to that person.
+{
+ const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'#marital-status','married');set(w,'#spouse-status','ordinary');set(w,'input[value="employment"]',true,'change');
+ d.getElementById('add-child').click();set(w,'#children .birth','2024-01-10');
+ for(let i=1;i<=2;i++){const q=`#income-people .income-person:nth-child(${i}) `;set(w,q+'.regular-amount','0');set(w,q+'.regular-from','2025-09');set(w,q+'.regular-to','2026-08');}
+ const checks=()=>[...d.querySelectorAll('[data-result-month="2026-10"] .individual-income-check')];
+ section(d,7);checks()[0].querySelector('[data-answer-target="#reason-person"]').click();assert.equal(d.body.dataset.question,'care');assert.equal(d.querySelector('#reason-person').value,'0');assert.equal(d.querySelectorAll('.reason').length,0,'navigation must not invent a reason');d.getElementById('add').click();assert.equal(d.querySelector('.reason .person').value,'0');
+ set(w,'.reason .type','careUnderThree','change');set(w,'.reason .from','2025-09');set(w,'.reason .to','2026-08');d.querySelector('#result-edit-context button').click();assert.equal(d.body.dataset.question,'result');assert.match(checks()[0].textContent,/не применяется/);assert.match(checks()[1].textContent,/216.744.*недостаточно/);paths++;
+ checks()[1].querySelector('[data-answer-target="#reason-person"]').click();assert.equal(d.querySelector('#reason-person').value,'1');assert.equal(d.querySelector('#care-person').value,'1');d.getElementById('add').click();assert.equal(d.querySelector('.reason:last-child .person').value,'1');assert.equal(d.querySelector('.reason:first-child .person').value,'0');paths++;
+ d.querySelector('.reason:last-child .remove').click();section(d,7);checks()[1].querySelector('[data-answer-target*="income-people"]').click();assert.equal(d.body.dataset.question,'salary');assert.ok(d.querySelector('.income-person:nth-child(2)').contains(d.activeElement));paths++;
+ set(w,'#income-mode','monthly');d.querySelector('.income-person:nth-child(2) details').open=false;section(d,7);checks()[1].querySelector('[data-answer-target*="income-people"]').click();assert.equal(d.querySelector('.income-person:nth-child(2) details').open,true);assert.ok(visible(d.activeElement));paths++;
+ set(w,'#save-draft',true,'change');w.dispatchEvent(new w.Event('pagehide'));const restored=await boot(w.localStorage.getItem('anna-benefit-draft-v1'));const rd=restored.window.document;assert.equal(rd.querySelector('.reason .person').value,'0');assert.equal(rd.querySelector('.reason .type').value,'careUnderThree');restored.window.close();dom.window.close();paths++;
 }
 console.log(`PASS ${paths} UI paths: every source, direct and next navigation, deselection, three salary modes, draft restoration, mixed order, no-income and existing result targets`);
