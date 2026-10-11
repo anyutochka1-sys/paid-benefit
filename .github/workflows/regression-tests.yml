@@ -1,0 +1,28 @@
+name: Regression tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: JavaScript syntax
+        run: node --check ui.mjs
+      - name: JavaScript regression tests
+        run: node --test *.test.mjs
+      - name: Python data tests
+        run: python -m unittest discover -s scripts -p 'test_*.py'
