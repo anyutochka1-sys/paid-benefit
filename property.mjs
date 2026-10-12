@@ -55,8 +55,8 @@ export function checkDepositInterest(accounts, {applicationMonth,perCapitaMinimu
   if(!Array.isArray(accounts)||!applicationMonth||!Number.isFinite(perCapitaMinimum))return {status:'unknown'};
   const appIndex=Number(applicationMonth.slice(0,4))*12+Number(applicationMonth.slice(5,7))-1;
   const activeInterest=accounts.reduce((sum,account)=>{
-    if(!Number.isFinite(account.interestForRelevantTaxYear))return NaN;
     if(account.nominalWardAccount)return sum;
+    if(!Number.isFinite(account.interestForRelevantTaxYear))return NaN;
     const closed=account.closedMonth;
     const closedIndex=closed?Number(closed.slice(0,4))*12+Number(closed.slice(5,7))-1:null;
     return sum+(closedIndex!==null&&closedIndex<=appIndex-6?0:account.interestForRelevantTaxYear);

@@ -80,3 +80,5 @@ test('ward nominal account is excluded from threshold and income',()=>{
   const r=depositIncomeForApplication([{taxYear:2025,interestForRelevantTaxYear:30000,nominalWardAccount:true}],{applicationMonth:'2026-09',perCapitaMinimum:20000});
   assert.equal(r.amount,0);assert.equal(r.thresholdStatus,'yes');
 });
+
+test('nominal ward account stays excluded even without next-year interest',()=>{assert.equal(checkDepositInterest([{nominalWardAccount:true,interestForRelevantTaxYear:undefined}],{applicationMonth:'2027-01',perCapitaMinimum:20000}).status,'yes');});

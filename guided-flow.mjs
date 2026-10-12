@@ -37,7 +37,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
 
   const primary=nodes.sourceSection.querySelector('.source-grid');
   const other=nodes.sourceSection.querySelectorAll('.source-grid')[1];
-  const common=new Set(['employment','childBenefit','otherBenefit','maternity','alimony','deposit']);
+  const common=new Set(['employment','childBenefit','workingCare','otherBenefit','maternity','alimony','deposit']);
   nodes.sourceSection.querySelectorAll('input[type=checkbox]:not(#no-income)').forEach(box=>{(common.has(box.value)?primary:other).append(box.closest('label'))});
   primary.prepend(primary.querySelector('input[value="maternity"]').closest('label'));
   nodes.sourceSection.querySelector('h3').textContent='Какие деньги поступали в семью?';

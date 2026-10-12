@@ -1,29 +1,29 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261012-49';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261012-49';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261012-49';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261012-49';
-import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261012-49';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261012-49';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261012-50';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261012-50';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261012-50';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261012-50';
+import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261012-50';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261012-50';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261012-49';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261012-49';
-import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261012-49';
-import {alimonyForApplication,allocatedAlimonyIncome,alimonyReceiptIssue} from './alimony.mjs?v=20261012-49';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261012-50';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261012-50';
+import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs?v=20261012-50';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261012-50';
+import {alimonyForApplication,allocatedAlimonyIncome,alimonyReceiptIssue} from './alimony.mjs?v=20261012-50';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
-import {maternityIncomeForApplication,maternityPaymentIssue} from './maternity.mjs?v=20261012-49';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261012-49';
-import {childIncomeForApplication} from './child-income.mjs?v=20261012-49';
+import {maternityIncomeForApplication,maternityPaymentIssue} from './maternity.mjs?v=20261012-50';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261012-50';
+import {childIncomeForApplication} from './child-income.mjs?v=20261012-50';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261012-49';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261012-50';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261012-49';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261012-50';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -212,7 +212,7 @@ const sourceEnabled=new Set();
 const sourceSection=document.createElement('section');
 sourceSection.className='source-picker';
 const sourceGroups=[
-  ['Чаще всего',[['employment','Зарплата до декрета или сейчас, работа по договору'],['pension','Пенсия / больничный'],['unemploymentBenefit','Пособие по безработице'],['otherBenefit','Пособие по уходу по месту работы и другие выплаты'],['childBenefit','Единое пособие и пособие по уходу для неработающего'],['alimony','Алименты'],['deposit','Проценты по вкладам'],['lottery','Выигрыш в лотерею']]],
+  ['Чаще всего',[['employment','Зарплата до декрета или сейчас, работа по договору'],['pension','Пенсия / больничный'],['unemploymentBenefit','Пособие по безработице'],['workingCare','Пособие по уходу за ребёнком до 1,5 лет — для работающих'],['otherBenefit','Другие пособия и компенсации'],['childBenefit','Единое пособие / пособие по уходу до 1,5 лет — для неработающих'],['alimony','Алименты'],['deposit','Проценты по вкладам'],['lottery','Выигрыш в лотерею']]],
   ['Другие поступления',[['childIncome','Доходы детей'],['maternity','Пособие по беременности и родам (БиР) — разовая выплата'],['selfEmployed','Самозанятость'],['business','ИП'],['scholarship','Стипендия'],['academicMedical','Выплата в медакадемическом отпуске'],['guardianReward','Вознаграждение приёмного родителя'],['successorPayment','Выплата правопреемнику'],['publicDuty','Компенсация за общественные обязанности'],['military','Денежное довольствие'],['rationCompensation','Компенсация вместо пайка'],['judgeAllowance','Содержание судьи в отставке'],['serviceSeverance','Выплата при увольнении со службы'],['rent','Аренда'],['propertySale','Продажа имущества'],['securities','Ценные бумаги / дивиденды'],['copyright','Авторские выплаты'],['foreignEarned','Заработок в иностранной валюте'],['foreignOther','Другой доход за пределами РФ']]]
 ];
 sourceSection.innerHTML='<h3>Какие поступления были в семье?</h3><p class="hint">Сначала отметьте все виды дохода, которые были у семьи в расчётном периоде. Затем нажмите «Далее: суммы доходов» и заполните суммы и месяцы по каждому выбранному виду. Если поступлений не было, отметьте это ниже.</p>'+sourceGroups.map(([title,items])=>`<fieldset><legend>${title}</legend><div class="source-grid">${items.map(([key,label])=>`<label class="check"><input type="checkbox" value="${key}"> ${label}</label>`).join('')}</div></fieldset>`).join('')+'<label class="check"><input id="no-income" type="checkbox"> Никаких поступлений из перечисленных не было</label>';
@@ -226,7 +226,7 @@ mobilizationSection.innerHTML='<summary>Если член семьи призв�
 sourceSection.after(mobilizationSection);
 mobilizationSection.querySelectorAll('input').forEach(input=>input.addEventListener('input',render));
 const extraSection=document.createElement('section');
-extraSection.innerHTML='<div class="section-heading"><h3>Другие доходы</h3><label>Повторить вид<select id="extra-add-type"></select></label><button id="add-extra" type="button">+ Ещё период</button></div><p class="hint">Поля для отмеченных видов уже добавлены ниже. Заполните сумму и период по каждому виду. Кнопка «Ещё период» нужна, если по тому же виду были разные суммы или получатели. Ежемесячную сумму укажите для месяцев поступления, а годовую для ИП, аренды, продажи имущества, ценных бумаг и авторских выплат — за налоговый год. Продажу недвижимости вводите по налоговой базе. Исключённые выплаты из списка выше вводить не нужно. Если вид выплаты неясен, выберите «Не уверена» — калькулятор не выдаст уверенный вывод. Материальную помощь работодателя при рождении укажите отдельно: исключается только подтверждённая необлагаемая часть. Пенсия по потере кормильца, если её получает учитываемый член семьи, относится к пенсиям.</p><div id="extra-entries"></div>';
+extraSection.innerHTML='<h3>Суммы выбранных доходов</h3><p class="hint">Ниже уже есть отдельная строка для каждого выбранного дохода. Укажите сумму и месяцы, когда получали деньги. Для ИП, аренды, продажи имущества, ценных бумаг и авторских выплат укажите годовую сумму за налоговый год.</p><div id="extra-entries"></div><div class="extra-add-controls"><label>Какой доход добавить ещё?<select id="extra-add-type"></select></label><button id="add-extra" type="button">+ Добавить ещё сумму или период</button><p class="hint">Эта кнопка нужна только если сумма менялась, был другой получатель или нужно добавить ещё один период того же дохода.</p></div>';
 maternitySection.after(extraSection);
 const childIncomeEntries=[];
 const childIncomeSection=document.createElement('section');
@@ -262,15 +262,17 @@ function renderExtraRows() {
   const typeSelect=$('extra-add-type'),previous=typeSelect.value;typeSelect.replaceChildren();
   [...sourceEnabled].filter(key=>ADDITIONAL_TYPES[key]).forEach(key=>typeSelect.add(new Option(ADDITIONAL_TYPES[key].label,key)));
   if([...typeSelect.options].some(option=>option.value===previous))typeSelect.value=previous;
+  typeSelect.closest('label').hidden=typeSelect.options.length<=1;
   $('extra-entries').replaceChildren();
   additionalEntries.forEach((entry,index)=>{
     const row=document.createElement('div');row.className='form-row';row.dataset.incomeSource=entry.type;row.dataset.extraIndex=String(index);
     if(!sourceEnabled.has(entry.type))return;
-    row.innerHTML=`<label>Кто получил<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><strong>${ADDITIONAL_TYPES[entry.type].label}</strong><label class="benefit-kind-field">Какое именно пособие?<select class="benefit-kind"><option value="">Выберите вид</option></select></label><label>${entry.type==='securities'?'Доход до расходов':['foreignEarned','foreignOther'].includes(entry.type)?'Сумма за месяц в указанной валюте':'Сумма, ₽'}<input class="amount" type="number" min="0" step="any"></label><label class="expenses-field">Расходы по операциям, ₽<input class="expenses" type="number" min="0"></label><label class="tax-field">Налоговый год<input class="tax-year" type="number" min="2024" max="2030"></label><label class="from-field">С какого месяца<input class="from" type="month"></label><label class="to-field">По какой месяц включительно<input class="to" type="month"></label><label class="birth-aid-field">Выплачено в течение первого года после рождения / усыновления / установления опеки?<select class="first-year"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label class="tax-free-field">Какая часть не облагалась НДФЛ, ₽<input class="tax-free" type="number" min="0"></label><div class="foreign-field"><label>Буквенный код валюты (например, RUB или USD)<input class="currency" maxlength="3" placeholder="USD"></label><label>Дата курса ЦБ<input class="rate-date" type="date"></label><label>Курс ЦБ: рублей за 1 единицу валюты<input class="rate" type="number" min="0" step="any"></label><p class="hint foreign-rate-hint"></p></div><button class="remove" type="button">Убрать</button>`;
+    row.innerHTML=`<label>Кто получил<select class="person"><option value="0">Заявитель</option><option value="1">Супруг(а)</option></select></label><strong>${ADDITIONAL_TYPES[entry.type].label}</strong><label class="benefit-kind-field">Какое именно пособие?<select class="benefit-kind"><option value="">Выберите вид</option></select></label><label>${entry.type==='securities'?'Доход до расходов':['foreignEarned','foreignOther'].includes(entry.type)?'Сумма за месяц в указанной валюте':ADDITIONAL_TYPES[entry.type].period==='monthly'?'Сумма за каждый месяц этого периода, ₽':'Сумма за налоговый год, ₽'}<input class="amount" type="number" min="0" step="any"></label><label class="expenses-field">Расходы по операциям, ₽<input class="expenses" type="number" min="0"></label><label class="tax-field">Налоговый год<input class="tax-year" type="number" min="2024" max="2030"></label><label class="from-field">С какого месяца<input class="from" type="month"></label><label class="to-field">По какой месяц включительно<input class="to" type="month"></label><label class="birth-aid-field">Выплачено в течение первого года после рождения / усыновления / установления опеки?<select class="first-year"><option value="">Выберите</option><option value="yes">Да</option><option value="no">Нет</option></select></label><label class="tax-free-field">Какая часть не облагалась НДФЛ, ₽<input class="tax-free" type="number" min="0"></label><div class="foreign-field"><label>Буквенный код валюты (например, RUB или USD)<input class="currency" maxlength="3" placeholder="USD"></label><label>Дата курса ЦБ<input class="rate-date" type="date"></label><label>Курс ЦБ: рублей за 1 единицу валюты<input class="rate" type="number" min="0" step="any"></label><p class="hint foreign-rate-hint"></p></div><button class="remove" type="button">Убрать</button>`;
     const businessFields=document.createElement('div');businessFields.className='business-fields';
     businessFields.innerHTML='<label>Как определена сумма ИП?<select class="business-basis"><option value="">Уточните</option><option value="usnGross">УСН «доходы»: годовая выручка без вычета расходов</option><option value="usnDocumented">УСН «доходы»: выручка и подтверждённые расходы</option><option value="documentedOther">Другой режим: готовая сумма дохода по налоговым документам</option></select></label><label class="business-expense-field">Расходы за налоговый год, ₽<input class="business-expenses" type="number" min="0" step="any"></label><label class="business-confirm-field check"><input class="business-confirm" type="checkbox"> Смогу представить документы о доходах за вычетом расходов</label><details class="business-grant-field"><summary>В годовой выручке есть целевая субсидия или грант на предпринимательство?</summary><label>Сколько из указанной выручки составляет такая поддержка, ₽<input class="business-grant" type="number" min="0" step="any"></label><label class="check"><input class="grant-confirm" type="checkbox"> Подтвержу целевое назначение и документы о получении</label><label class="grant-expense-field check"><input class="grant-expense-confirm" type="checkbox"> Указанные выше расходы не включают затраты, оплаченные из этих средств</label></details><p class="hint">Сверьте суммы с декларацией и КУДиР. Для УСН «доходы» расходы вычитаются при представлении документов в СФР. Целевую поддержку укажите здесь лишь если она уже вошла в общую выручку; не добавляйте её повторно. <a href="https://www.nalog.gov.ru/rn77/taxation/taxes/usn/" target="_blank" rel="noopener">Разъяснение ФНС об УСН</a>.</p>';
     row.querySelector('.remove').before(businessFields);
-    Object.entries(OTHER_BENEFIT_KINDS).filter(([key])=>['counted','employerBirthAid','uncertain'].includes(key)).forEach(([key,kind])=>row.querySelector('.benefit-kind').add(new Option(kind.label,key)));
+    Object.entries(OTHER_BENEFIT_KINDS).filter(([key])=>['workingCare','counted','employerBirthAid','uncertain'].includes(key)).forEach(([key,kind])=>row.querySelector('.benefit-kind').add(new Option(kind.label,key)));
+    if(entry.type==='otherBenefit'&&entry.benefitKind==='workingCare')row.querySelector('strong').textContent=ADDITIONAL_TYPES.workingCare.label;
     row.querySelector('.person').value=String(entry.personIndex);
     row.querySelector('.amount').value=entry.amount??'';
     row.querySelector('.expenses').value=entry.expenses??'';
@@ -569,7 +571,8 @@ function addOtherVehicle() {
 }
 function addDeposit() {
   const row=document.createElement('div');row.className='form-row';
-  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель</option><option value="spouse">Нынешний супруг</option></select></label><label>Год получения процентов<input class="tax-year" type="number" min="2024" max="2030"></label><label>Выплачено процентов, ₽<input class="interest" type="number" min="0"></label><label>Счёт закрыт в месяце<input class="closed" type="month"></label><label class="check"><input class="nominal" type="checkbox"> Номинальный счёт ребёнка под опекой</label><button class="remove" type="button">Убрать</button>';
+  row.innerHTML='<label>Владелец<select class="owner"><option value="applicant">Заявитель</option><option value="spouse">Нынешний супруг</option></select></label><label>Год получения процентов<input class="tax-year" type="number" min="2024" max="2030"></label><label>Выплачено процентов, ₽<input class="interest" type="number" min="0"></label><label>Месяц закрытия — только если счёт закрывали<input class="closed" type="month"><span class="hint">Если счёт открыт, оставьте пустым. Для открытого счёта дата закрытия не нужна.</span></label><label class="check"><input class="nominal" type="checkbox"> Номинальный счёт ребёнка под опекой</label><button class="remove" type="button">Убрать</button>';
+  const forecast=document.createElement('label');forecast.className='deposit-forecast-field';forecast.innerHTML='Ожидаемые проценты за 2026 год — для прогноза на 2027 год, ₽<input class="forecast-interest" data-interest-year="2026" type="number" min="0" step="0.01"><span class="hint">Необязательно для расчёта в 2026 году. Укажите ожидаемую сумму процентов за весь 2026 год, если хотите сравнить месяцы подачи в 2027 году. Если процентов не будет, можно указать 0. Пустое поле означает, что прогноз по этому счёту пока неизвестен.</span>';row.append(forecast);
   bindRow(row);$('deposits').append(row);render();
 }
 function bindRow(row) {
@@ -630,13 +633,17 @@ function otherVehicleData() {
     seized:row.querySelector('.excluded').checked
   }));
 }
-function depositData() {
+function depositData(requestedYear) {
   return [...document.querySelectorAll('#deposits .form-row')].map(row=>({
     owner:row.querySelector('.owner').value,taxYear:row.querySelector('.tax-year').value===''?undefined:Number(row.querySelector('.tax-year').value),
     interestForRelevantTaxYear:row.querySelector('.interest').value===''?undefined:Number(row.querySelector('.interest').value),
     closedMonth:row.querySelector('.closed').value||undefined,
     nominalWardAccount:row.querySelector('.nominal').checked
-  }));
+  })).map((account,index)=>{
+    if(requestedYear===undefined||account.taxYear===requestedYear)return account;
+    const forecast=$('deposits').children[index].querySelector(`[data-interest-year="${requestedYear}"]`);
+    return {...account,taxYear:requestedYear,interestForRelevantTaxYear:!forecast||forecast.value===''?undefined:Number(forecast.value),projected:Boolean(forecast&&forecast.value!=='')};
+  });
 }
 function missingIncomeRows() {
   const missing=[];
@@ -659,6 +666,7 @@ function syncResultEdit(question) {
 function render() {
   if(restoringDraft)return;
   updateRelevantFields();
+  document.querySelectorAll('#deposits .form-row').forEach(row=>{const forecast=row.querySelector('.deposit-forecast-field');if(forecast)forecast.hidden=Number(row.querySelector('.tax-year').value)===2026;});
   document.querySelectorAll('input[type=number]').forEach(input=>input.setAttribute('inputmode','decimal'));
   if($('income-period-note')){const months=incomeWindow($('start').value||currentMonth);$('income-period-note').textContent=`Для подачи в ${monthLabel($('start').value||currentMonth).replace(/^(январь|февраль|апрель|июнь|июль|сентябрь|октябрь|ноябрь|декабрь)/,m=>m.slice(0,-1)+'е').replace(/^март /,'марте ').replace(/^май /,'мае ').replace(/^август /,'августе ')} нужны доходы: ${monthLabel(months[0])} — ${monthLabel(months.at(-1))}. Для следующих месяцев период сдвигается: будущие суммы указывайте только как предположение.`;}
   const start=$('start').value; if (!start){guidedFlow?.refresh();return;}
@@ -670,7 +678,7 @@ function render() {
   }
   const emptySources=missingIncomeRows();
   const sourceComplete=sourceEnabled.size>0||$('no-income').checked;
-  const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData(),deposits=sourceEnabled.has('deposit')?depositData():[];
+  const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData();
   const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked,careRelationship:row.querySelector('.care-relationship select').value}));
   document.querySelectorAll('.reason').forEach(row=>{
     const check=reasonPeriod({start:row.querySelector('.from').value,end:row.querySelector('.to').value});
@@ -698,7 +706,7 @@ function render() {
     const rightsUnknown=rightsChecks.some(check=>check.status==='unknown');
     const rightsText=rightsBlocked?'Родительские права заявителя: по пункту 31(р) есть основание для отказа по соответствующему ребёнку.':rightsUnknown?'Родительские права заявителя: уточните ответ в карточке ребёнка.':'Родительские права заявителя: по указанным детям препятствий не отмечено.';
     const {fourOrMoreChildren,fourChildrenReview}=fourChildCarStatus(children,members,filingDate);
-    const householdAssets=[familyAssets(cars,members),familyAssets(properties,members),familyAssets(otherVehicles,members),familyAssets(deposits,members,{includeWardIncome:true})];
+    const householdAssets=[familyAssets(cars,members),familyAssets(properties,members),familyAssets(otherVehicles,members),familyAssets(sourceEnabled.has('deposit')?depositData(year-1):[],members,{includeWardIncome:true})];
     const assetsUnanswered=$('assets-none')&&(!$('assets-none').checked&&![...document.querySelectorAll('.asset-choice')].some(input=>input.checked)||assetInputsMissing().length>0);
     const assetOwnerReview=assetsUnanswered||householdAssets.some(group=>group.needsReview);
     const carCheck=checkCars(householdAssets[0].items,{applicationYear:year,multipleChildren:$('large-family').checked,disabledFamilyMember:$('disability').checked,supportVehicle:$('support-car').checked,fourOrMoreChildren,fourChildrenReview});
@@ -711,6 +719,7 @@ function render() {
     const depositCheck=allDepositsKnown&&pmPerson!==null?checkDepositInterest(countedDeposits,{applicationMonth:month,perCapitaMinimum:pmPerson}):{status:'unknown'};
     const familyText=`Учтено в этом шаге: ${members.included.length}${members.unanswered.length?' (есть неуточнённые члены семьи)':''}${$('marital-status').value==='married'&&members.unanswered.some(item=>item.person.role==='spouse')?' (уточните статус супруга)':''}${spouseRuleExcluded?' (супруг исключён по п. 46)':''}. ${assetOwnerReview?'Для одного или нескольких объектов нужно уточнить владельца или его включение в состав семьи. ':''}Детей, на которых можно подать: ${applicable.filter(x=>x.status==='yes').length}${applicable.some(x=>x.status==='unknown')?' (есть неуточнённые)':''}.`;
     const assetText=`Автомобили: ${carCheck.status==='yes'?'по этим признакам подходят':carCheck.status==='no'?carCheck.reasons.join('; '):carCheck.review?.join('; ')||'нужны сведения'}. Другая недвижимость: ${propertyCheck.status==='yes'?'по указанным объектам подходит':propertyCheck.status==='no'?propertyCheck.reasons.join('; '):propertyCheck.review?.join('; ')||'нужна проверка'}. Прочая техника: ${otherCheck.status==='yes'?'по указанным объектам подходит':otherCheck.status==='no'?otherCheck.reasons.join('; '):otherCheck.review?.join('; ')||'нужна проверка'}. Вклады: ${depositCheck.status==='yes'?'по порогу процентов подходят':depositCheck.status==='no'?'превышен порог процентов':'нужны данные налогового года/ПМ'}.`;
+    const depositAssumption=countedDeposits.some(account=>account.projected)?` Для вкладов использована указанная вами ожидаемая сумма процентов за ${year-1} год.`:'';
     const baseMonths=(person,index)=>mobilizedIndices.includes(index)||!sourceEnabled.has('employment')?Object.fromEntries(incomeWindow(month).map(m=>[m,0])):$('income-mode').value==='period'?regularIncomeMonths(person,month,{knownThrough:currentMonth,projectFuture:person.projectFuture===true}):person.months;
     const incomeResult=incomeForMonth(countedAdults.map(({person,index})=>({...person,months:baseMonths(person,index),total:mobilizedIndices.includes(index)?0:sourceEnabled.has('employment')?person.total:0,mode:mobilizedIndices.includes(index)?'monthly':sourceEnabled.has('employment')&&$('income-mode').value==='total'?'total':'monthly',baseApplicationMonth:start})),month);
     const incomeEntryReviewText=incomeResult.missing.length?'Ввод доходов требует уточнения: '+incomeResult.missing.slice(0,3).join('; ')+(incomeResult.missing.length>3?`; ещё ${incomeResult.missing.length-3} незаполненных или неверных сумм`:'')+'.':'';
@@ -930,7 +939,7 @@ function render() {
       {title:'Минимальный доход',text:`${adultText}.${!newbornOnly&&adults.flatMap(a=>a.warnings).length?' '+adults.flatMap(a=>a.warnings).join(' '):''}`},
       {title:'Доходы и выплаты на детей',text:`${newbornOnly?'':incomeEntryReviewText} ${incomeText}`},
       {title:'Отдельное заявление по беременности',text:pregnancyText},
-      {title:'Состав семьи и имущество',text:`${familyText} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}`}
+      {title:'Состав семьи и имущество',text:`${familyText} ${depositAssumption} ${newbornOnly?(newbornReview?'Имущество: необходимость новой оценки зависит от подтверждения упрощённого назначения.':'Имущество: при упрощённом назначении новая оценка не проводится.'):assetText}`}
     ];
     const shortStatus=explicitBlockers?'Есть условие, которое мешает назначению':clear?'Предварительный расчёт готов':headline.includes('новорождённого')?'Возможно упрощённое назначение новорождённому':'Нужно уточнить ответы';
     const amount=clear&&scenarioAmounts.length&&scenarioAmounts.every(Number.isFinite)?scenarioAmounts.reduce((sum,value)=>sum+value,0):null;
@@ -1010,7 +1019,15 @@ function render() {
       addAnswer(`Доход ребёнка, строка ${index+1}: ${check.issues.join('; ')}`,target);
     });
     if(alimony.status!=='known')addAnswer('Алименты: '+alimony.reason,alimonyAnswerTarget);
-    if(sourceEnabled.has('deposit')&&(depositIncome.status!=='known'||depositCheck.status==='unknown'))addAnswer(`Вклады: укажите проценты за ${year-1} год и данные счетов`,'#deposits');
+    if(sourceEnabled.has('deposit')&&(depositIncome.status!=='known'||depositCheck.status==='unknown')){
+      const accounts=depositData(year-1);
+      const index=accounts.findIndex(account=>!account.nominalWardAccount&&familyAssets([account],members,{includeWardIncome:true}).items.length>0&&!excludedIncomeIndices.includes(account.owner==='applicant'?0:account.owner==='spouse'?1:-1)&&(account.taxYear!==year-1||!Number.isFinite(account.interestForRelevantTaxYear)||account.interestForRelevantTaxYear<0));
+      if(index>=0){
+        const prefix=`#deposits .form-row:nth-child(${index+1})`,row=$('deposits').children[index];
+        const field=Number(row.querySelector('.tax-year').value)!==year-1&&row.querySelector(`[data-interest-year="${year-1}"]`)?' .forecast-interest':row.querySelector('.tax-year').value===''||Number(row.querySelector('.tax-year').value)!==year-1?' .tax-year':' .interest';
+        addAnswer(year===2027?`Для прогноза на 2027 год: укажите ожидаемые проценты за 2026 год. Для подачи в 2026 году это не требуется`:`Вклад ${index+1}: укажите сумму процентов за ${year-1} год`,prefix+field);
+      }
+    }
     if(applicantCheck==='unknown')addAnswer($('applicant-citizen').value?'Уточните, проживает ли заявитель в России':'Уточните гражданство заявителя',$('applicant-citizen').value?'#applicant-residence':'#applicant-citizen');
     if(capacity.status==='unknown')addAnswer('Ответьте, было ли решение суда о дееспособности','#applicant-capacity');
     if(addressReview)addAnswer(addressBasis?'Подтвердите адрес, по которому будете подавать заявление':'Выберите основание адреса подачи',addressBasis?'#address-proof':'#residence-basis');
@@ -1160,7 +1177,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261012-49').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261012-50').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
@@ -1330,9 +1347,16 @@ function renderCompletionChecklist(pending=[]) {
   });
   const box=$('completion-check');if(!box)return;box.replaceChildren();box.hidden=!issues.length;
   if(!issues.length)return;
-  const title=document.createElement('h3');title.textContent='Что заполнить для расчёта';box.append(title);
-  const text=document.createElement('p');text.textContent='Начните с этих ответов. Нажмите на нужный пункт — откроется поле для заполнения. Уточнения для будущих месяцев подписаны отдельно.';box.append(text);
-  for(const issue of [...new Map(issues.map(issue=>[issue.selector,issue])).values()]){const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=issue.label+(issue.month?` (подача: ${monthLabel(issue.month)})`:'');button.dataset.answerTarget=issue.selector;if(issue.month)button.dataset.applicationMonth=issue.month;button.onclick=()=>{if(issue.month){openResultAnswer(issue.selector,issue.month);return;}const field=document.querySelector(issue.selector);showStep(Number(field?.closest('.panel')?.dataset.step??issue.step));for(let parent=field?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;guidedFlow?.revealField(field);field?.focus();field?.scrollIntoView({block:'center',behavior:'smooth'})};box.append(button)}
+  const current=issues.filter(issue=>!issue.month||issue.month===$('start').value),future=issues.filter(issue=>issue.month&&issue.month!==$('start').value);
+  const heading=document.createElement('h3');heading.textContent=current.length?`Что заполнить для подачи в ${monthLabel($('start').value)}`:`Ответы для подачи в ${monthLabel($('start').value)} заполнены`;box.append(heading);
+  const text=document.createElement('p');text.textContent=current.length?'Нажмите на пункт — откроется конкретное поле, которое нужно дополнить.':'Уточнения ниже относятся только к будущим месяцам. Они не мешают расчёту выбранного месяца.';box.append(text);
+  const draw=(list,parent)=>{for(const issue of [...new Map(list.map(issue=>[issue.selector,issue])).values()]){
+    const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=issue.label+(issue.month?` (подача: ${monthLabel(issue.month)})`:'');button.dataset.answerTarget=issue.selector;if(issue.month)button.dataset.applicationMonth=issue.month;
+    button.onclick=()=>{if(issue.month){openResultAnswer(issue.selector,issue.month);return;}const field=document.querySelector(issue.selector);showStep(Number(field?.closest('.panel')?.dataset.step??issue.step));for(let parent=field?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;guidedFlow?.revealField(field);field?.focus();field?.scrollIntoView({block:'center',behavior:'smooth'})};parent.append(button);
+  }};
+  const currentBox=document.createElement('div');currentBox.className='current-answers';draw(current,currentBox);box.append(currentBox);
+  if(future.length){const details=document.createElement('details');details.className='future-answers';const summary=document.createElement('summary');summary.textContent='Дополнить прогноз следующих месяцев — необязательно для выбранного месяца';details.append(summary);const note=document.createElement('p');note.textContent='Будущие поступления могут отличаться. Заполните эти поля, если хотите сравнить будущие месяцы подачи.';details.append(note);draw(future,details);box.append(details);}
+
 }
 
 function organizeChildCard(row) {

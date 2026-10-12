@@ -3,6 +3,7 @@ import {incomeWindow} from './engine.mjs';
 // Decree 2330 p. 47, 49, 50. Annual categories under p. 50 are spread over
 // twelve months of the tax year; exact exclusions under p. 53 are separate.
 export const ADDITIONAL_TYPES = {
+  workingCare:{label:'Пособие по уходу за ребёнком до 1,5 лет — для работающих',period:'monthly',qualifies:false},
   pension:{label:'Пенсия / больничный',period:'monthly',qualifies:true},
   scholarship:{label:'Стипендия',period:'monthly',qualifies:true},
   academicMedical:{label:'Компенсация при академическом отпуске по медицинским показаниям',period:'monthly',qualifies:true},
@@ -38,7 +39,7 @@ export function foreignRateDate(applicationMonth) {
 // conditional payment (for example some uses of maternity capital) must be
 // classified after its statutory purpose is known.
 export const OTHER_BENEFIT_KINDS = {
-  workingCare:{label:'Пособие по уходу до 1,5 лет, назначенное по месту работы',excluded:false},
+  workingCare:{label:'Пособие по уходу за ребёнком до 1,5 лет — для работающих (выплата СФР)',excluded:false},
   counted:{label:'Иное учитываемое пособие / компенсация',excluded:false},
   uncertain:{label:'Не уверена, учитывается ли эта выплата',excluded:false},
   employerBirthAid:{label:'Единовременная материальная помощь работодателя при рождении / усыновлении / опеке',excluded:false},
