@@ -1,33 +1,33 @@
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261012-48';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261012-48';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261012-48';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261012-48';
-import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261012-48';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261012-48';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261012-49';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261012-49';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261012-49';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261012-49';
+import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261012-49';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261012-49';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261012-48';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261012-48';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261012-49';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261012-49';
 import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261012-48';
-import {alimonyForApplication,allocatedAlimonyIncome,alimonyReceiptIssue} from './alimony.mjs?v=20261012-48';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261012-49';
+import {alimonyForApplication,allocatedAlimonyIncome,alimonyReceiptIssue} from './alimony.mjs?v=20261012-49';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
-import {maternityIncomeForApplication,maternityPaymentIssue} from './maternity.mjs?v=20261012-48';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261012-48';
-import {childIncomeForApplication} from './child-income.mjs';
+import {maternityIncomeForApplication,maternityPaymentIssue} from './maternity.mjs?v=20261012-49';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261012-49';
+import {childIncomeForApplication} from './child-income.mjs?v=20261012-49';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261012-48';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261012-49';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261012-48';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261012-49';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
-let restoringDraft=false;let guidedFlow=null;let resultEdit=null;
+let restoringDraft=false;let guidedFlow=null;let resultEdit=null;let resultEditEntry=null;
 for(const id of ['family-goal','guided-question']){const input=document.createElement('input');input.type='hidden';input.id=id;document.querySelector('main').append(input)}
 const today=new Date();
 const currentMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
@@ -236,7 +236,7 @@ function renderChildIncomeRows() {
   $('child-income-entries').replaceChildren();
   const childOptions=childData().map((child,index)=>({id:child.id,label:document.querySelector(`[data-child-id="${child.id}"] .child-name`)?.value||`Ребёнок ${index+1}`}));
   childIncomeEntries.forEach((entry,index)=>{
-    const row=document.createElement('div');row.className='form-row';
+    const row=document.createElement('div');row.className='form-row';row.dataset.childIncomeIndex=String(index);
     row.innerHTML='<label>Кто получил<select class="child"><option value="">Выберите ребёнка</option></select></label><label>Вид<select class="type"><option value="employment">Зарплата / ГПХ</option><option value="scholarship">Стипендия</option><option value="publicDutyCompensation">Компенсация за государственные обязанности</option><option value="other">Другой учитываемый доход</option></select></label><label>За месяц, ₽<input class="amount" type="number" min="0"></label><label>С месяца<input class="from" type="month"></label><label>По месяц<input class="to" type="month"></label><label class="birthday-income-date">Если доход пришёл в месяц 18-летия, укажите дату получения<input class="receipt-date" type="date"></label><button class="remove" type="button">Убрать</button>';
     childOptions.forEach(child=>row.querySelector('.child').add(new Option(child.label,child.id)));
     for(const [selector,key] of [['.child','childId'],['.type','type'],['.amount','amount'],['.from','from'],['.to','to']]) {
@@ -638,6 +638,24 @@ function depositData() {
     nominalWardAccount:row.querySelector('.nominal').checked
   }));
 }
+function missingIncomeRows() {
+  const missing=[];
+  for(const [key,rows,selector,label] of [
+    ['maternity',maternityPayments,'#add-maternity','БиР: добавьте выплату или снимите выбор этого дохода'],
+    ['childBenefit',benefitPayments,'#add-benefit','Пособия на детей: добавьте выплату или снимите выбор этого дохода'],
+    ['childIncome',childIncomeEntries,'#add-child-income','Доходы детей: добавьте период или снимите выбор этого дохода'],
+    ['deposit',[...$('deposits').children],'#add-deposit','Проценты по вкладам: добавьте вклад или снимите выбор этого дохода']
+  ])if(sourceEnabled.has(key)&&!rows.length)missing.push({key,selector,label});
+  for(const key of sourceEnabled)if(ADDITIONAL_TYPES[key]&&!additionalEntries.some(entry=>entry.type===key))missing.push({key,selector:'#add-extra',label:ADDITIONAL_TYPES[key].label+': добавьте строку дохода или снимите его выбор'});
+  return missing;
+}
+
+function syncResultEdit(question) {
+  if(!resultEdit)return;
+  let valid=false;try{valid=resultEdit.question===question&&Boolean(document.querySelector(resultEdit.selector))&&(!resultEditEntry||resultEditEntry.rows.includes(resultEditEntry.entry));}catch{}
+  if(!valid){resultEdit=null;resultEditEntry=null;if($('result-edit-context'))$('result-edit-context').hidden=true;}
+}
+
 function render() {
   if(restoringDraft)return;
   updateRelevantFields();
@@ -650,6 +668,7 @@ function render() {
     const current=input.value;input.replaceChildren(new Option('Выберите',''),new Option('Заявитель (пособие по беременности)','applicant'));
     childData().forEach((child,i)=>input.add(new Option(child.name||`Ребёнок ${i+1}`,`child:${child.id}`)));input.value=current;
   }
+  const emptySources=missingIncomeRows();
   const sourceComplete=sourceEnabled.size>0||$('no-income').checked;
   const children=childData(), cars=carData(), properties=propertyData(),otherVehicles=otherVehicleData(),deposits=sourceEnabled.has('deposit')?depositData():[];
   const reasons=[...document.querySelectorAll('.reason')].map(row=>({person:Number(row.querySelector('.person').value),type:row.querySelector('.type').value,start:row.querySelector('.from').value,end:row.querySelector('.to').value,registered:row.querySelector('.registered').checked,careRelationship:row.querySelector('.care-relationship select').value}));
@@ -696,15 +715,20 @@ function render() {
     const incomeResult=incomeForMonth(countedAdults.map(({person,index})=>({...person,months:baseMonths(person,index),total:mobilizedIndices.includes(index)?0:sourceEnabled.has('employment')?person.total:0,mode:mobilizedIndices.includes(index)?'monthly':sourceEnabled.has('employment')&&$('income-mode').value==='total'?'total':'monthly',baseApplicationMonth:start})),month);
     const incomeEntryReviewText=incomeResult.missing.length?'Ввод доходов требует уточнения: '+incomeResult.missing.slice(0,3).join('; ')+(incomeResult.missing.length>3?`; ещё ${incomeResult.missing.length-3} незаполненных или неверных сумм`:'')+'.':'';
     const supplemental=additionalIncomeForApplication(withOfficialRates(additionalEntries.filter(e=>sourceEnabled.has(e.type)),month,cbrRateTable),month,excludedIncomeIndices);
+    for(const item of emptySources.filter(item=>ADDITIONAL_TYPES[item.key])){supplemental.status='unknown';supplemental.amount=null;supplemental.issues.push(item.label);}
     const childEarnings=childIncomeForApplication(sourceEnabled.has('childIncome')?childIncomeEntries:[],children,members,month);
+    if(emptySources.some(item=>item.key==='childIncome')){childEarnings.status='unknown';childEarnings.amount=null;childEarnings.issues.push('Добавьте период дохода ребёнка');}
     const applicationSelection=applicationChildren(children,filingDate);
     const selected=applicationSelection.selected;
     const applicationSelectionText=applicationSelection.requested.length?'Дети, отмеченные для заявления: '+applicationSelection.requested.map(check=>`${childLabel(check.child,children.findIndex(child=>child.id===check.child.id))}: ${check.status==='yes'?'возраст, семейное положение, гражданство и проживание позволяют подать; остальные критерии проверяем отдельно':check.status==='unknown'?'нужно уточнить — '+check.reason:'подать нельзя — '+check.reason}`).join('; ')+'.':'';
     const scenarios=$('application-mode').value==='separate'?selected.map(c=>[c]):[selected];
     const jointRenewal=$('application-mode').value==='together'&&selected.some(c=>c.awardRecipient==='self'&&c.awardEnd?.slice(0,7)===month);
     const benefitRows=sourceEnabled.has('childBenefit')?benefitRowsForWindow(month):{payments:[],missing:[]};
+    if(emptySources.some(item=>item.key==='childBenefit'))benefitRows.missing.push('Добавьте выплату пособия на ребёнка');
     const depositIncome=pmPerson!==null?depositIncomeForApplication(countedDeposits,{applicationMonth:month,perCapitaMinimum:pmPerson}):{status:'unknown',reason:pm.reason};
+    if(emptySources.some(item=>item.key==='deposit')){depositIncome.status='unknown';depositIncome.amount=null;depositIncome.reason='Добавьте сведения о вкладе';}
     const maternityIncome=maternityIncomeForApplication(sourceEnabled.has('maternity')?maternityPayments:[],month,excludedIncomeIndices);
+    if(emptySources.some(item=>item.key==='maternity')){maternityIncome.status='unknown';maternityIncome.amount=null;maternityIncome.missing.push('Добавьте выплату БиР');}
     const maritalStatus=$('marital-status').value;
     const alimonyFrom=$('alimony-from').value, alimonyTo=$('alimony-to').value;
     const alimonyMonthly=$('alimony-monthly').value;
@@ -874,7 +898,7 @@ function render() {
       if(j===0&&pregnancyState.status==='forecast')result.warnings.push(pregnancyState.reason+'.');
       const amountKnown=mobilizedIndices.includes(j)||!sourceEnabled.has('employment')||$('income-mode').value!=='total'?incomeWindow(month).every(m=>Number.isFinite(baseMonths(person,j)[m])&&baseMonths(person,j)[m]>=0):month===start&&Number.isFinite(person.total)&&person.total>=0;
       const earned=!mobilizedIndices.includes(j)&&sourceEnabled.has('employment')&&$('income-mode').value==='total'&&month===start&&person.incomeType!=='other'?person.total+[...Object.values(supplemental.byPerson.get(j)||{})].reduce((sum,v)=>sum+v.qualifying,0):result.earned;
-      return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&!spouseStatusUnknown&&person.incomeType!=='other'&&personalSupplemental.status==='known'&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
+      return {...result,earned,passed:earned>=result.minimum,known:!mobilizedIndices.includes(j)&&sourceComplete&&amountKnown&&!guardianUnknown&&!spouseStatusUnknown&&person.incomeType!=='other'&&personalSupplemental.status==='known'&&!emptySources.some(item=>ADDITIONAL_TYPES[item.key]?.qualifies)&&(!result.uncertain||earned>=result.minimum),mobilizedReview:mobilizedIndices.includes(j),label:person.label};
     });
     const needsMeansAssessment=!shortcutOnly||$('pregnancy-applying').checked;
     const newbornOnly=selected.length>0&&!needsMeansAssessment;
@@ -912,6 +936,7 @@ function render() {
     const amount=clear&&scenarioAmounts.length&&scenarioAmounts.every(Number.isFinite)?scenarioAmounts.reduce((sum,value)=>sum+value,0):null;
     const answerActions=[];
     const addAnswer=(label,selector)=>{if(selector&&!answerActions.some(a=>a.selector===selector))answerActions.push({label,selector})};
+    emptySources.forEach(item=>addAnswer(item.label,item.selector));
     if(scenario.invalid)addAnswer(forecastAction.label,forecastAction.selector);
     if(pm.status!=='known')addAnswer('Выберите регион и территорию для расчёта прожиточного минимума',$('pm-region').value?'#pm-area':'#pm-region');
     if(!sourceComplete)addAnswer('Отметьте виды доходов или их отсутствие','#no-income');
@@ -934,7 +959,7 @@ function render() {
       let field='';
       if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(payment.from||''))field='.benefit-from';
       else if(!benefitReceiptRange(payment))field='.benefit-to';
-      else if(!payment.childId)field='.benefit-child';
+      else if(!children.some(child=>child.id===payment.childId))field='.benefit-child';
       else if(['decree606','decree175','nonworkingCare'].includes(payment.kind)&&typeof payment.forPastPeriods!=='boolean')field='.benefit-past-periods';
       else if((payment.kind||'unified')==='unified'&&payment.amountMode==='automatic'){
         const row=document.querySelector(prefix);
@@ -965,7 +990,25 @@ function render() {
       const field=!Number.isFinite(entry.amount)||entry.amount<0?'.amount':entry.type==='otherBenefit'&&(!entry.benefitKind||entry.benefitKind==='uncertain')?'.benefit-kind':entry.type==='business'&&!entry.businessBasis?'.business-basis':entry.type==='securities'&&(!Number.isFinite(entry.expenses)||entry.expenses<0||entry.expenses>entry.amount)?'.expenses':annual&&!Number.isInteger(entry.taxYear)?'.tax-year':!annual&&!entry.from?'.from':!annual&&(!entry.to||entry.from>entry.to)?'.to':'';
       addAnswer(`${ADDITIONAL_TYPES[entry.type].label}, строка ${index+1}: ${entryCheck.issues.join('; ')}`,`#extra-entries [data-extra-index="${index}"]${field?' '+field:''}`);
     });
-    if(childEarnings.status!=='known')addAnswer('Доходы детей: '+childEarnings.issues.join('; '),'#child-income-entries');
+    if(childEarnings.status!=='known')childIncomeEntries.forEach((entry,index)=>{
+      const check=childIncomeForApplication([entry],children,members,month);if(check.status==='known')return;
+      const child=children.find(child=>child.id===entry.childId),prefix=`#child-income-entries [data-child-income-index="${index}"]`;
+      let target=prefix;
+      if(!child)target+=' .child';
+      else if(!Number.isFinite(entry.amount)||entry.amount<0)target+=' .amount';
+      else if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(entry.from||''))target+=' .from';
+      else if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(entry.to||'')||entry.from>entry.to)target+=' .to';
+      else if(!['employment','scholarship','publicDutyCompensation','other'].includes(entry.type))target+=' .type';
+      else {
+        const childPrefix=`#children .form-row:nth-child(${children.indexOf(child)+1})`;
+        if(!child.birthDate)target=childPrefix+' .birth';
+        else if(check.issues.some(issue=>issue.includes('точную дату')))target+=' .receipt-date';
+        else if(check.issues.some(issue=>issue.includes('вид обучения')))target=childPrefix+' .education-status';
+        else if(check.issues.some(issue=>issue.includes('месяцы очного обучения')))target=childPrefix+(!/^\d{4}-(0[1-9]|1[0-2])$/.test(child.educationFrom||'')?' .education-from':' .education-to');
+        else if(check.issues.some(issue=>issue.includes('состав семьи')))target=childPrefix+(child.married===undefined?' .married':' .student');
+      }
+      addAnswer(`Доход ребёнка, строка ${index+1}: ${check.issues.join('; ')}`,target);
+    });
     if(alimony.status!=='known')addAnswer('Алименты: '+alimony.reason,alimonyAnswerTarget);
     if(sourceEnabled.has('deposit')&&(depositIncome.status!=='known'||depositCheck.status==='unknown'))addAnswer(`Вклады: укажите проценты за ${year-1} год и данные счетов`,'#deposits');
     if(applicantCheck==='unknown')addAnswer($('applicant-citizen').value?'Уточните, проживает ли заявитель в России':'Уточните гражданство заявителя',$('applicant-citizen').value?'#applicant-residence':'#applicant-citizen');
@@ -1117,7 +1160,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261012-48').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261012-49').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
@@ -1263,12 +1306,14 @@ updateRelevantFields();
 function openResultAnswer(selector,month,personIndex) {
   if([0,1].includes(personIndex)&&$('reason-person')){$('reason-person').value=String(personIndex);$('care-person').value=String(personIndex);}
   const field=document.querySelector(selector);if(!field)return;
+  if(selector==='#add-extra'){const missing=missingIncomeRows().find(item=>item.selector===selector);if(missing)$('extra-add-type').value=missing.key;}
   guidedFlow?.revealField(field);
   for(let parent=field.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;
   let banner=$('result-edit-context');if(!banner){banner=document.createElement('div');banner.id='result-edit-context';banner.className='result-edit-context';$('progress').after(banner)}
   banner.replaceChildren();const text=document.createElement('p');text.textContent=`Дополните ответы${[0,1].includes(personIndex)?(personIndex===0?' для вас':' для супруга'):''}. Месяц подачи: ${monthLabel(month)}. После изменения вернитесь к результату — прогноз пересчитается.`;banner.append(text);
   resultEdit={selector,month,personIndex,question:document.body.dataset.question};
-  const back=document.createElement('button');back.type='button';back.textContent='Вернуться к результату';back.onclick=()=>{resultEdit=null;banner.hidden=true;guidedFlow?.selectSection(6);const card=$('results').querySelector(`[data-result-month="${month}"] details`);if(card){card.open=true;card.scrollIntoView({block:'center',behavior:'smooth'})}};banner.append(back);banner.hidden=false;
+  resultEditEntry=null;for(const [attribute,rows] of [['data-maternity-index',maternityPayments],['data-benefit-index',benefitPayments],['data-extra-index',additionalEntries],['data-child-income-index',childIncomeEntries]]){const row=field.closest(`[${attribute}]`);if(row){resultEditEntry={rows,entry:rows[Number(row.getAttribute(attribute))]};break;}}
+  const back=document.createElement('button');back.type='button';back.textContent='Вернуться к результату';back.onclick=()=>{resultEdit=null;resultEditEntry=null;banner.hidden=true;guidedFlow?.selectSection(6);const card=$('results').querySelector(`[data-result-month="${month}"] details`);if(card){card.open=true;card.scrollIntoView({block:'center',behavior:'smooth'})}};banner.append(back);banner.hidden=false;
   const focusTarget=field.matches('input,select,button')?field:field.querySelector('input,select,button');for(let parent=focusTarget?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;field.scrollIntoView({block:'center',behavior:'smooth'});focusTarget?.focus();
 }
 
@@ -1331,7 +1376,7 @@ function reviewStep() {
 }
 
 // The guided view moves controls; calculation and draft identities remain unchanged.
-guidedFlow=createGuidedFlow({steps,showSection:showStep,render,sourceEnabled,parents:{basic:basicGrid,children:originalPanels[2],income:originalPanels[5],reasons:originalPanels[1],property:originalPanels[4],cars:originalPanels[3],conditions:originalPanels[0],result:originalPanels[6]},nodes:{sourceSection,periodNote,leaveHelp,extraSection,benefitsSection,maternitySection,childIncomeSection,alimonySection,applicationChoice,pregnancyPanel,assetPicker,propertyAdds,conditionsQuick,priorSupportPanel},currentSection:currentStep,addChild});
+guidedFlow=createGuidedFlow({steps,showSection:showStep,render,sourceEnabled,onScreenChange:syncResultEdit,missingIncomeRows,parents:{basic:basicGrid,children:originalPanels[2],income:originalPanels[5],reasons:originalPanels[1],property:originalPanels[4],cars:originalPanels[3],conditions:originalPanels[0],result:originalPanels[6]},nodes:{sourceSection,periodNote,leaveHelp,extraSection,benefitsSection,maternitySection,childIncomeSection,alimonySection,applicationChoice,pregnancyPanel,assetPicker,propertyAdds,conditionsQuick,priorSupportPanel},currentSection:currentStep,addChild});
 
 // Restore a correction only when its screen, month and field still exist.
 if(resultEdit){

@@ -1,6 +1,6 @@
 import {incomeWindow} from './engine.mjs';
 // A presentation layer over the existing controls; their draft keys and models stay intact.
-export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents,nodes,currentSection,addChild}) {
+export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents,nodes,currentSection,addChild,onScreenChange=()=>{},missingIncomeRows=()=>[]}) {
   const document=parents.basic.ownerDocument,window=document.defaultView;
   const $=id=>document.getElementById(id),groups=[];
   let active=null,painting=false;
@@ -95,7 +95,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   function isVisibleField(el){if(!el||el.disabled)return false;for(let node=el;node&&node!==active.el.parentElement;node=node.parentElement)if(node.hidden)return false;return true}
   function requiredMissing(){const issue=[],salaryMonths=new Set($('start').value?incomeWindow($('start').value):[]);for(const selector of active.required||[])for(const el of active.el.querySelectorAll(selector)){if(!isVisibleField(el))continue;if(el.dataset.incomeMonth&&salaryMonths.size&&!salaryMonths.has(el.dataset.incomeMonth))continue;if(el.matches('.applicant-rights')&&el.closest('.form-row').querySelector('.child-role').value==='ward')continue;if(!el.value||['unknown'].includes(el.value)||!el.validity.valid)issue.push(el)}return issue}
   function advance(){const list=screens(),index=list.findIndex(item=>item.id===active.id);goTo(list[Math.min(index+1,list.length-1)])}
-  function next(){const issue=requiredMissing();let message='';if(active.id==='income-sources'&&!sourceEnabled.size&&!$('no-income').checked)message='Отметьте поступления или подтвердите, что их не было.';if(active.id==='assets'&&!$('assets-none').checked&&!document.querySelector('.asset-choice:checked'))message='Отметьте собственность семьи или её отсутствие.';
+  function next(){const issue=requiredMissing();let message='';const empty=missingIncomeRows().filter(item=>active.el.contains(document.querySelector(item.selector)));if(empty.length)message=empty.map(item=>item.label).join('. ');if(active.id==='income-sources'&&!sourceEnabled.size&&!$('no-income').checked)message='Отметьте поступления или подтвердите, что их не было.';if(active.id==='assets'&&!$('assets-none').checked&&!document.querySelector('.asset-choice:checked'))message='Отметьте собственность семьи или её отсутствие.';
     if(active.id==='alimony'&&!$('marital-status').value){message='Сначала укажите семейное положение: от него зависят вопросы об алиментах.';}
     if(active.id==='salary'&&$('income-mode').value==='period'){for(const row of $('income-people').querySelectorAll('.form-row')){const from=row.querySelector('.regular-from'),to=row.querySelector('.regular-to');if(from.value&&to.value&&from.value>to.value){issue.push(to);message='Последний месяц зарплаты не может быть раньше первого.';}}}
     if(active.id==='maternity'&&!$('maternity-payments').children.length)message='Добавьте выплату декретных или снимите её выбор в разделе доходов.';
@@ -123,7 +123,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     const links=$('progress').querySelector('.step-links');if(links){const menu=document.createElement('details');menu.className='section-menu';menu.innerHTML='<summary>Перейти к другому разделу</summary>';menu.append(links);const changeGoal=document.createElement('button');changeGoal.type='button';changeGoal.className='remove';changeGoal.textContent='Изменить мою ситуацию';changeGoal.onclick=()=>{goal.value='';goTo(groups.find(item=>item.id==='goal'))};menu.append(changeGoal);$('progress').append(menu)}
     const track=document.createElement('div');track.className='progress-track';track.setAttribute('aria-hidden','true');const fill=document.createElement('span');fill.style.width=((active.section+1)/steps.length*100)+'%';track.append(fill);$('progress').prepend(track);
     $('step-help').hidden=true;intro.hidden=active.id!=='goal';$('back').hidden=index===0;$('next').hidden=active.section===6||active.id==='goal';$('next').textContent=active.id==='income-sources'&&sourceEnabled.size?'Далее: суммы доходов':list[index+1]?.section===6?'Показать результат':'Продолжить';$('next').onclick=next;$('back').onclick=()=>goTo(list[Math.max(0,index-1)]);
-    document.body.dataset.question=active.id;$('guided-question').value=active.id;painting=false;
+    document.body.dataset.question=active.id;$('guided-question').value=active.id;onScreenChange(active.id);painting=false;
   }
   function goTo(item){if(!item)return;active=item;paint();window.scrollTo({top:0,behavior:'smooth'})}
   function refresh(){if(painting)return;const list=screens();const item=list.find(item=>item.id===active?.id)||list.find(item=>item.section===active?.section)||list[0];if(item){active=item;paint()}}

@@ -1,9 +1,11 @@
 import {incomeWindow,monthIndex,monthString} from './engine.mjs';
 import {ageAt} from './family-assets.mjs';
 
+const validMonth=value=>/^\d{4}-(0[1-9]|1[0-2])$/.test(value||'');
+const validDate=value=>/^\d{4}-(0[1-9]|1[0-2])-\d{2}$/.test(value||'')&&Number.isFinite(new Date(value+'T00:00:00Z').getTime())&&new Date(value+'T00:00:00Z').toISOString().slice(0,10)===value;
 const exemptible=new Set(['employment','publicDutyCompensation']);
 const monthsBetween=(from,to)=>{
-  if(!from||!to||from>to)return [];
+  if(!validMonth(from)||!validMonth(to)||from>to)return [];
   return Array.from({length:monthIndex(to)-monthIndex(from)+1},(_,i)=>monthString(monthIndex(from)+i));
 };
 
@@ -20,7 +22,7 @@ export function childIncomeForApplication(entries,children,family,applicationMon
   let amount=0;
   for(const entry of entries) {
     const child=byId.get(entry.childId);
-    if(!child||!entry.from||!entry.to||entry.from>entry.to||!Number.isFinite(entry.amount)||entry.amount<0||!['employment','scholarship','publicDutyCompensation','other'].includes(entry.type)) {
+    if(!child||!validMonth(entry.from)||!validMonth(entry.to)||entry.from>entry.to||!Number.isFinite(entry.amount)||entry.amount<0||!['employment','scholarship','publicDutyCompensation','other'].includes(entry.type)) {
       issues.push('Уточните ребёнка, вид дохода, сумму и период');continue;
     }
     for(const month of monthsBetween(entry.from,entry.to).filter(m=>window.has(m))) {
@@ -29,14 +31,14 @@ export function childIncomeForApplication(entries,children,family,applicationMon
       if(!child.birthDate){issues.push('Уточните дату рождения ребёнка с доходом');continue}
       const eighteenth=Number(child.birthDate.slice(0,4))+18+'-'+child.birthDate.slice(5,7);
       const birthdayMonth=month===eighteenth;
-      if(exemptible.has(entry.type)&&birthdayMonth&&(!/^\d{4}-\d{2}-\d{2}$/.test(entry.receiptDate||'')||entry.receiptDate.slice(0,7)!==month)) {
+      if(exemptible.has(entry.type)&&birthdayMonth&&(!validDate(entry.receiptDate)||entry.receiptDate.slice(0,7)!==month)) {
         issues.push('Укажите точную дату дохода в месяце 18-летия');continue;
       }
       const minor=ageAt(child.birthDate,birthdayMonth&&entry.receiptDate?entry.receiptDate:`${month}-01`)<18;
       if(exemptible.has(entry.type)&&minor) {
         if(['none','additional'].includes(child.educationStatus)){amount+=entry.amount;counted.push({childId:child.id,month,amount:entry.amount});continue}
         if(child.educationStatus!=='school'){issues.push('Уточните вид обучения несовершеннолетнего ребёнка');continue}
-        if(!child.educationFrom||!child.educationTo||child.educationFrom>child.educationTo){issues.push('Уточните месяцы очного обучения несовершеннолетнего ребёнка');continue}
+        if(!validMonth(child.educationFrom)||!validMonth(child.educationTo)||child.educationFrom>child.educationTo){issues.push('Уточните месяцы очного обучения несовершеннолетнего ребёнка');continue}
         const studied=monthsBetween(child.educationFrom,child.educationTo).filter(m=>window.has(m)).length;
         if(studied>=6){excluded.push({childId:child.id,month,reason:'пункт 52(1): очное обучение не менее шести месяцев'});continue}
       }

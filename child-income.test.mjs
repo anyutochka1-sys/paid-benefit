@@ -39,3 +39,10 @@ test('birthday-month wages use the exact receipt date and minor education rule',
   assert.equal(after.amount,10000);
   assert.equal(childIncomeForApplication([{...base,receiptDate:'2026-03-01'}],[adult],{included:[adult],unanswered:[]},'2026-09').status,'unknown');
 });
+
+test('malformed saved months and impossible birthday receipt dates stay unknown',()=>{
+ const base={childId:'c',type:'other',amount:1000,from:'2025-09',to:'2026-08'};
+ for(const overrides of [{from:'2025-13'},{to:'2026-00'},{from:'wrong'}])assert.equal(childIncomeForApplication([{...base,...overrides}],[child],family,'2026-10').status,'unknown');
+ const badSchool={...child,educationFrom:'2025-13'};assert.equal(childIncomeForApplication(income,[badSchool],{included:[badSchool],unanswered:[]},'2026-09').status,'unknown');
+ const birthday={...child,birthDate:'2008-02-12',fullTimeStudent:true};assert.equal(childIncomeForApplication([{childId:'c',type:'employment',amount:10000,from:'2026-02',to:'2026-02',receiptDate:'2026-02-30'}],[birthday],{included:[birthday],unanswered:[]},'2026-09').status,'unknown');
+});
