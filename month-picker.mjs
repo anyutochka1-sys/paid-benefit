@@ -17,7 +17,7 @@ export function enhanceMonthInputs(root) {
       monthNames.forEach((name,index)=>month.add(new window.Option(name,String(index+1).padStart(2,'0'))));
       year.add(new window.Option('Год',''));
       const currentYear=new Date().getFullYear();
-      for(let value=currentYear+5;value>=1990;value--)year.add(new window.Option(String(value),String(value)));
+      for(let value=input.id==='start'?currentYear+1:currentYear+5,minimum=input.id==='start'?2025:1990;value>=minimum;value--)year.add(new window.Option(String(value),String(value)));
       input.before(group);group.append(input,month,year);
       input.classList.add('month-model');input.tabIndex=-1;input.setAttribute('aria-hidden','true');
       input.focus=options=>month.focus(options);

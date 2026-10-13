@@ -50,7 +50,7 @@ for(const [i,amount] of [[1,0],[2,35000]]){
   const q=`.income-person:nth-child(${i}) `;set(w,q+'.regular-amount',String(amount));
   month(w,q+'.regular-from','2025-09');month(w,q+'.regular-to','2026-08');
 }
-next(d);assert.equal(d.body.dataset.question,'extra-income');
+next(d);if(d.body.dataset.question==='salary-spouse')next(d);assert.equal(d.body.dataset.question,'extra-income');
 const care='#extra-entries [data-income-source="workingCare"] ';
 assert.ok(visible(d.querySelector(care+'.amount')));assert.equal(visible(d.querySelector('#deposit-section')),false);
 set(w,care+'.amount','15000');month(w,care+'.from','2025-09');month(w,care+'.to','2026-08');next(d);

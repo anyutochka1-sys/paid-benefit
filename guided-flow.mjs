@@ -30,6 +30,8 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   const childMore=document.createElement('div');childMore.className='children-more';
   const addMore=document.createElement('button');addMore.type='button';addMore.className='remove';addMore.textContent='+ Ещё один ребёнок';addMore.onclick=addChild;childMore.append(addMore);
   group(1,'children-finish','Все дети добавлены?',parents.children,[childMore,nodes.applicationChoice,$('newborn-explanation'),$('mother-pregnancy-benefit').closest('label'),nodes.pregnancyPanel],{when:()=>!!$('children').children.length,required:['#pregnancy-registered','#weeks']});
+  const childSummary=document.createElement('div');childSummary.className='child-summary';groups.find(item=>item.id==='children-finish').el.querySelector('h2').after(childSummary);
+  function paintChildSummary(){childSummary.replaceChildren();for(const item of childItems()){const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=item.title+' — проверить ответы';button.onclick=()=>goTo(item);childSummary.append(button);}}
   const pregnancyMore=document.createElement('details');pregnancyMore.className='optional-details';pregnancyMore.innerHTML='<summary>Дополнительно: расчёт пособия по беременности</summary>';groups.at(-1).el.append(pregnancyMore);
   group(1,'pregnancy','Расскажите о беременности',parents.children,[],{when:()=>$('pregnancy-applying').checked&&!$('children').children.length,required:['#pregnancy-registered','#weeks']});
   const addPregnancyChildren=document.createElement('button');addPregnancyChildren.type='button';addPregnancyChildren.className='remove';addPregnancyChildren.textContent='Также оформить пособие на детей';addPregnancyChildren.onclick=()=>{goal.value='both';addChild();render()};groups.at(-1).el.append(addPregnancyChildren);
@@ -42,8 +44,11 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   primary.prepend(primary.querySelector('input[value="maternity"]').closest('label'));
   nodes.sourceSection.querySelector('h3').textContent='Какие деньги поступали в семью?';
   nodes.sourceSection.querySelector('legend').textContent='Отметьте всё, что было в нужные месяцы';
+  const rareIncome=document.createElement('details');rareIncome.className='rare-income';rareIncome.innerHTML='<summary>Другие доходы: самозанятость, пенсия, аренда и прочие</summary>';const rareFields=other.closest('fieldset');rareFields.before(rareIncome);rareIncome.append(rareFields);
+
   group(2,'income-sources','Какие доходы были у вашей семьи?',parents.income,[nodes.periodNote,nodes.sourceSection,nodes.leaveHelp]);
   group(2,'salary','Сколько начисляли вам и супругу?',parents.income,[field('income-mode'),$('income-people')],{when:()=>sourceEnabled.has('employment'),required:['.regular-amount','.regular-from','.regular-to','.total-amount','[data-income-month]']});
+  const salaryMode=document.createElement('details');salaryMode.className='optional-details salary-mode';salaryMode.innerHTML='<summary>Зарплата менялась? Выбрать другой способ ввода</summary>';salaryMode.append(field('income-mode'));groups.find(item=>item.id==='salary').el.insertBefore(salaryMode,$('income-people'));
   group(2,'maternity','Сколько получили по беременности и родам (БиР)?',parents.income,[nodes.maternitySection],{when:()=>sourceEnabled.has('maternity'),required:['.amount','.start','.months']});
   group(2,'benefits','Какие пособия получали на детей?',parents.income,[nodes.benefitsSection],{when:()=>sourceEnabled.has('childBenefit'),required:['.benefit-child','.benefit-amount','.benefit-from','.benefit-to','.benefit-same-region','.benefit-region','.benefit-area','.benefit-tier','[data-receipt-month]']});
   group(2,'alimony','Расскажите об алиментах',parents.income,[nodes.alimonySection],{when:()=>$('marital-status').value==='divorced'||sourceEnabled.has('alimony'),required:['#alimony-monthly','#alimony-from','#alimony-to','#alimony-kind','#divorce-month']});
@@ -65,7 +70,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
       const box=[...nodes.sourceSection.querySelectorAll('input')].find(el=>el.value===key);
       const button=document.createElement('button');button.type='button';button.className='review-link';button.dataset.incomeTarget=key;
       button.textContent='Заполнить: '+(box?.closest('label')?.textContent.trim()||key);
-      button.onclick=()=>{const target=key==='employment'?$('income-people'):key==='maternity'?$('maternity-payments'):key==='childBenefit'?$('benefits'):key==='deposit'?$('deposits'):key==='childIncome'?$('child-income-entries'):key==='alimony'?nodes.alimonySection:[...$('extra-entries').children].find(row=>row.dataset.incomeSource===key);const item=screens().find(item=>item.el===target||item.el.contains(target));goTo(item||groups.find(item=>item.id===(targets[key]||'extra-income')));target?.scrollIntoView({block:'center',behavior:'smooth'});target?.querySelector('input:not([type=checkbox]),select')?.focus();};selectedIncome.append(button);
+      button.onclick=()=>{const target=key==='employment'?$('income-people'):key==='maternity'?$('maternity-payments'):key==='childBenefit'?$('benefits'):key==='deposit'?$('deposits'):key==='childIncome'?$('child-income-entries'):key==='alimony'?nodes.alimonySection:[...$('extra-entries').children].find(row=>row.dataset.incomeSource===key);const item=screens().find(item=>item.el===target||item.el.contains(target)||target?.contains(item.el));goTo(item||groups.find(item=>item.id===(targets[key]||'extra-income')));target?.scrollIntoView({block:'center',behavior:'auto'});target?.querySelector('input:not([type=checkbox]),select')?.focus();};selectedIncome.append(button);
     }
   }
   const careIntro=document.createElement('p');careIntro.className='hint';careIntro.textContent='Если да, укажите причину: например, уход за ребёнком, беременность или учёба. Если таких месяцев не было, продолжайте.';
@@ -103,12 +108,14 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
       return {section:4,id:index===0?'property':el.dataset.propertyId,title:type,el,required:['.owner','.share','.area','.hectares',...(el.querySelector('.type').value==='land'?['#rural']:[])]};
     });
   }
+  function salaryItems(){return [...$('income-people').children].map((el,index)=>({section:2,id:index===0?'salary':'salary-spouse',title:index===0?'Ваша зарплата':'Зарплата супруга',el,required:['.regular-amount','.regular-from','.regular-to','.total-amount','[data-income-month]']}))}
   function extraItems(){return [...$('extra-entries').children].filter(row=>sourceEnabled.has(row.dataset.incomeSource)).map((el,index)=>({section:2,id:index===0?'extra-income':'extra-income-'+index,title:el.dataset.incomeSource==='workingCare'?'Пособие по уходу до 1,5 лет — для работающих':([...nodes.sourceSection.querySelectorAll('input')].find(box=>box.value===el.dataset.incomeSource)?.closest('label').textContent.trim()||'Дополнительный доход'),el,required:['.amount','.from','.to','.tax-year','.benefit-kind','.business-basis','.business-expenses','.currency','.rate-date','.rate']}))}
   function screens(){
     const list=groups.filter(item=>item.when());
     const childrenIndex=list.findIndex(item=>item.id==='children-finish');if(childrenIndex>=0)list.splice(childrenIndex,0,...childItems());
     const propertyIndex=list.findIndex(item=>item.id==='property'),properties=propertyItems();
     if(propertyIndex>=0&&properties.length)list.splice(propertyIndex,1,...properties,{...groups.find(item=>item.id==='property'),id:'property-summary',title:'Все объекты недвижимости добавлены?',required:[]});
+    const salaryIndex=list.findIndex(item=>item.id==='salary');if(salaryIndex>=0)list.splice(salaryIndex,1,...salaryItems());
     const extraIndex=list.findIndex(item=>item.id==='extra-income'),extras=extraItems();if(extraIndex>=0&&extras.length)list.splice(extraIndex,1,...extras);
     return list;
   }
@@ -119,7 +126,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
   function next(){const issue=requiredMissing();let message='';const empty=missingIncomeRows().filter(item=>active.el.contains(document.querySelector(item.selector)));if(empty.length)message=empty.map(item=>item.label).join('. ');if(active.id==='income-sources'&&!sourceEnabled.size&&!$('no-income').checked)message='Отметьте поступления или подтвердите, что их не было.';if(active.id==='assets'&&!$('assets-none').checked&&!document.querySelector('.asset-choice:checked'))message='Отметьте собственность семьи или её отсутствие.';
     if(active.el.closest('#properties')&&active.el.querySelector('.type').value==='land'&&!$('rural').value)issue.push($('rural'));
     if(active.id==='alimony'&&!$('marital-status').value){message='Сначала укажите семейное положение: от него зависят вопросы об алиментах.';}
-    if(active.id==='salary'&&$('income-mode').value==='period'){for(const row of $('income-people').querySelectorAll('.form-row')){const from=row.querySelector('.regular-from'),to=row.querySelector('.regular-to');if(from.value&&to.value&&from.value>to.value){issue.push(to);message='Последний месяц зарплаты не может быть раньше первого.';}}}
+    if(['salary','salary-spouse'].includes(active.id)&&$('income-mode').value==='period'){for(const row of active.el.querySelectorAll('.form-row')){const from=row.querySelector('.regular-from'),to=row.querySelector('.regular-to');if(from.value&&to.value&&from.value>to.value){issue.push(to);message='Последний месяц зарплаты не может быть раньше первого.';}}}
     if(active.id==='maternity'&&!$('maternity-payments').children.length)message='Добавьте выплату декретных или снимите её выбор в разделе доходов.';
     if(active.id==='benefits'){
       if(!$('benefits').children.length)message='Добавьте пособие или снимите его выбор в разделе доходов.';
@@ -132,18 +139,18 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     }
     if(!issue.length&&!message){advance();return;}
     const box=$('step-review');box.replaceChildren();box.hidden=false;const heading=document.createElement('h3');heading.textContent='Осталось уточнить';box.append(heading);const text=document.createElement('p');text.textContent=message||'Ответьте на выделенные вопросы. Можно продолжить и вернуться позже.';box.append(text);
-    issue.forEach(el=>{el.setAttribute('aria-invalid','true');el.classList.add('field-invalid');if(el.classList.contains('month-model')){el.closest('.month-picker').classList.add('field-invalid');el.closest('.month-picker').querySelectorAll('select').forEach(select=>select.setAttribute('aria-invalid','true'));}const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=el.closest('label')?.firstChild?.textContent?.trim()||'Заполните ответ';button.onclick=()=>{for(let parent=el.parentElement;parent&&parent!==active.el;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;el.focus();el.scrollIntoView({block:'center',behavior:'smooth'})};box.append(button)});
-    const skip=document.createElement('button');skip.type='button';skip.className='remove';skip.textContent='Продолжить, заполню позже';skip.onclick=advance;box.append(skip);box.scrollIntoView({block:'center',behavior:'smooth'});
+    issue.forEach(el=>{el.setAttribute('aria-invalid','true');el.classList.add('field-invalid');if(el.classList.contains('month-model')){el.closest('.month-picker').classList.add('field-invalid');el.closest('.month-picker').querySelectorAll('select').forEach(select=>select.setAttribute('aria-invalid','true'));}const button=document.createElement('button');button.type='button';button.className='review-link';button.textContent=el.closest('label')?.firstChild?.textContent?.trim()||'Заполните ответ';button.onclick=()=>{for(let parent=el.parentElement;parent&&parent!==active.el;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;el.focus();el.scrollIntoView({block:'center',behavior:'auto'})};box.append(button)});
+    const skip=document.createElement('button');skip.type='button';skip.className='remove';skip.textContent='Продолжить, заполню позже';skip.onclick=advance;box.append(skip);box.scrollIntoView({block:'center',behavior:'auto'});
   }
-  function paint(){if(painting||!active)return;painting=true;showSection(active.section);paintIncomeChoices();
+  function paint(){if(painting||!active)return;painting=true;showSection(active.section);paintIncomeChoices();paintChildSummary();
     const pregnancy=groups.find(item=>item.id==='pregnancy');const finish=groups.find(item=>item.id==='children-finish');pregnancyMore.hidden=['pregnant','both'].includes(goal.value);(pregnancy.when()?pregnancy.el:['pregnant','both'].includes(goal.value)?finish.el:pregnancyMore).append(nodes.pregnancyPanel);
-    const allItems=[...groups,...childItems(),...propertyItems(),...extraItems()];
+    const allItems=[...groups,...childItems(),...propertyItems(),...extraItems(),...salaryItems()];
     for(const el of new Set(allItems.map(item=>item.el)))el.hidden=el!==active.el&&!el.contains(active.el);
     const propertyGroup=groups.find(item=>item.id==='property');
     nodes.propertyAdds.hidden=active.el!==propertyGroup.el;
     const rural=field('rural');propertyGroup.el.append(rural);
     rural.hidden=active.el.closest('#properties')?active.el.querySelector('.type').value!=='land':!$('asset-land').checked;
-    for(const id of ['property','extra-income']){const parent=groups.find(item=>item.id===id);parent.el.querySelector('h2').textContent=parent.el.contains(active.el)?active.title:parent.title;}
+    for(const id of ['property','extra-income','salary']){const parent=groups.find(item=>item.id===id);parent.el.querySelector('h2').textContent=parent.el.contains(active.el)?active.title:parent.title;}
     if(active.el.closest('#properties'))active.el.querySelector('.asset-row-title').hidden=true;
     const addControls=nodes.extraSection.querySelector('.extra-add-controls');if(addControls)addControls.hidden=!nodes.extraSection.contains(active.el)&&active.el!==groups.find(item=>item.id==='extra-income').el;
     if(['yes','unknown'].includes(priorSelect.value))groups.find(item=>item.id==='prior').el.append(legacy);else oldConditionEntry.append(legacy);
@@ -157,7 +164,7 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     $('step-help').hidden=true;intro.hidden=active.id!=='goal';$('back').hidden=index===0;$('next').hidden=active.section===6||active.id==='goal';$('next').textContent=active.id==='income-sources'&&sourceEnabled.size?'Далее: суммы доходов':list[index+1]?.section===6?'Показать результат':'Продолжить';$('next').onclick=next;$('back').onclick=()=>goTo(list[Math.max(0,index-1)]);
     document.body.dataset.question=active.id;$('guided-question').value=active.id;onScreenChange(active.id);painting=false;
   }
-  function goTo(item){if(!item)return;active=item;paint();window.scrollTo({top:0,behavior:'smooth'});const heading=active.el.querySelector('h2,h3')||active.el;heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}
+  function goTo(item){if(!item)return;active=item;paint();window.scrollTo({top:0,behavior:'auto'});const heading=active.el.querySelector('h2,h3')||active.el;heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}
   function refresh(){if(painting)return;const list=screens();const item=list.find(item=>item.id===active?.id)||list.find(item=>item.section===active?.section)||list[0];if(item){active=item;paint()}}
   const api={get painting(){return painting},refresh,selectSection(section){goTo(screens().find(item=>item.section===section))},revealField(el){const item=screens().find(item=>item.el===el||item.el.contains(el)||el?.contains(item.el));if(item){active=item;paint()}},childAdded(row){active={section:1,id:row.dataset.childId,el:row};}};
   goTo(screens().find(item=>item.id===$('guided-question').value)||screens().find(item=>item.section===currentSection)||screens()[0]);return api;
