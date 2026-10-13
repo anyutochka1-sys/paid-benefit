@@ -14,15 +14,16 @@ async function boot(saved){
  w.eval(code.replace(/^import .*?;$/gm,''));return dom;
 }
 function set(w,selector,value,event='input'){const el=w.document.querySelector(selector);assert.ok(el,selector);if(el.type==='checkbox')el.checked=value;else el.value=value;el.dispatchEvent(new w.Event(event,{bubbles:true}));}
+function focusTarget(el){return el?.classList.contains('month-model')?el.closest('.month-picker').querySelector('.month-picker-month'):el;}
 function visible(el){if(!el)return false;for(let node=el;node;node=node.parentElement){if(node.hidden)return false;if(node.tagName==='DETAILS'&&!node.open&&!node.querySelector('summary')?.contains(el))return false;}return true;}
-function section(d,n){d.querySelector(`.step-links button:nth-child(${n})`).click();}
+function section(d,n){d.querySelector(`.step-links button:nth-child(${n})`).click();if(n===3)d.querySelector('.selected-income-details').open=true;}
 function start(w){const d=w.document;d.querySelector('[data-goal=children]').click();section(d,3);}
 let paths=0;
 const seed=await boot();const keys=[...seed.window.document.querySelectorAll('.source-picker input:not(#no-income)')].map(el=>el.value);seed.window.close();
 for(const key of keys){
  const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,`.source-picker input[value="${key}"]`,true,'change');
  const direct=d.querySelector(`[data-income-target="${key}"]`);assert.ok(visible(direct),key+' direct button');direct.click();
- const expected={employment:'salary',maternity:'maternity',childBenefit:'benefits',alimony:'alimony'}[key]||'extra-income';assert.equal(d.body.dataset.question,expected,key);
+ const expected={employment:'salary',maternity:'maternity',childBenefit:'benefits',alimony:'alimony',deposit:'deposits',childIncome:'child-income'}[key]||'extra-income';assert.equal(d.body.dataset.question,expected,key);
  const field={employment:'.regular-amount',maternity:'#maternity-payments .amount',childBenefit:'.benefit-from',alimony:'#marital-status',childIncome:'#child-income-entries .amount',deposit:'#deposits input'}[key]||'#extra-entries .amount';
  // Alimony needs the family-status question first when that has not been answered.
  if(key==='alimony')set(w,'#marital-status','never');
@@ -42,7 +43,7 @@ for(const mode of ['period','monthly','total']){
 {
  const dom=await boot(),w=dom.window,d=w.document;start(w);
  for(const key of ['deposit','childBenefit','maternity','employment','pension'])set(w,`input[value="${key}"]`,true,'change');
- const screens=['salary','maternity','benefits','extra-income'];d.getElementById('next').click();
+ const screens=['salary','maternity','benefits','extra-income','deposits'];d.getElementById('next').click();
  for(const expected of screens){assert.equal(d.body.dataset.question,expected);d.getElementById('next').click();if(d.body.dataset.question===expected){const skip=[...d.getElementById('step-review').querySelectorAll('button')].find(b=>b.textContent==='Продолжить, заполню позже');assert.ok(skip,expected);skip.click();}}
  assert.equal(d.body.dataset.question,'care');section(d,3);set(w,'#no-income',true,'change');assert.equal(d.querySelectorAll('[data-income-target]').length,0);d.getElementById('next').click();assert.equal(d.body.dataset.question,'care');dom.window.close();paths++;
 }
@@ -78,7 +79,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
   else if(mode==='total')put(person.querySelector('.total-amount'),'300000');
   else for(const el of person.querySelectorAll('[data-income-month]'))if(el.dataset.incomeMonth>='2025-09'&&el.dataset.incomeMonth<='2026-08')put(el,'25000');
  }
- next();assert.equal(d.body.dataset.question,'care');next();assert.equal(d.body.dataset.question,'assets');set(w,'#assets-none',true);next();assert.equal(d.body.dataset.question,'citizenship');d.querySelector('section[data-question="citizenship"] .quick-confirm button').click();assert.equal(d.body.dataset.question,'address');set(w,'#residence-basis','permanent');next();assert.equal(d.body.dataset.question,'prior');next();assert.equal(d.body.dataset.question,'result');
+ next();assert.equal(d.body.dataset.question,'care');next();assert.equal(d.body.dataset.question,'assets');set(w,'#assets-none',true);next();assert.equal(d.body.dataset.question,'citizenship');d.querySelector('section[data-question="citizenship"] .quick-confirm button').click();assert.equal(d.body.dataset.question,'address');set(w,'#residence-basis','permanent');next();assert.equal(d.body.dataset.question,'result');next();assert.equal(d.body.dataset.question,'result');
  assert.equal(d.querySelector('[data-result-month="2026-10"] .result-answers [data-answer-target*="income-people"]'),null,'filled first salary no missing '+mode);
  for(const button of d.querySelectorAll('[data-answer-target]'))assert.ok(d.querySelector(button.dataset.answerTarget),'complete flow existing selector');dom.window.close();paths++;
 }
@@ -122,11 +123,11 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
 {
  const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'#marital-status','never');set(w,'#applicant-citizen','yes');set(w,'#residence-basis','temporary');section(d,7);
  for(const selector of ['#applicant-residence','#address-proof']){
-  const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target="${selector}"]`);assert.ok(button,'missing answer '+selector);button.click();assert.equal(d.activeElement,d.querySelector(selector));assert.ok(visible(d.activeElement));section(d,7);paths++;
+  const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target="${selector}"]`);assert.ok(button,'missing answer '+selector);button.click();assert.equal(d.activeElement,focusTarget(d.querySelector(selector)));assert.ok(visible(d.activeElement));section(d,7);paths++;
  }
  for(const [field,value] of [['#forecast-mrot-growth',''],['#forecast-pm-growth','']]){
   set(w,'#forecast-pm-growth','0');set(w,'#forecast-mrot-growth','0');set(w,field,value);section(d,7);
-  const button=d.querySelector(`[data-result-month="2027-01"] [data-answer-target="${field}"]`);assert.ok(button,'invalid forecast '+field);assert.match(button.textContent,/Можно поставить 0/);button.click();assert.equal(d.activeElement,d.querySelector(field));assert.ok(visible(d.activeElement));set(w,field,'0');d.querySelector('#result-edit-context button').click();assert.equal(d.body.dataset.question,'result');assert.equal(d.querySelector(`[data-result-month="2027-01"] [data-answer-target="${field}"]`),null);paths++;
+  const button=d.querySelector(`[data-result-month="2027-01"] [data-answer-target="${field}"]`);assert.ok(button,'invalid forecast '+field);assert.match(button.textContent,/Можно поставить 0/);button.click();assert.equal(d.activeElement,focusTarget(d.querySelector(field)));assert.ok(visible(d.activeElement));set(w,field,'0');d.querySelector('#result-edit-context button').click();assert.equal(d.body.dataset.question,'result');assert.equal(d.querySelector(`[data-result-month="2027-01"] [data-answer-target="${field}"]`),null);paths++;
  }
  dom.window.close();
 }
@@ -135,7 +136,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'#marital-status','never');set(w,'input[value="alimony"]',true,'change');
  for(let i=1;i<=2;i++){d.getElementById('add-child').click();set(w,`#children .form-row:nth-child(${i}) .birth`,'2024-01-10');set(w,`#children .form-row:nth-child(${i}) .citizen`,'yes');}
  set(w,'#alimony-received','yes');
- const recover=selector=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] .result-answers [data-answer-target="${selector}"]`);assert.ok(button,'alimony missing '+selector);button.click();assert.ok(visible(d.querySelector(selector)));assert.equal(d.activeElement,d.querySelector(selector));paths++;};
+ const recover=selector=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] .result-answers [data-answer-target="${selector}"]`);assert.ok(button,'alimony missing '+selector);button.click();assert.ok(visible(d.querySelector(selector)));assert.equal(d.activeElement,focusTarget(d.querySelector(selector)));paths++;};
  recover('#alimony-monthly');set(w,'#alimony-monthly','-1');recover('#alimony-monthly');set(w,'#alimony-monthly','10000');recover('#alimony-from');set(w,'#alimony-from','2026-08');recover('#alimony-to');set(w,'#alimony-to','2025-09');recover('#alimony-to');assert.match(d.querySelector('#result-edit-context').textContent,/октябрь 2026/);set(w,'#alimony-from','2025-09');set(w,'#alimony-to','2026-08');section(d,7);assert.equal(d.querySelector('[data-result-month="2026-10"] .result-answers [data-answer-target="#alimony-to"]'),null);paths++;
  section(d,3);d.querySelector('.add-obligation').click();
  // Pick the second child's labelled control; this removes that child from the first payer.
@@ -149,7 +150,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  set(w,'#extra-entries .amount','1000');set(w,'#extra-entries .from','2025-09');set(w,'#extra-entries .to','2026-08');d.getElementById('add-extra').click();
  const prefix='#extra-entries [data-extra-index="1"]';
  for(const [field,value] of [['.amount','2000'],['.from','2025-09'],['.to','2026-08']]){
-  section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${prefix} ${field}']`);assert.ok(button,'second entry '+field);button.click();assert.equal(d.activeElement,d.querySelector(prefix+' '+field));assert.ok(visible(d.activeElement));set(w,prefix+' '+field,value);paths++;
+  section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${prefix} ${field}']`);assert.ok(button,'second entry '+field);button.click();assert.equal(d.activeElement,focusTarget(d.querySelector(prefix+' '+field)));assert.ok(visible(d.activeElement));set(w,prefix+' '+field,value);paths++;
  }
  section(d,7);assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${prefix}']`),null);dom.window.close();paths++;
 }
@@ -157,7 +158,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
 {
  const dom=await boot(),w=dom.window,d=w.document;start(w);set(w,'#pm-region','63');set(w,'input[value="maternity"]',true,'change');
  set(w,'#maternity-payments .amount','250000');set(w,'#maternity-payments .start','2026-01');d.getElementById('add-maternity').click();const prefix='#maternity-payments [data-maternity-index="1"]';
- const recover=field=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${prefix} ${field}']`);assert.ok(button,'second maternity '+field);button.click();assert.equal(d.activeElement,d.querySelector(prefix+' '+field));assert.ok(visible(d.activeElement));paths++;};
+ const recover=field=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${prefix} ${field}']`);assert.ok(button,'second maternity '+field);button.click();assert.equal(d.activeElement,focusTarget(d.querySelector(prefix+' '+field)));assert.ok(visible(d.activeElement));paths++;};
  recover('.amount');set(w,prefix+' .amount','100000');recover('.start');set(w,prefix+' .start','2026-03');set(w,prefix+' .months','2.5');recover('.months');set(w,prefix+' .months','5');d.querySelector('#result-edit-context button').click();assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${prefix}']`),null);paths++;dom.window.close();
 }
 // Each child's benefit has its own period, recipient and manual amount recovery.
@@ -167,7 +168,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  set(w,'#children .form-row:nth-child(2) .applying',false,'change');
  const first='#benefits [data-benefit-index="0"]',second='#benefits [data-benefit-index="1"]';
  set(w,first+' .benefit-amount-mode','manual');set(w,first+' .benefit-child',d.querySelector('#children .form-row').dataset.childId);set(w,first+' .benefit-from','2025-08');set(w,first+' .benefit-to','2026-07');set(w,first+' .benefit-amount','1000');d.getElementById('add-benefit').click();set(w,second+' .benefit-amount-mode','manual');
- const recover=field=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${second} ${field}']`);assert.ok(button,'second benefit '+field);button.click();assert.equal(d.activeElement,d.querySelector(second+' '+field));assert.ok(visible(d.activeElement));paths++;};
+ const recover=field=>{section(d,7);const button=d.querySelector(`[data-result-month="2026-10"] [data-answer-target='${second} ${field}']`);assert.ok(button,'second benefit '+field);button.click();assert.equal(d.activeElement,focusTarget(d.querySelector(second+' '+field)));assert.ok(visible(d.activeElement));paths++;};
  recover('.benefit-from');set(w,second+' .benefit-from','2025-08');recover('.benefit-to');set(w,second+' .benefit-to','2025-07');recover('.benefit-to');set(w,second+' .benefit-to','2026-07');recover('.benefit-child');set(w,second+' .benefit-child',d.querySelector('#children .form-row:nth-child(2)').dataset.childId);recover('.benefit-amount');set(w,second+' .benefit-amount','2000');d.querySelector('#result-edit-context button').click();assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;
  set(w,second+' .benefit-amount-mode','automatic');set(w,second+' .benefit-same-region','yes');set(w,second+' .benefit-tier','100');recover('.benefit-receipts-confirmed');set(w,second+' .benefit-receipts-confirmed',true);section(d,7);assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;
  section(d,3);d.querySelector(`[data-income-target="childBenefit"]`).click();set(w,second+' [data-receipt-month="2025-09"]','');recover('[data-receipt-month="2025-09"]');set(w,second+' [data-receipt-month="2025-09"]','19000');d.querySelector('#result-edit-context button').click();assert.equal(d.querySelector(`[data-result-month="2026-10"] [data-answer-target^='${second}']`),null);paths++;dom.window.close();
@@ -179,7 +180,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  const target='#maternity-payments [data-maternity-index="1"] .amount';
  d.querySelector(`[data-result-month="2027-01"] [data-answer-target='${target}']`).click();set(w,'#save-draft',true,'change');w.dispatchEvent(new w.Event('pagehide'));
  const raw=w.localStorage.getItem('anna-benefit-draft-v1');const restored=await boot(raw),rw=restored.window,rd=rw.document;
- assert.equal(rd.body.dataset.question,'maternity');assert.equal(rd.activeElement,rd.querySelector(target));assert.ok(visible(rd.activeElement));assert.match(rd.querySelector('#result-edit-context').textContent,/январь 2027/);assert.equal(rd.querySelector('#maternity-payments .amount').value,'250000');paths++;
+ assert.equal(rd.body.dataset.question,'maternity');assert.equal(rd.activeElement,focusTarget(rd.querySelector(target)));assert.ok(visible(rd.activeElement));assert.match(rd.querySelector('#result-edit-context').textContent,/январь 2027/);assert.equal(rd.querySelector('#maternity-payments .amount').value,'250000');paths++;
  set(rw,target,'100000');set(rw,'#maternity-payments [data-maternity-index="1"] .start','2026-03');rd.querySelector('#result-edit-context button').click();assert.ok(rd.querySelector('[data-result-month="2027-01"] details').open);rw.dispatchEvent(new rw.Event('pagehide'));
  const returned=await boot(rw.localStorage.getItem('anna-benefit-draft-v1'));assert.equal(returned.window.document.body.dataset.question,'result');assert.ok(!returned.window.document.querySelector('#result-edit-context'));assert.equal(returned.window.document.querySelector(target).value,'100000');paths++;returned.window.close();restored.window.close();
  section(d,2);w.dispatchEvent(new w.Event('pagehide'));const elsewhere=await boot(w.localStorage.getItem('anna-benefit-draft-v1'));assert.equal(elsewhere.window.document.body.dataset.question,d.body.dataset.question);assert.ok(!elsewhere.window.document.querySelector('#result-edit-context'));paths++;elsewhere.window.close();

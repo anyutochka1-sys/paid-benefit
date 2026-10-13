@@ -15,8 +15,8 @@ export function forecastScenario(year,officialPm,officialRules,baselinePm,baseli
   const pm=missingPm?{...baselinePm,year,person:Math.round(baselinePm.person*(1+Number(pmGrowth)/100)),child:Math.round(baselinePm.child*(1+Number(pmGrowth)/100)),working:Math.round(baselinePm.working*(1+Number(pmGrowth)/100))}:officialPm;
   const rules=missingRules?{...baselineRules,mrot:Math.round(baselineRules.mrot*(1+Number(mrotGrowth)/100))}:officialRules;
   const assumptions=[];
-  if(missingPm)assumptions.push(`ПМ: суммы 2026 года, изменение ${Number(pmGrowth)}%; на человека ${pm.person.toLocaleString('ru-RU')} ₽, на ребёнка ${pm.child.toLocaleString('ru-RU')} ₽, для трудоспособного ${pm.working.toLocaleString('ru-RU')} ₽`);
-  if(missingRules)assumptions.push(`МРОТ: сумма 2026 года, изменение ${Number(mrotGrowth)}%; ${rules.mrot.toLocaleString('ru-RU')} ₽`);
+  if(missingPm)assumptions.push(`ПМ 2027 для выбранной территории ещё не загружен. Допущение: суммы ПМ 2026 года, изменение ${Number(pmGrowth)}%; на человека ${pm.person.toLocaleString('ru-RU')} ₽, на ребёнка ${pm.child.toLocaleString('ru-RU')} ₽, для трудоспособного ${pm.working.toLocaleString('ru-RU')} ₽`);
+  if(missingRules)assumptions.push(`Проверенный МРОТ 2027 ещё не загружен. Допущение: сумма МРОТ 2026 года, изменение ${Number(mrotGrowth)}%; ${rules.mrot.toLocaleString('ru-RU')} ₽`);
   assumptions.push('Правила оценки — как в расчёте на 2026 год. Новые условия 2027 года здесь не подтверждены. Суммы доходов и будущие выплаты взяты из ваших ответов');
   return {pm,rules,estimated:true,assumptions};
 }

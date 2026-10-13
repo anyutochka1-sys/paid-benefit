@@ -14,8 +14,9 @@ async function boot(saved){
  w.eval(code.replace(/^import .*?;$/gm,''));return dom;
 }
 function set(w,selector,value,event='input'){const el=w.document.querySelector(selector);assert.ok(el,selector);if(el.type==='checkbox')el.checked=value;else el.value=value;el.dispatchEvent(new w.Event(event,{bubbles:true}));}
+function focusTarget(el){return el?.classList.contains('month-model')?el.closest('.month-picker').querySelector('.month-picker-month'):el;}
 function visible(el){if(!el)return false;for(let node=el;node;node=node.parentElement){if(node.hidden)return false;if(node.tagName==='DETAILS'&&!node.open&&!node.querySelector('summary')?.contains(el))return false;}return true;}
-function section(d,n){d.querySelector(`.step-links button:nth-child(${n})`).click();}
+function section(d,n){d.querySelector(`.step-links button:nth-child(${n})`).click();if(n===3)d.querySelector('.selected-income-details').open=true;}
 function start(w){const d=w.document;d.querySelector('[data-goal=children]').click();section(d,3);}
 let paths=0;const failures=[];
 async function scenario(name,run){if(process.argv.includes('--child-only')&&!name.startsWith('second child income'))return;const dom=await boot();try{await run(dom.window,dom.window.document);console.log('PASS',name);paths++;}catch(error){failures.push({name,message:error.message});console.log('FAIL',name,error.message.slice(0,220));}finally{dom.window.close();}}
@@ -53,7 +54,7 @@ await scenario('missing extra source preselects its own add type',async(w,d)=>{
 });
 await scenario('second child income recovery focuses its own amount and period',async(w,d)=>{
  basic(w);salary(w);const ids=[d.querySelector('#children .form-row').dataset.childId,child(w)];set(w,'input[value="childIncome"]',true,'change');for(const [cls,value] of [['child',ids[0]],['type','other'],['amount','1000'],['from','2025-09'],['to','2026-08']])set(w,'#child-income-entries .'+cls,value);d.getElementById('add-child-income').click();const prefix='#child-income-entries [data-child-income-index="1"]';set(w,'#child-income-entries .form-row:nth-child(2) .child',ids[1]);set(w,'#child-income-entries .form-row:nth-child(2) .type','other');
- for(const [field,value] of [['.amount','2000'],['.from','2025-09'],['.to','2026-08']]){section(d,7);const button=card(d).querySelector(`[data-answer-target='${prefix} ${field}']`);assert.ok(button,'second income '+field);button.click();assert.equal(d.activeElement,d.querySelector(prefix+' '+field));assert.ok(visible(d.activeElement));set(w,prefix+' '+field,value);}
+ for(const [field,value] of [['.amount','2000'],['.from','2025-09'],['.to','2026-08']]){section(d,7);const button=card(d).querySelector(`[data-answer-target='${prefix} ${field}']`);assert.ok(button,'second income '+field);button.click();assert.equal(d.activeElement,focusTarget(d.querySelector(prefix+' '+field)));assert.ok(visible(d.activeElement));set(w,prefix+' '+field,value);}
  d.querySelector('#result-edit-context button').click();assert.match(card(d).textContent,/564.000 ₽/);assert.equal(d.querySelector('#child-income-entries .amount').value,'1000');
 });
 console.log(`CHECKED ${paths} passed, ${failures.length} failed state transitions`);if(failures.length)throw new Error(JSON.stringify(failures));

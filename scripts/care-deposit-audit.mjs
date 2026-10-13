@@ -15,7 +15,7 @@ async function boot(saved){
 }
 function set(w,selector,value,event='input'){const el=w.document.querySelector(selector);assert.ok(el,selector);if(el.type==='checkbox')el.checked=value;else el.value=value;el.dispatchEvent(new w.Event(event,{bubbles:true}));}
 function visible(el){if(!el)return false;for(let node=el;node;node=node.parentElement){if(node.hidden)return false;if(node.tagName==='DETAILS'&&!node.open&&!node.querySelector('summary')?.contains(el))return false;}return true;}
-function section(d,n){d.querySelector(`.step-links button:nth-child(${n})`).click();}
+function section(d,n){d.querySelector(`.step-links button:nth-child(${n})`).click();if(n===3)d.querySelector('.selected-income-details').open=true;}
 function start(w){const d=w.document;d.querySelector('[data-goal=children]').click();section(d,3);}
 let paths=0;
 function basic(w){start(w);for(const [id,value] of [['pm-region','63'],['marital-status','married'],['spouse-status','ordinary'],['applicant-citizen','yes'],['applicant-residence','yes'],['applicant-capacity','none'],['residence-basis','permanent']])set(w,'#'+id,value);set(w,'#assets-none',true);const d=w.document;d.getElementById('add-child').click();for(const [cls,value] of [['birth','2021-01-10'],['citizen','yes'],['applicant-rights','intact'],['second-parent-status','recorded'],['award-recipient','none']])set(w,'#children .'+cls,value);set(w,'input[value="employment"]',true,'change');for(const [i,amount] of [[1,25000],[2,19000]]){const q=`.income-person:nth-child(${i}) `;set(w,q+'.regular-amount',String(amount));set(w,q+'.regular-from','2025-09');set(w,q+'.regular-to','2027-08');set(w,q+'.project-future',true);}}
