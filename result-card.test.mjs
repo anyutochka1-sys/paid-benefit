@@ -37,27 +37,27 @@ test('result dates and income windows use readable Russian months',()=>{
 });
 
 
-test('month-specific answer buttons stay outside collapsed details and escape all values',()=>{
+test('month-specific answer buttons stay inside collapsed details and escape all values',()=>{
   const rendered=resultCard('2027-01-01',['2025-12','2026-11'],'Нужно уточнить ответы',[],'unknown',false,'','Уточните доходы',[
     {label:'Зарплата: ноябрь 2026 <b>',selector:'#income-people [data-income-month="2026-11"]'}
   ]);
   assert.ok(rendered.includes('data-result-month="2027-01"'));
-  assert.ok(rendered.includes('</details><div class="result-answers">'));
+  assert.ok(rendered.indexOf('class="result-answers"')<rendered.indexOf('</details>'));
   assert.ok(rendered.includes('data-application-month="2027-01"'));
   assert.ok(rendered.includes('data-income-month=&quot;2026-11&quot;'));
   assert.ok(rendered.includes('ноябрь 2026 &lt;b&gt;'));
 });
 
 
-test('individual income checks are visible outside details and escaped',()=>{
+test('individual income checks are inside collapsed details and escaped',()=>{
  const html=resultCard('2026-10-01',['2025-09','2026-08'],'Оценка',[],'unknown',false,'','',[],[{label:'Вы <b>',text:'360 000 ₽ — достаточно'},{label:'Супруг',text:'12 000 ₽ — недостаточно'}]);
- assert.ok(html.includes('</details><section class="individual-income-checks">'));
+ assert.ok(html.indexOf('class="individual-income-checks"')<html.indexOf('</details>'));assert.ok(html.includes('Подробности расчёта'));assert.equal(html.includes('<details class="result" open>'),false);
  assert.ok(html.includes('Вы &lt;b&gt;'));assert.ok(html.includes('Доход одного супруга не покрывает'));
  assert.ok(html.includes('360 000 ₽ — достаточно'));assert.ok(html.includes('12 000 ₽ — недостаточно'));
 });
 
 
-test('individual edit buttons retain recipient and filing month outside collapsed details',()=>{
+test('individual edit buttons retain recipient and filing month inside collapsed details',()=>{
  const html=resultCard('2026-10-01',[],'Оценка',[],'unknown',false,'','',[],[{label:'Супруг',text:'Уточните',actions:[{label:'Причины <b>',selector:'#reason-person',personIndex:1}]}]);
- assert.ok(html.includes('data-person-index="1"'));assert.ok(html.includes('data-application-month="2026-10"'));assert.ok(html.includes('Причины &lt;b&gt;'));assert.ok(html.indexOf('data-person-index')>html.indexOf('</details>'));
+ assert.ok(html.includes('data-person-index="1"'));assert.ok(html.includes('data-application-month="2026-10"'));assert.ok(html.includes('Причины &lt;b&gt;'));assert.ok(html.indexOf('data-person-index')<html.indexOf('</details>'));
 });

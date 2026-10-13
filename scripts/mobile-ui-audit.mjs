@@ -60,12 +60,13 @@ d.getElementById('care-helper').open=true;set(w,'#care-child',d.querySelector('#
 month(w,'#care-from','2025-09');month(w,'#care-to','2026-08');d.getElementById('add-care-period').click();next(d);
 assert.equal(d.body.dataset.question,'assets');set(w,'#asset-house',true);set(w,'#asset-apartment',true);next(d);
 assert.equal(d.body.dataset.question,'property');assert.equal(d.querySelector('#properties .form-row:not([hidden]) .type').value,'apartment','apartment comes before a house even if selected later');
-assert.equal(visible(d.querySelector('#properties .form-row:not([hidden]) .area')),false,'a single apartment has no redundant area question');next(d);
-assert.equal(d.querySelector('#properties .form-row:not([hidden]) .type').value,'house');next(d);
+assert.equal(visible(d.querySelector('#properties .form-row:not([hidden]) .area')),true,'area is visible for every apartment');set(w,'#properties .form-row:not([hidden]) .area','55');next(d);
+assert.equal(d.querySelector('#properties .form-row:not([hidden]) .type').value,'house');assert.equal(visible(d.querySelector('#properties .form-row:not([hidden]) .area')),true);set(w,'#properties .form-row:not([hidden]) .area','90');next(d);
 assert.equal(d.body.dataset.question,'property-summary');next(d);assert.equal(d.body.dataset.question,'citizenship');
 d.querySelector('section[data-question=citizenship] .quick-confirm button').click();set(w,'#residence-basis','permanent');next(d);
 assert.equal(d.body.dataset.question,'result');
 const result=d.querySelector('[data-result-month="2026-10"]');assert.match(result.textContent,/Предварительный расчёт готов/);
+assert.ok(result.querySelector('.individual-income-checks').closest('details.result'));assert.equal(result.querySelector('details.result').open,false);
 assert.equal(result.querySelector('.result-answers'),null,'complete first-month questionnaire must not ask for missing answers');
 const pm=pmFor(2026,'63');
 assert.match(result.textContent,new RegExp(pm.child.toLocaleString('ru-RU').replace(/\u00a0/g,'.')));

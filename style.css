@@ -175,3 +175,5 @@ body[data-question=goal] .draft-tools { margin-bottom:12px }
 .salary-mode { margin:0 0 18px }.income-person > h3 { display:none }.rare-income { padding:8px 0;border-top:1px solid var(--line) }.child-summary { margin-bottom:16px }.child-summary .review-link { width:100%;padding:10px 0 }
 
 .completion-check.only-future { background:transparent;padding:0;margin:0 0 12px }.completion-check.only-future > h3,.completion-check.only-future > p { display:none }.completion-check.only-future .future-answers { margin:0 }.completion-check.only-future summary { font-size:.9rem }
+
+.result-expand { display:block;font-size:.9rem;color:var(--teal);font-weight:500;text-decoration:underline }.result > summary { flex-wrap:wrap }.result-expand { flex-basis:100% }.result-detail > .individual-income-checks { margin:16px 0 }.result-detail > .result-answers { padding:0 0 16px }
