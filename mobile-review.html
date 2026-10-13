@@ -13,5 +13,5 @@
 </style>
 <header><label>Ширина экрана <select id="width"><option>320</option><option>360</option><option selected>390</option><option>430</option><option>768</option></select> px</label><span>Проверка мобильного вида</span></header>
 <main><iframe title="Калькулятор на мобильном экране" src="index.html"></iframe></main>
-<script>document.querySelector('#width').onchange=e=>document.querySelector('iframe').style.width=e.target.value+'px';</script>
+<script>document.querySelector('iframe').src='index.html'+location.search;document.querySelector('#width').onchange=e=>document.querySelector('iframe').style.width=e.target.value+'px';</script>
 </html>

@@ -112,6 +112,9 @@ if(process.env.BASELINE_ROOT){
  assert.equal(fd.querySelector('#extra-entries .amount').validity.valid,true);fd.getElementById('next').click();assert.equal(fd.body.dataset.question,'extra-income');assert.match(fd.getElementById('step-review').textContent,/раньше первого/);
  month(fw,'#extra-entries .from','2025-09');month(fw,'#extra-entries .to','2026-08');next(fd);assert.equal(fd.body.dataset.question,'care');
  fd.getElementById('add').click();month(fw,'#reasons .from','2026-08');month(fw,'#reasons .to','2025-09');fd.getElementById('next').click();assert.equal(fd.body.dataset.question,'care');assert.match(fd.getElementById('step-review').textContent,/раньше первого/);
+ section(fd,5);next(fd);next(fd);assert.equal(fd.body.dataset.question,'property-summary');fd.querySelector('.property-adds button[data-kind="apartment"]').click();
+ assert.notEqual(fd.body.dataset.question,'property-summary','adding another object opens its own card');assert.equal(fd.querySelector('#properties .form-row:not([hidden])'),fd.querySelector('#properties .form-row:last-child'));assert.equal(fd.activeElement,fd.querySelector('#properties .form-row:last-child .area'));
+ set(fw,'#properties .form-row:last-child .area','48.25');next(fd);assert.equal(fd.body.dataset.question,'property-summary');
  const loaded=await boot(save(fw)),ld=loaded.window.document;assert.equal(ld.querySelector('#properties .area').value,'55.5');assert.equal(ld.querySelector('#properties .share').value,'66.67');assert.equal(ld.querySelector('#extra-entries .amount').value,'15000.25');loaded.window.close();fractional.window.close();checks++;
 }
 // Printing expands every detail and restores the client's compact view afterwards.

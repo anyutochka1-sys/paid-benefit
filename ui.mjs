@@ -1,30 +1,30 @@
-import {enhanceMonthInputs} from './month-picker.mjs?v=20261013-mobile4';
-import {pmZones,zoneValue} from './pm-zones.mjs?v=20261013-mobile4';
-import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261013-mobile4';
-import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261013-mobile4';
-import {createGuidedFlow} from './guided-flow.mjs?v=20261013-mobile4';
-import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261013-mobile4';
-import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261013-mobile4';
+import {enhanceMonthInputs} from './month-picker.mjs?v=20261013-mobile5';
+import {pmZones,zoneValue} from './pm-zones.mjs?v=20261013-mobile5';
+import {searchableSelect,syncSearchableSelect} from './searchable-select.mjs?v=20261013-mobile5';
+import {unifiedReceiptSuggestion,receiptAmount,receiptContext,benefitMonthForReceipt} from './benefit-amounts.mjs?v=20261013-mobile5';
+import {createGuidedFlow} from './guided-flow.mjs?v=20261013-mobile5';
+import {forecastScenario,forecastSettingsIssue} from './forecast-scenario.mjs?v=20261013-mobile5';
+import {resultCard,childLabel,monthLabel,dateLabel} from './result-card.mjs?v=20261013-mobile5';
 import {comparePriorSupport} from './prior-support.mjs';
 import {applicantCapacity} from './applicant-capacity.mjs';
 import {officialRate,withOfficialRates} from './cbr-rates.mjs';
 let cbrRateTable=null;
 import { incomeWindow, minimumIncomeTest, reasonPeriod, applicationDateForMonth, monthIndex, monthString, RULES } from './engine.mjs?v=20260930-12';
-import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261013-mobile4';
-import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261013-mobile4';
-import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs?v=20261013-mobile4';
-import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261013-mobile4';
-import {alimonyForApplication,allocatedAlimonyIncome,alimonyReceiptIssue} from './alimony.mjs?v=20261013-mobile4';
+import { includedFamily, childCanApply, applicationChildren, applicantParentalRights, checkCars, ageAt, fourChildCarStatus } from './family-assets.mjs?v=20261013-mobile5';
+import {incomeForMonth,childTier,regularIncomeMonths} from './income.mjs?v=20261013-mobile5';
+import {checkProperty,checkOtherVehicles,checkDepositInterest,depositIncomeForApplication} from './property.mjs?v=20261013-mobile5';
+import {CHILD_BENEFIT_KINDS,childBenefitIncome,expandBenefitPayments,benefitReceiptRange} from './benefits.mjs?v=20261013-mobile5';
+import {alimonyForApplication,allocatedAlimonyIncome,alimonyReceiptIssue} from './alimony.mjs?v=20261013-mobile5';
 import {soleParentStatus} from './parental-status.mjs';
 import {newbornShortcut} from './newborn.mjs?v=20260930-8';
-import {maternityIncomeForApplication,maternityPaymentIssue} from './maternity.mjs?v=20261013-mobile4';
-import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261013-mobile4';
-import {childIncomeForApplication} from './child-income.mjs?v=20261013-mobile4';
+import {maternityIncomeForApplication,maternityPaymentIssue} from './maternity.mjs?v=20261013-mobile5';
+import {ADDITIONAL_TYPES,OTHER_BENEFIT_KINDS,additionalIncomeForApplication,foreignRateDate} from './extra-income.mjs?v=20261013-mobile5';
+import {childIncomeForApplication} from './child-income.mjs?v=20261013-mobile5';
 import {awardConflict} from './award-conflict.mjs';
 import {largeFamilyGrace} from './large-family-grace.mjs';
-import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261013-mobile4';
+import {pmRegions,pmAreas,pmFor} from './regional-pm.mjs?v=20261013-mobile5';
 import {pregnancyTier,pregnancyAtDate} from './pregnancy.mjs';
-import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261013-mobile4';
+import {confirmedRegionalWage} from './rosstat-wages.mjs?v=20261013-mobile5';
 import {familyAssets} from './asset-owners.mjs';
 import {adultStudentChecks} from './adult-student.mjs';
 const $ = id => document.getElementById(id);
@@ -561,7 +561,7 @@ function addProperty(requestedType) {
   if($('asset-'+row.querySelector('.type').value))$('asset-'+row.querySelector('.type').value).checked=true;
   if($('assets-none'))$('assets-none').checked=false;
   bindRow(row); const toggle=()=>{const type=row.querySelector('.type').value;row.querySelector('.area-field').hidden=!['apartment','house'].includes(type);row.querySelector('.land-field').hidden=type!=='land';render()}; row.querySelector('.type').addEventListener('input',toggle);
-  $('properties').append(row);toggle();
+  $('properties').append(row);toggle();return row;
 }
 function addOtherVehicle() {
   const row=document.createElement('div');row.className='form-row';
@@ -1118,7 +1118,7 @@ originalPanels[4].querySelector('h2').textContent='Имущество семьи
 originalPanels[4].querySelector(':scope > p:not(.hint)').remove();
 $('add-property').hidden=true;originalPanels[4].querySelector('.section-heading').after(assetPicker);
 const propertyAdds=document.createElement('div');propertyAdds.className='property-adds';
-for(const [kind,title] of assetKinds.filter(([kind])=>!['car','vehicle'].includes(kind))){const button=document.createElement('button');button.type='button';button.dataset.kind=kind;button.textContent='+ Ещё: '+title.toLowerCase();button.onclick=()=>addProperty(kind);propertyAdds.append(button)}
+for(const [kind,title] of assetKinds.filter(([kind])=>!['car','vehicle'].includes(kind))){const button=document.createElement('button');button.type='button';button.dataset.kind=kind;button.textContent='+ Ещё: '+title.toLowerCase();button.onclick=()=>{const row=addProperty(kind);guidedFlow?.revealField(row);row.scrollIntoView({block:'start',behavior:'auto'});row.querySelector(['apartment','house'].includes(kind)?'.area':kind==='land'?'.hectares':'.share').focus()};propertyAdds.append(button)}
 $('properties').after(propertyAdds);
 const vehicleFields=document.createElement('div');vehicleFields.id='vehicle-fields';const vehicleHeading=$('add-vehicle').closest('.section-heading');vehicleHeading.before(vehicleFields);vehicleFields.append(vehicleHeading,vehicleHeading.nextElementSibling,$('other-vehicles'));
 // The support details were originally next to the heading; retain them inside this group.
@@ -1179,7 +1179,7 @@ function showStep(index) {
 $('back').onclick=()=>showStep(currentStep-1);
 $('next').onclick=()=>{if(!reviewStep())showStep(currentStep+1)};
 render();showStep(0);
-fetch('./data/rosstat-wages.json?v=20261013-mobile4').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
+fetch('./data/rosstat-wages.json?v=20261013-mobile5').then(response=>{if(!response.ok)throw new Error('No wage data');return response.json()}).then(table=>{rosstatAnnualTable=table;renderAlimonyWageYears();render()}).catch(()=>{/* Manual entry remains available. */});
 
 fetch('./data/cbr-rates.json').then(response=>{if(!response.ok)throw new Error('No CBR data');return response.json()}).then(table=>{cbrRateTable=table;renderExtraRows();render()}).catch(()=>{/* Date-specific manual entry remains available. */});
 
