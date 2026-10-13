@@ -97,7 +97,7 @@ for(const mode of ['period','monthly','total'])for(const married of [false,true]
  for(const [index,amount] of [[1,'30000'],[2,'0']]){const q=`#income-people .income-person:nth-child(${index}) `;set(w,q+'.regular-amount',amount);set(w,q+'.regular-from','2025-09');set(w,q+'.regular-to','2026-08');}
  set(w,'input[value="selfEmployed"]',true,'change');const q='#extra-entries [data-income-source="selfEmployed"] ';set(w,q+'.person','1');section(d,7);
  const checks=()=>[...d.querySelectorAll('[data-result-month="2026-10"] .individual-income-check')];
- assert.equal(checks().length,2);assert.ok(visible(checks()[0]));assert.match(checks()[0].textContent,/360.000.*Дохода достаточно/);assert.match(checks()[1].textContent,/нужно уточнить/);paths++;
+ assert.equal(checks().length,2);const detail=checks()[0].closest('details.result');assert.equal(detail.open,false,'income checks are initially collapsed');detail.querySelector('summary').click();assert.ok(visible(checks()[0]));assert.match(checks()[0].textContent,/360.000.*Дохода достаточно/);assert.match(checks()[1].textContent,/нужно уточнить/);paths++;
  set(w,q+'.amount','1000');set(w,q+'.from','2025-09');set(w,q+'.to','2026-08');assert.match(checks()[1].textContent,/12.000.*Дохода недостаточно/);assert.match(checks()[0].textContent,/360.000.*Дохода достаточно/);paths++;
  set(w,q+'.person','0');assert.match(checks()[0].textContent,/372.000.*Дохода достаточно/);assert.match(checks()[1].textContent,/0 ₽.*Дохода недостаточно/);paths++;
  set(w,q+'.person','1');set(w,q+'.amount','30000');assert.match(checks()[1].textContent,/360.000.*Дохода достаточно/);paths++;

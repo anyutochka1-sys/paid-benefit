@@ -21,7 +21,7 @@ export function checkProperty(items, {familySize, rural, multipleChildren, disab
     const objects=group(type).filter(x=>!(type==='apartment'&&(x.uninhabitable||x.severeIllnessResidence)));
     if(objects.length>=2) {
       const hasShares=objects.some(x=>x.familyShare<1);
-      if(objects.some(x=>!Number.isFinite(x.area))) review.push(`Укажите площадь всех ${label}`);
+      if(objects.some(x=>!Number.isFinite(x.area)||x.area<=0)) review.push(`Укажите площадь всех ${label}`);
       else if(objects.reduce((s,x)=>s+x.area,0)>limit*familySize && !hasShares) reasons.push(`Площадь ${label} при наличии нескольких объектов выше ${limit} м² на человека`);
       if(hasShares) review.push(`Проверьте площадь учитываемых долей ${label} по выписке ЕГРН: общая площадь объектов сама по себе не даёт окончательного вывода`);
     }
@@ -31,7 +31,7 @@ export function checkProperty(items, {familySize, rural, multipleChildren, disab
   }
   const land=group('land').filter(x=>!x.agriculturalExcluded && !x.farEastHectare);
   if(land.length && rural===undefined) review.push('Уточните место жительства для порога земли: 0,25 га или 1 га');
-  if(land.some(x=>!Number.isFinite(x.hectares))) review.push('Нужна площадь земельных участков');
+  if(land.some(x=>!Number.isFinite(x.hectares)||x.hectares<=0)) review.push('Нужна площадь земельных участков');
   else if(rural!==undefined && land.reduce((s,x)=>s+x.hectares,0)>(rural?1:.25)) reasons.push('Площадь земельных участков выше допустимой');
   if(relevant.some(x=>!['apartment','house','garden','nonresidential','garage','land'].includes(x.type))) review.push('Есть объект недвижимости, для которого пока нет правила');
   return {status:reasons.length?'no':review.length?'review':'yes',reasons,review};

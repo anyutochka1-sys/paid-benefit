@@ -101,4 +101,23 @@ if(process.env.BASELINE_ROOT){
   for(const [selector,value] of [['#start','2026-10'],['#deposits .interest','1234'],['#deposits .closed','2026-02'],['#deposits .forecast-interest','0']])assert.equal(ud.querySelector(selector).value,value);
   old.window.close();upgraded.window.close();checks++;
 }
+// Fractional area, ownership and money must remain valid and survive reload.
+{
+ const fractional=await boot(),fw=fractional.window,fd=fw.document;
+ fd.querySelector('[data-goal=children]').click();set(fw,'#pm-region','63');set(fw,'#asset-apartment',true);section(fd,5);next(fd);
+ set(fw,'#properties .area','0');fd.getElementById('next').click();assert.equal(fd.body.dataset.question,'property');assert.equal(fd.querySelector('#properties .area').validity.valid,false);set(fw,'#properties .area','55.5');set(fw,'#properties .share','66.67');
+ assert.equal(fd.querySelector('#properties .area').validity.valid,true);assert.equal(fd.querySelector('#properties .share').validity.valid,true);next(fd);assert.equal(fd.body.dataset.question,'property-summary');
+ set(fw,'input[value="pension"]',true,'change');section(fd,3);next(fd);
+ set(fw,'#extra-entries .amount','15000.25');month(fw,'#extra-entries .from','2026-08');month(fw,'#extra-entries .to','2025-09');
+ assert.equal(fd.querySelector('#extra-entries .amount').validity.valid,true);fd.getElementById('next').click();assert.equal(fd.body.dataset.question,'extra-income');assert.match(fd.getElementById('step-review').textContent,/раньше первого/);
+ month(fw,'#extra-entries .from','2025-09');month(fw,'#extra-entries .to','2026-08');next(fd);assert.equal(fd.body.dataset.question,'care');
+ fd.getElementById('add').click();month(fw,'#reasons .from','2026-08');month(fw,'#reasons .to','2025-09');fd.getElementById('next').click();assert.equal(fd.body.dataset.question,'care');assert.match(fd.getElementById('step-review').textContent,/раньше первого/);
+ const loaded=await boot(save(fw)),ld=loaded.window.document;assert.equal(ld.querySelector('#properties .area').value,'55.5');assert.equal(ld.querySelector('#properties .share').value,'66.67');assert.equal(ld.querySelector('#extra-entries .amount').value,'15000.25');loaded.window.close();fractional.window.close();checks++;
+}
+// Printing expands every detail and restores the client's compact view afterwards.
+{
+ section(rd,7);const details=[...rd.querySelectorAll('#results details')];assert.ok(details.length);const before=details.map(el=>el.open);
+ restored.window.print=()=>{assert.ok(details.every(el=>el.open),'print contains full explanations');restored.window.dispatchEvent(new restored.window.Event('afterprint'));};
+ rd.getElementById('print-results').click();assert.deepEqual(details.map(el=>el.open),before);checks++;
+}
 dom.window.close();restored.window.close();console.log(`PASS ${checks} complete mobile and draft regression scenarios`);

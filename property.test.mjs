@@ -82,3 +82,13 @@ test('ward nominal account is excluded from threshold and income',()=>{
 });
 
 test('nominal ward account stays excluded even without next-year interest',()=>{assert.equal(checkDepositInterest([{nominalWardAccount:true,interestForRelevantTaxYear:undefined}],{applicationMonth:'2027-01',perCapitaMinimum:20000}).status,'yes');});
+
+test('invalid housing or land area cannot bypass property limits',()=>{
+  for(const area of [0,-100,NaN]){
+    assert.equal(checkProperty([{type:'apartment',area:100},{type:'apartment',area}],context).status,'review');
+    assert.equal(checkProperty([{type:'house',area:200},{type:'house',area}],context).status,'review');
+    assert.equal(checkProperty([{type:'land',hectares:area}],context).status,'review');
+  }
+  assert.equal(checkProperty([{type:'apartment',area:48.01},{type:'apartment',area:48}],context).status,'no');
+  assert.equal(checkProperty([{type:'land',hectares:0.25001}],context).status,'no');
+});

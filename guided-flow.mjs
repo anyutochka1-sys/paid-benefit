@@ -127,6 +127,14 @@ export function createGuidedFlow({steps,showSection,render,sourceEnabled,parents
     if(active.el.closest('#properties')&&active.el.querySelector('.type').value==='land'&&!$('rural').value)issue.push($('rural'));
     if(active.id==='alimony'&&!$('marital-status').value){message='Сначала укажите семейное положение: от него зависят вопросы об алиментах.';}
     if(['salary','salary-spouse'].includes(active.id)&&$('income-mode').value==='period'){for(const row of active.el.querySelectorAll('.form-row')){const from=row.querySelector('.regular-from'),to=row.querySelector('.regular-to');if(from.value&&to.value&&from.value>to.value){issue.push(to);message='Последний месяц зарплаты не может быть раньше первого.';}}}
+    for(const row of [...(active.el.matches('.form-row,.reason')?[active.el]:[]),...active.el.querySelectorAll('.form-row,.reason')]){
+      const from=row.querySelector('input.from'),to=row.querySelector('input.to');
+      if(from&&to&&isVisibleField(from)&&isVisibleField(to)&&from.value&&to.value&&from.value>to.value){issue.push(to);message='Последний месяц периода не может быть раньше первого.';}
+    }
+    if(active.id==='alimony'){
+      const from=$('alimony-from'),to=$('alimony-to');
+      if(isVisibleField(from)&&isVisibleField(to)&&from.value&&to.value&&from.value>to.value){issue.push(to);message='Последний месяц поступления алиментов не может быть раньше первого.';}
+    }
     if(active.id==='maternity'&&!$('maternity-payments').children.length)message='Добавьте выплату декретных или снимите её выбор в разделе доходов.';
     if(active.id==='benefits'){
       if(!$('benefits').children.length)message='Добавьте пособие или снимите его выбор в разделе доходов.';
